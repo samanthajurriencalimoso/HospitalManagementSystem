@@ -1,8 +1,6 @@
 package Left_Sidebar;
 
 import static Color_Palette.ColorPalette.*;
-import Dashboard.Admin_Dashboard;
-import Dashboard.Doctor_Dashboard;
 import Dashboard.Nurse_Dashboard;
 import java.awt.*;
 import javax.swing.*;
@@ -34,16 +32,14 @@ public class Nurse_SideBarFrame extends JFrame{
         lblSearch.setFont(new Font("Calibri", Font.PLAIN, 18));
         header.add(lblSearch);
         
-        JLabel lblNurseName = new JLabel("Nurse | Nr. Angela Reyes");
+        JLabel lblNurseName = new JLabel("Nurse | Angela Cruz");
         lblNurseName.setFont(new Font("Calibri", Font.BOLD, 20));
         lblNurseName.setBounds(1170, 15, 350, 40);
         header.add(lblNurseName);
         
-        ImageIcon imgNurse = new ImageIcon("C:\\Users\\Jm's Laptop\\Documents\\NetBeansProjects\\HospitalManagement\\src\\resources\\NURSE.PHOTO.png");
-        Image imgNur = imgNurse.getImage();
-        Image imgNurScaled = imgNur.getScaledInstance(60, 60, Image.SCALE_SMOOTH);
-
-        JLabel lblNurseIcon = new JLabel(new ImageIcon(imgNurScaled));
+        ImageIcon imgNurse = new ImageIcon(getClass().getResource("/resources/NURSE.PHOTO.png"));
+        Image imgNur = imgNurse.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+        JLabel lblNurseIcon = new JLabel(new ImageIcon(imgNur));
         lblNurseIcon.setBounds(1420, 13, 60, 60);
         header.add(lblNurseIcon);
 

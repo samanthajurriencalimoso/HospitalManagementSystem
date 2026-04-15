@@ -14,11 +14,9 @@ public class Admin_Sidebar extends JPanel{
         leftSidebar.setBackground(new Color(0x39, 0x5A, 0x7F));
         add(leftSidebar);
         
-        ImageIcon imgDlogo = new ImageIcon("C:\\Users\\Jm's Laptop\\Downloads\\eTriage.Logo.png");
-        Image imgbg = imgDlogo.getImage();
-        Image imgScaled = imgbg.getScaledInstance(180, 180, Image.SCALE_SMOOTH);
-        
-        JLabel lblLogo = new JLabel(new ImageIcon(imgScaled));
+        ImageIcon imgDlogo = new ImageIcon(getClass().getResource("/resources/eTriage.Logo.png"));
+        Image imgbg = imgDlogo.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+        JLabel lblLogo = new JLabel(new ImageIcon(imgbg));
         lblLogo.setBounds(60, 40, 180, 180);
         leftSidebar.add(lblLogo);
         
@@ -56,7 +54,7 @@ public class Admin_Sidebar extends JPanel{
         btnUManagement.setMargin(new Insets(0, 10, 0, 0));
         leftSidebar.add(btnUManagement);
         
-        JButton btnPInfo = new JButton("Patient Information");
+        JButton btnPInfo = new JButton("Patient Central");
         btnPInfo.setBounds(20, 380, 260, 45);
         btnPInfo.setFont(new Font("Calibri", Font.BOLD, 20));
         btnPInfo.setForeground(Color.WHITE);

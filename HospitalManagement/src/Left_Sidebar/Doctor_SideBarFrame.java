@@ -37,11 +37,9 @@ public class Doctor_SideBarFrame extends JFrame{
         lblDoctorName.setBounds(1170, 15, 350, 40);
         header.add(lblDoctorName);
         
-        ImageIcon imgDoctor = new ImageIcon("C:\\Users\\Jm's Laptop\\Documents\\NetBeansProjects\\HospitalManagement\\src\\resources\\DOCTOR.PHOTO.png");
-        Image imgDoc = imgDoctor.getImage();
-        Image imgDocScaled = imgDoc.getScaledInstance(60, 60, Image.SCALE_SMOOTH);
-
-        JLabel lblDoctorIcon = new JLabel(new ImageIcon(imgDocScaled));
+        ImageIcon imgDoctor = new ImageIcon(getClass().getResource("/resources/DOCTOR.PHOTO.png"));
+        Image imgDoc = imgDoctor.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+        JLabel lblDoctorIcon = new JLabel(new ImageIcon(imgDoc));
         lblDoctorIcon.setBounds(1420, 13, 60, 60);
         header.add(lblDoctorIcon);
 

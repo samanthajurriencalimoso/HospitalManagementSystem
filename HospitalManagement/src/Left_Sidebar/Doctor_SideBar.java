@@ -16,11 +16,9 @@ public class Doctor_SideBar extends JPanel{
         leftSidebar.setBackground(darkBlue);
         add(leftSidebar);
         
-        ImageIcon imgDlogo = new ImageIcon("C:\\Users\\Jm's Laptop\\Downloads\\eTriage.Logo.png");
-        Image imgbg = imgDlogo.getImage();
-        Image imgScaled = imgbg.getScaledInstance(180, 180, Image.SCALE_SMOOTH);
-        
-        JLabel lblLogo = new JLabel(new ImageIcon(imgScaled));
+        ImageIcon imgDlogo = new ImageIcon(getClass().getResource("/resources/eTriage.Logo.png"));
+        Image imgbg = imgDlogo.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+        JLabel lblLogo = new JLabel(new ImageIcon(imgbg));
         lblLogo.setBounds(60, 40, 180, 180);
         leftSidebar.add(lblLogo);
         

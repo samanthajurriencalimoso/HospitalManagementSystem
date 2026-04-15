@@ -45,7 +45,7 @@ public class Admin_SideBarFrame extends JFrame{
         lblDoctorName.setBounds(1170, 15, 350, 40);
         header.add(lblDoctorName);
         
-        ImageIcon imgDoctor = new ImageIcon("C:\\Users\\Jm's Laptop\\Downloads\\ADMIN.PHOTO.png");
+        ImageIcon imgDoctor = new ImageIcon(getClass().getResource("/resources/ADMIN.PHOTO.png"));
         Image imgDoc = imgDoctor.getImage();
         Image imgDocScaled = imgDoc.getScaledInstance(60, 60, Image.SCALE_SMOOTH);
 

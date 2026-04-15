@@ -104,11 +104,9 @@ public class Doctor_Dashboard extends JPanel{
         pnlRecent.setBackground(Color.WHITE);
         pnlMain.add(pnlRecent);
         
-        ImageIcon imgPatient = new ImageIcon("C:\\Users\\Jm's Laptop\\Downloads\\PATIENT.PHOTO.png");
-        Image imgPat = imgPatient.getImage();
-        Image imgPatScaled = imgPat.getScaledInstance(180, 180, Image.SCALE_SMOOTH);
-
-        JLabel lblPatientIcon = new JLabel(new ImageIcon(imgPatScaled));
+        ImageIcon imgPatient = new ImageIcon(getClass().getResource("/resources/PATIENT.PHOTO.png"));
+        Image imgPat = imgPatient.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+        JLabel lblPatientIcon = new JLabel(new ImageIcon(imgPat));
         lblPatientIcon.setBounds(110, 20, 180, 180);
         pnlRecent.add(lblPatientIcon);
         
@@ -275,43 +273,40 @@ public class Doctor_Dashboard extends JPanel{
         pnlSelection.setBackground(Color.WHITE);
         pnlMain.add(pnlSelection);
 
-        Font actionFont = new Font("Calibri", Font.BOLD, 18);
-        Color borderColor = Color.BLACK;
-
         JButton btnViewSched = new JButton("View Schedule");
         btnViewSched.setBounds(40, 55, 200, 65);
-        btnViewSched.setFont(actionFont);
+        btnViewSched.setFont(new Font("Calibri", Font.BOLD, 18));
         btnViewSched.setBackground(Green);
         btnViewSched.setForeground(Color.BLACK);
         btnViewSched.setFocusPainted(false);
-        btnViewSched.setBorder(BorderFactory.createLineBorder(borderColor, 2));
+        btnViewSched.setBorder(BorderFactory.createLineBorder(borderBLACK, 2));
         pnlSelection.add(btnViewSched);
 
         JButton btnPatientRecord = new JButton("Patient Record");
         btnPatientRecord.setBounds(280, 55, 200, 65);
-        btnPatientRecord.setFont(actionFont);
+        btnPatientRecord.setFont(new Font("Calibri", Font.BOLD, 18));
         btnPatientRecord.setBackground(Blue);
         btnPatientRecord.setForeground(Color.BLACK);
         btnPatientRecord.setFocusPainted(false);
-        btnPatientRecord.setBorder(BorderFactory.createLineBorder(borderColor, 2));
+        btnPatientRecord.setBorder(BorderFactory.createLineBorder(borderBLACK, 2));
         pnlSelection.add(btnPatientRecord);
 
         JButton btnAddAppointment = new JButton("Add Appointment");
         btnAddAppointment.setBounds(40, 140, 200, 65);
-        btnAddAppointment.setFont(actionFont);
+        btnAddAppointment.setFont(new Font("Calibri", Font.BOLD, 18));
         btnAddAppointment.setBackground(Yellow);
         btnAddAppointment.setForeground(Color.BLACK);
         btnAddAppointment.setFocusPainted(false);
-        btnAddAppointment.setBorder(BorderFactory.createLineBorder(borderColor, 2));
+        btnAddAppointment.setBorder(BorderFactory.createLineBorder(borderBLACK, 2));
         pnlSelection.add(btnAddAppointment);
 
         JButton btnWriteNote = new JButton("Write Note");
         btnWriteNote.setBounds(280, 140, 200, 65);
-        btnWriteNote.setFont(actionFont);
+        btnWriteNote.setFont(new Font("Calibri", Font.BOLD, 18));
         btnWriteNote.setBackground(LightRed);
         btnWriteNote.setForeground(Color.BLACK);
         btnWriteNote.setFocusPainted(false);
-        btnWriteNote.setBorder(BorderFactory.createLineBorder(borderColor, 2));
+        btnWriteNote.setBorder(BorderFactory.createLineBorder(borderBLACK, 2));
         pnlSelection.add(btnWriteNote);
         
         

@@ -24,3 +24,4 @@ hs_err_pid*
 replay_pid*
 /HospitalManagement/nbproject/private/
 /HospitalManagement/build/
+/HospitalManagement/dist/

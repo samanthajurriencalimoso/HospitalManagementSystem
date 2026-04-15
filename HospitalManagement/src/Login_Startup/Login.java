@@ -2,6 +2,7 @@ package Login_Startup;
 
 import Dashboard.Admin_Dashboard;
 import Dashboard.Doctor_Dashboard;
+import Dashboard.Nurse_Dashboard;
 import Left_Sidebar.Admin_SideBarFrame;
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +27,7 @@ public class Login extends JFrame implements ActionListener{
         setLayout(null);
         setLocationRelativeTo(null);
         
-        ImageIcon imgBg = new ImageIcon("C:/Users/Jm's Laptop/Downloads/OOP - LOGIN BG.jpg");
+        ImageIcon imgBg = new ImageIcon(getClass().getResource("/resources/OOP - LOGIN BG.jpg"));
         Image BgImage = imgBg.getImage().getScaledInstance(1920, 1080, Image.SCALE_SMOOTH);
         JLabel lblbackground = new JLabel(new ImageIcon(BgImage));
         lblbackground.setBounds(0, 0, 1920, 1080);
@@ -130,6 +131,10 @@ public class Login extends JFrame implements ActionListener{
                 dispose();
             } else if (user.equals("doctor") && pass.equals("doctor123")) {
                 Doctor_Dashboard dc = new Doctor_Dashboard();
+                dc.setVisible(true);
+                dispose();
+            } else if (user.equals("nurse") && pass.equals("nurse123")) {
+                Nurse_Dashboard dc = new Nurse_Dashboard();
                 dc.setVisible(true);
                 dispose();
             } else {
