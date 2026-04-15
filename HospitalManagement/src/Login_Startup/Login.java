@@ -1,9 +1,8 @@
 package Login_Startup;
 
-import Dashboard.Admin_Dashboard;
-import Dashboard.Doctor_Dashboard;
-import Dashboard.Nurse_Dashboard;
 import Left_Sidebar.Admin_SideBarFrame;
+import Left_Sidebar.Doctor_SideBarFrame;
+import Left_Sidebar.Nurse_SideBarFrame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -130,12 +129,12 @@ public class Login extends JFrame implements ActionListener{
                 ad.setVisible(true);
                 dispose();
             } else if (user.equals("doctor") && pass.equals("doctor123")) {
-                Doctor_Dashboard dc = new Doctor_Dashboard();
+                Doctor_SideBarFrame dc = new Doctor_SideBarFrame();
                 dc.setVisible(true);
                 dispose();
             } else if (user.equals("nurse") && pass.equals("nurse123")) {
-                Nurse_Dashboard dc = new Nurse_Dashboard();
-                dc.setVisible(true);
+                Nurse_SideBarFrame nr = new Nurse_SideBarFrame();
+                nr.setVisible(true);
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Invalid credentials!", "Login Error", JOptionPane.ERROR_MESSAGE);

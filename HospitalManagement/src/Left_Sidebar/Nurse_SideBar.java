@@ -1,12 +1,19 @@
 package Left_Sidebar;
 
 import static Color_Palette.ColorPalette.*;
+import Login_Startup.Login;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 
-public class Nurse_SideBar extends JPanel{
+public class Nurse_SideBar extends JPanel implements ActionListener{
 
+    private JButton btnLogout;
+    private Nurse_SideBarFrame navPage;
+    
     public Nurse_SideBar(Nurse_SideBarFrame navPage) {
+        this.navPage = navPage;
         setLayout(null);
         //Left Sidebar
         JPanel leftSidebar = new JPanel();
@@ -225,7 +232,7 @@ public class Nurse_SideBar extends JPanel{
         rbtnDarkMode.setOpaque(true);
         leftSidebar.add(rbtnDarkMode);
         
-        JButton btnLogout = new JButton("Logout");
+        btnLogout = new JButton("Logout");
         btnLogout.setBounds(20, 930, 260, 45);
         btnLogout.setFont(new Font("Calibri", Font.BOLD, 18));
         btnLogout.setForeground(Color.BLACK);
@@ -236,6 +243,27 @@ public class Nurse_SideBar extends JPanel{
         btnLogout.setOpaque(true);
         btnLogout.setHorizontalAlignment(SwingConstants.CENTER);
         leftSidebar.add(btnLogout);
+        
+        btnLogout.addActionListener(this);
     }
 
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+    if (ae.getSource() == btnLogout) {
+
+        int confirm = JOptionPane.showConfirmDialog(
+                navPage,
+                "Are you sure you want to logout?",
+                "Logout Confirmation",
+                JOptionPane.YES_NO_OPTION
+        );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                Login lg = new Login();
+                lg.setVisible(true);
+                navPage.dispose();
+            }
+        }
+    }
+    
 }
