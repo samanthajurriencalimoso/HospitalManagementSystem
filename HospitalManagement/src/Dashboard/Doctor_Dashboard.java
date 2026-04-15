@@ -146,19 +146,19 @@ public class Doctor_Dashboard extends JPanel{
         lblSchedule.setFont(new Font("Calibri", Font.BOLD, 24));
         pnlSchedule.add(lblSchedule);
         
-        String[] clmSchedule = {"Time", "Patient Name", "Reason", "Last Visit", "Status"};
+        String[] clmSchedule = {"Time", "Patient Name", "Room", "Reason", "Last Visit", "Status"};
         
         String[][] RwSchedule = {
-            {"09:00 AM", "Joshua Garcia", "Routine Checkup", "03/05/2026", "Completed"},
-            {"10:30 AM", "Maria Santos", "Follow-up Consultation", "02/20/2026", "Pending"},
-            {"01:00 PM", "Daniel Cruz", "Lab Results Review", "01/15/2026", "In Progress"},
-            {"03:15 PM", "Angela Reyes", "General Consultation", "04/01/2026", "Scheduled"},
-            {"04:45 PM", "Michael Tan", "Prescription Renewal", "03/28/2026", "Completed"},
-            {"08:30 AM", "Sophia Lim", "Annual Physical Exam", "04/10/2026", "Scheduled"},
-            {"11:15 AM", "Carlos Dela Cruz", "Blood Pressure Check", "03/22/2026", "Completed"},
-            {"02:30 PM", "Isabella Ramos", "Diabetes Follow-up", "02/18/2026", "Pending"},
-            {"05:00 PM", "John Bautista", "Post-Surgery Check", "03/30/2026", "In Progress"},
-            {"06:15 PM", "Emily Flores", "Vaccination", "04/05/2026", "Completed"}
+            {"09:00 AM", "Joshua Garcia", "Room 101", "Routine Checkup", "03/05/2026", "Completed"},
+            {"10:30 AM", "Maria Santos", "Room 102", "Follow-up Consultation", "02/20/2026", "Pending"},
+            {"01:00 PM", "Daniel Cruz", "Room 103", "Lab Results Review", "01/15/2026", "In Progress"},
+            {"03:15 PM", "Angela Reyes", "Room 104", "General Consultation", "04/01/2026", "Scheduled"},
+            {"04:45 PM", "Michael Tan", "Room 105", "Prescription Renewal", "03/28/2026", "Completed"},
+            {"08:30 AM", "Sophia Lim", "Room 106", "Annual Physical Exam", "04/10/2026", "Scheduled"},
+            {"11:15 AM", "Carlos Dela Cruz", "Room 107", "Blood Pressure Check", "03/22/2026", "Completed"},
+            {"02:30 PM", "Isabella Ramos", "Room 108", "Diabetes Follow-up", "02/18/2026", "Pending"},
+            {"05:00 PM", "John Bautista", "Room 109", "Post-Surgery Check", "03/30/2026", "In Progress"},
+            {"06:15 PM", "Emily Flores", "Room 110", "Vaccination", "04/05/2026", "Completed"}
             };
         
         JTable tblActivities = new JTable(RwSchedule, clmSchedule);
@@ -173,7 +173,7 @@ public class Doctor_Dashboard extends JPanel{
             tblActivities.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
         
-        tblActivities.getColumnModel().getColumn(4).setCellRenderer((table, value, isSelected, hasFocus, row, column) -> {
+        tblActivities.getColumnModel().getColumn(5).setCellRenderer((table, value, isSelected, hasFocus, row, column) -> {
         JLabel lblStatusAct = new JLabel(value.toString(), SwingConstants.CENTER);
         lblStatusAct.setOpaque(true);
         lblStatusAct.setFont(new Font("Calibri", Font.PLAIN, 16));
@@ -279,7 +279,6 @@ public class Doctor_Dashboard extends JPanel{
         btnViewSched.setBackground(Green);
         btnViewSched.setForeground(Color.BLACK);
         btnViewSched.setFocusPainted(false);
-        btnViewSched.setBorder(BorderFactory.createLineBorder(borderBLACK, 2));
         pnlSelection.add(btnViewSched);
 
         JButton btnPatientRecord = new JButton("Patient Record");
@@ -288,7 +287,6 @@ public class Doctor_Dashboard extends JPanel{
         btnPatientRecord.setBackground(Blue);
         btnPatientRecord.setForeground(Color.BLACK);
         btnPatientRecord.setFocusPainted(false);
-        btnPatientRecord.setBorder(BorderFactory.createLineBorder(borderBLACK, 2));
         pnlSelection.add(btnPatientRecord);
 
         JButton btnAddAppointment = new JButton("Add Appointment");
@@ -297,7 +295,6 @@ public class Doctor_Dashboard extends JPanel{
         btnAddAppointment.setBackground(Yellow);
         btnAddAppointment.setForeground(Color.BLACK);
         btnAddAppointment.setFocusPainted(false);
-        btnAddAppointment.setBorder(BorderFactory.createLineBorder(borderBLACK, 2));
         pnlSelection.add(btnAddAppointment);
 
         JButton btnWriteNote = new JButton("Write Note");
@@ -306,7 +303,6 @@ public class Doctor_Dashboard extends JPanel{
         btnWriteNote.setBackground(LightRed);
         btnWriteNote.setForeground(Color.BLACK);
         btnWriteNote.setFocusPainted(false);
-        btnWriteNote.setBorder(BorderFactory.createLineBorder(borderBLACK, 2));
         pnlSelection.add(btnWriteNote);
         
         

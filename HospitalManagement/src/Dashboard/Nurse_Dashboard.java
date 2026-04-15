@@ -116,23 +116,23 @@ public class Nurse_Dashboard extends JPanel{
         lblView.setForeground(Color.BLUE);
         pnlMSched.add(lblView);
 
-        String[] clmMSched = {"Patient ID", "Patient Name", "Time", "Heart Rate (BPM)", "Presz. (mmHg)", "Temperature", "Medicine", "Status"};
+        String[] clmMSched = {"Patient ID", "Patient Name", "Room", "Time", "Heart Rate (BPM)", "Presz. (mmHg)", "Temperature", "Medicine", "Status"};
 
         String[][] RwMSched = {
-            {"P001", "Juan Dela Cruz", "08:00 AM", "78", "120/80", "36.7°C", "Paracetamol 500mg", "Given"},
-            {"P002", "Maria Santos", "08:30 AM", "82", "118/79", "36.8°C", "Amoxicillin 250mg", "Given"},
-            {"P003", "Pedro Reyes", "09:00 AM", "90", "130/85", "37.2°C", "Insulin", "Pending"},
-            {"P004", "Ana Lopez", "09:30 AM", "75", "115/75", "36.6°C", "Losartan 50mg", "Given"},
-            {"P005", "Carlos Mendoza", "10:00 AM", "88", "125/82", "37.0°C", "IV Antibiotic", "Ongoing"},
-            {"P006", "Liza Bautista", "10:30 AM", "80", "119/78", "36.9°C", "Vitamin C", "Pending"},
-            {"P007", "Mark Villanueva", "11:00 AM", "76", "117/76", "36.5°C", "Omeprazole 20mg", "Given"},
-            {"P008", "Sofia Ramos", "11:30 AM", "92", "135/88", "37.3°C", "Nebulization", "Ongoing"},
-            {"P009", "Daniel Cruz", "12:00 PM", "85", "122/80", "37.1°C", "Paracetamol 500mg", "Pending"},
-            {"P010", "Isabella Flores", "12:30 PM", "89", "128/84", "37.0°C", "IV Antibiotic", "Ongoing"},
-            {"P011", "John Garcia", "01:00 PM", "72", "110/70", "36.4°C", "Aspirin 80mg", "Given"},
-            {"P012", "Carla Fernandez", "01:30 PM", "95", "140/90", "37.5°C", "Metformin 500mg", "Pending"},
-            {"P013", "Ethan Aquino", "02:00 PM", "87", "126/82", "37.2°C", "Insulin", "Pending"},
-            {"P014", "Nicole Torres", "02:30 PM", "74", "115/75", "36.6°C", "Pain Reliever", "Given"}
+            {"P001", "Juan Dela Cruz", "Room 101", "08:00 AM", "78", "120/80", "36.7°C", "Paracetamol 500mg", "Given"},
+            {"P002", "Maria Santos", "Room 102", "08:30 AM", "82", "118/79", "36.8°C", "Amoxicillin 250mg", "Given"},
+            {"P003", "Pedro Reyes", "Room 103", "09:00 AM", "90", "130/85", "37.2°C", "Insulin", "Pending"},
+            {"P004", "Ana Lopez", "Room 104", "09:30 AM", "75", "115/75", "36.6°C", "Losartan 50mg", "Given"},
+            {"P005", "Carlos Mendoza", "Room 105", "10:00 AM", "88", "125/82", "37.0°C", "IV Antibiotic", "Ongoing"},
+            {"P006", "Liza Bautista", "Room 106", "10:30 AM", "80", "119/78", "36.9°C", "Vitamin C", "Pending"},
+            {"P007", "Mark Villanueva", "Room 107", "11:00 AM", "76", "117/76", "36.5°C", "Omeprazole 20mg", "Given"},
+            {"P008", "Sofia Ramos", "Room 108", "11:30 AM", "92", "135/88", "37.3°C", "Nebulization", "Ongoing"},
+            {"P009", "Daniel Cruz", "Room 109", "12:00 PM", "85", "122/80", "37.1°C", "Paracetamol 500mg", "Pending"},
+            {"P010", "Isabella Flores", "Room 110", "12:30 PM", "89", "128/84", "37.0°C", "IV Antibiotic", "Ongoing"},
+            {"P011", "John Garcia", "Room 111", "01:00 PM", "72", "110/70", "36.4°C", "Aspirin 80mg", "Given"},
+            {"P012", "Carla Fernandez", "Room 112", "01:30 PM", "95", "140/90", "37.5°C", "Metformin 500mg", "Pending"},
+            {"P013", "Ethan Aquino", "Room 113", "02:00 PM", "87", "126/82", "37.2°C", "Insulin", "Pending"},
+            {"P014", "Nicole Torres", "Room 114", "02:30 PM", "74", "115/75", "36.6°C", "Pain Reliever", "Given"}
         };
 
         JTable tblMSched = new JTable(RwMSched, clmMSched);
