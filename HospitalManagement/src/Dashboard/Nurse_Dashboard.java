@@ -197,7 +197,7 @@ public class Nurse_Dashboard extends JPanel{
         pnlSummary.add(lblSummary);
         
         lblView = new JLabel("View All");
-        lblView.setBounds(610, 15, 100, 30);
+        lblView.setBounds(620, 15, 100, 30);
         lblView.setFont(new Font("Calibri", Font.BOLD, 18));
         lblView.setForeground(Color.BLUE);
         pnlSummary.add(lblView);

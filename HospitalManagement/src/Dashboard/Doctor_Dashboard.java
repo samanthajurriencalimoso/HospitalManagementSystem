@@ -236,6 +236,13 @@ public class Doctor_Dashboard extends JPanel{
         lblSummary.setBounds(20, 15, 400, 30);
         lblSummary.setFont(new Font("Calibri", Font.BOLD, 24));
         pnlSummary.add(lblSummary);
+        
+        lblView = new JLabel("View All");
+        lblView.setFont(new Font("Calibri", Font.PLAIN, 18));
+        lblView.setForeground(Color.BLUE);
+        lblView.setBounds(820, 15, 80, 30);
+        lblView.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        pnlSummary.add(lblView);
 
         String[] clmSummary = {"Room Number", "Doctor", "Nurse", "Equipment"};
 
@@ -272,9 +279,15 @@ public class Doctor_Dashboard extends JPanel{
         pnlSelection.setBounds(990, 650, 530, 230);
         pnlSelection.setBackground(Color.WHITE);
         pnlMain.add(pnlSelection);
+        
+        JLabel lblQuick = new JLabel("Quick Actions");
+        lblQuick.setBounds(20, 15, 300, 30);
+        lblQuick.setFont(new Font("Calibri", Font.BOLD, 24));
+        lblQuick.setForeground(Color.BLACK);
+        pnlSelection.add(lblQuick);
 
         JButton btnViewSched = new JButton("View Schedule");
-        btnViewSched.setBounds(40, 55, 200, 65);
+        btnViewSched.setBounds(15, 60, 240, 70);
         btnViewSched.setFont(new Font("Calibri", Font.BOLD, 18));
         btnViewSched.setBackground(Green);
         btnViewSched.setForeground(Color.BLACK);
@@ -282,7 +295,7 @@ public class Doctor_Dashboard extends JPanel{
         pnlSelection.add(btnViewSched);
 
         JButton btnPatientRecord = new JButton("Patient Record");
-        btnPatientRecord.setBounds(280, 55, 200, 65);
+        btnPatientRecord.setBounds(275, 60, 240, 70);
         btnPatientRecord.setFont(new Font("Calibri", Font.BOLD, 18));
         btnPatientRecord.setBackground(Blue);
         btnPatientRecord.setForeground(Color.BLACK);
@@ -290,7 +303,7 @@ public class Doctor_Dashboard extends JPanel{
         pnlSelection.add(btnPatientRecord);
 
         JButton btnAddAppointment = new JButton("Add Appointment");
-        btnAddAppointment.setBounds(40, 140, 200, 65);
+        btnAddAppointment.setBounds(15, 140, 240, 70);
         btnAddAppointment.setFont(new Font("Calibri", Font.BOLD, 18));
         btnAddAppointment.setBackground(Yellow);
         btnAddAppointment.setForeground(Color.BLACK);
@@ -298,7 +311,7 @@ public class Doctor_Dashboard extends JPanel{
         pnlSelection.add(btnAddAppointment);
 
         JButton btnWriteNote = new JButton("Write Note");
-        btnWriteNote.setBounds(280, 140, 200, 65);
+        btnWriteNote.setBounds(275, 140, 240, 70);
         btnWriteNote.setFont(new Font("Calibri", Font.BOLD, 18));
         btnWriteNote.setBackground(LightRed);
         btnWriteNote.setForeground(Color.BLACK);

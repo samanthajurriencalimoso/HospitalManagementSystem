@@ -28,19 +28,19 @@ public class Doctor_SideBarFrame extends JFrame{
         add(header);
         
         JTextField lblSearch = new JTextField("Search...");
-        lblSearch.setBounds(850, 15, 300, 35);
+        lblSearch.setBounds(970, 18, 260, 35);
         lblSearch.setFont(new Font("Calibri", Font.PLAIN, 18));
         header.add(lblSearch);
         
-        JLabel lblDoctorName = new JLabel("Doctor | Dr. Isabella Ramos");
+        JLabel lblDoctorName = new JLabel("Doctor | Isabella Ramos");
         lblDoctorName.setFont(new Font("Calibri", Font.BOLD, 20));
-        lblDoctorName.setBounds(1170, 15, 350, 40);
+        lblDoctorName.setBounds(1320, 20, 300, 35);
         header.add(lblDoctorName);
         
         ImageIcon imgDoctor = new ImageIcon(getClass().getResource("/resources/DOCTOR.PHOTO.png"));
         Image imgDoc = imgDoctor.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         JLabel lblDoctorIcon = new JLabel(new ImageIcon(imgDoc));
-        lblDoctorIcon.setBounds(1420, 13, 60, 60);
+        lblDoctorIcon.setBounds(1250, 13, 60, 60);
         header.add(lblDoctorIcon);
 
         // Main content area

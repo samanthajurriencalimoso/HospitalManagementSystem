@@ -28,19 +28,19 @@ public class Nurse_SideBarFrame extends JFrame{
         add(header);
         
         JTextField lblSearch = new JTextField("Search...");
-        lblSearch.setBounds(850, 15, 300, 35);
+        lblSearch.setBounds(970, 18, 260, 35);
         lblSearch.setFont(new Font("Calibri", Font.PLAIN, 18));
         header.add(lblSearch);
         
         JLabel lblNurseName = new JLabel("Nurse | Angela Cruz");
         lblNurseName.setFont(new Font("Calibri", Font.BOLD, 20));
-        lblNurseName.setBounds(1170, 15, 350, 40);
+        lblNurseName.setBounds(1320, 20, 300, 35);
         header.add(lblNurseName);
         
         ImageIcon imgNurse = new ImageIcon(getClass().getResource("/resources/NURSE.PHOTO.png"));
         Image imgNur = imgNurse.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         JLabel lblNurseIcon = new JLabel(new ImageIcon(imgNur));
-        lblNurseIcon.setBounds(1420, 13, 60, 60);
+        lblNurseIcon.setBounds(1250, 13, 60, 60);
         header.add(lblNurseIcon);
 
         // Main content area
