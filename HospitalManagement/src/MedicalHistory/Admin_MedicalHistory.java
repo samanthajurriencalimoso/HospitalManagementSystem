@@ -35,7 +35,7 @@ public class Admin_MedicalHistory extends JFrame {
         AppPane.setFont(new Font("Segoe UI", Font.BOLD, 16));
         UIManager.put("TabbedPane.selected", new Color(0x5A, 0x8F, 0xC9));
         
-        AppPane.addTab("Medical History", new JPanel());
+        AppPane.addTab("What Do I Do", new JPanel());
         
 //        AppointmentHistory doctorAvailabilityPanel = new AppointmentHistory();
 //        AppPane.addTab("Appointment History", doctorAvailabilityPanel);
