@@ -3,18 +3,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package MedicalHistory;
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
-/**
- *
- * @author Zaphkiel
- */
-public class Admin_MedicalHistory extends JFrame {
+
+public class Doctor_MedicalHistory extends JFrame {
+    private boolean editMode = false;
     private JPanel selectedRow = null, centerPanel;
     private java.util.List<Runnable> saveTasks = new java.util.ArrayList<>();
     
-    Admin_MedicalHistory(){
+    Doctor_MedicalHistory(){
         setTitle("Hospital Appointment System");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         
@@ -37,8 +36,8 @@ public class Admin_MedicalHistory extends JFrame {
         
         AppPane.addTab("Medical History", new JPanel());
         
-//        AppointmentHistory doctorAvailabilityPanel = new AppointmentHistory();
-//        AppPane.addTab("Appointment History", doctorAvailabilityPanel);
+        AppointmentHistory doctorAvailabilityPanel = new AppointmentHistory();
+        AppPane.addTab("Appointment History", doctorAvailabilityPanel);
 
         add(AppPane);
         
@@ -331,6 +330,42 @@ public class Admin_MedicalHistory extends JFrame {
         return line;
     }
     
+    public JButton createEditButton(int x, int y){
+       JButton btn = new JButton("Edit");
+            btn.setBounds(x, y, 80, 25);
+
+            btn.setFocusPainted(false);
+            btn.setBackground(Color.WHITE);
+            btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
+
+            return btn;
+    }
+    
+    public void makeEditable(JButton btn, JLabel label, JTextField field) {
+
+        field.setVisible(false); // safety default
+
+        btn.addActionListener(e -> {
+
+            if (field.isVisible()) {
+                // SAVE MODE
+                label.setText(field.getText());
+                field.setVisible(false);
+                label.setVisible(true);
+                btn.setText("Edit");
+            } else {
+                // EDIT MODE
+                field.setVisible(true);
+                label.setVisible(false);
+                btn.setText("Save");
+
+                field.setText(label.getText()); // sync latest value
+            }
+
+            revalidate();
+            repaint();
+        });
+    }
     
     public JPanel createHistoryRow(String date, String illness, int yPosition) {
 
@@ -369,6 +404,44 @@ public class Admin_MedicalHistory extends JFrame {
             return row;
     } 
     
+    public void setupEditableComponent(JPanel parentPanel, JLabel label, JTextField field) {
+
+        field.setVisible(false);
+        
+        Runnable saveLogic = () -> { label.setText(field.getText()); field.setVisible(false); label.setVisible(true); };
+
+        label.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+
+                if (!editMode) return; 
+                field.setText(label.getText());
+                label.setVisible(false);
+                field.setVisible(true);
+                
+            }
+        });
+        field.addActionListener(e -> saveLogic.run());
+    }
+
+    public void configureEdit(JButton btn, JLabel label, JTextField field) {
+        btn.addActionListener(e -> {
+            editMode = !editMode;
+
+            if (editMode) {
+                btn.setText("Save");
+            } else {
+                btn.setText("Edit");
+                field.setVisible(false);
+                label.setVisible(true);
+                label.setText(field.getText());
+                selectedRow = null;
+            }
+            label.getParent().revalidate();
+            label.getParent().repaint();
+        });
+    }
+    
     public JPanel createSmallPanel (JPanel parent, int x, int y, int width, int height){
         JPanel panel = new JPanel ();
         panel.setLayout(null);
@@ -405,6 +478,21 @@ public class Admin_MedicalHistory extends JFrame {
         pnlpatient.setBackground(Color.WHITE);
         centerPanel.add(pnlpatient);
     
+        JButton btnEditPatient = createEditButton(940, 15);
+        pnlpatient.add(btnEditPatient);
+        
+        btnEditPatient.addActionListener(e -> {
+            editMode = !editMode;
+            btnEditPatient.setText(editMode ? "Save" : "Edit");
+            if (!editMode) {
+                for (Runnable task : saveTasks) {
+                    task.run();
+                }
+            }
+            pnlpatient.revalidate();
+            pnlpatient.repaint();
+        });
+        
         JPanel pnlImageFrame = createSmallPanel(pnlpatient, 20, 15, 135, 120);
         JLabel lblImage = createLabel(pnlImageFrame, "", 0, 0, 180, 180);
     
@@ -438,6 +526,8 @@ public class Admin_MedicalHistory extends JFrame {
         JLabel lblpatient = createLabel(pnlpatient, "Patient's Name", 180, 15, 300, 24);
         applyFont (lblpatient, "Seoge UI", Font.PLAIN, 18);
         JTextField txtpatient = createHiddenField(pnlpatient, "Patient's Name", 180, 15, 300, 24);
+        configureEdit(btnEditPatient, lblpatient, txtpatient);
+        setupEditableComponent(pnlpatient, lblpatient, txtpatient);
         pnlpatient.add(createLine(180,45,500,1,Color.LIGHT_GRAY));
         
         JLabel lbldiagnosis = createLabel(pnlpatient, " Diagnosis", 940, 50, 100, 24);
@@ -466,8 +556,13 @@ public class Admin_MedicalHistory extends JFrame {
             JLabel lblvalues = createLabel(pnl, patientData[i][1], 10, 5, 70, 24);
             applyFont (lblvalues, "Seoge UI", Font.BOLD, 18);
             JTextField txtvalues = createHiddenField(pnl, patientData[i][1], 10, 5, 50, 24);
+            setupEditableComponent(pnl, lblvalues, txtvalues);
 
         }
+            btnEditPatient.addActionListener(e -> {
+                editMode = !editMode;
+                btnEditPatient.setText(editMode ? "Save" : "Edit");
+            });
 //        JPanel pnlBMI = createSmallPanel(pnlpatient, 180, 75, 120, 60);
 //        JLabel lblbmi = createLabel(pnlBMI, "BMI", 10, 35, 120, 15);
 //        applyFont (lblbmi, "Seoge UI", Font.BOLD, 12);
@@ -476,6 +571,8 @@ public class Admin_MedicalHistory extends JFrame {
 //        JLabel lblBMIVal = createLabel(pnlBMI, "22.4", 10, 5, 50, 24);
 //        applyFont (lblBMIVal, "Seoge UI", Font.BOLD, 18);
 //        JTextField txtBMIVal = createHiddenField(pnlBMI, "22.4", 10, 5, 50, 24);
+//        setupEditableComponent(pnlBMI, lblBMIVal, txtBMIVal);
+//        configureEdit(btnEditPatient, lblBMIVal, txtBMIVal);
 //        
 //        JPanel pnlWeight = createSmallPanel(pnlpatient, 315, 75, 120, 60);
 //        JLabel lblWeight = createLabel(pnlWeight, "Weight", 10, 35, 120, 15);
@@ -489,6 +586,7 @@ public class Admin_MedicalHistory extends JFrame {
 //        JLabel lblWeightVal = createLabel(pnlWeight, "70", 10, 5, 50, 24);
 //        applyFont(lblWeightVal, "Seoge UI", Font.BOLD, 18);
 //        JTextField txtWeightVal = createHiddenField(pnlWeight, "70", 10, 5, 50, 24);
+//        setupEditableComponent(pnlWeight, lblWeightVal, txtWeightVal);
 //
 //        // --- Height Panel ---
 //        JPanel pnlHeight = createSmallPanel(pnlpatient, 450, 75, 120, 60);
@@ -502,6 +600,7 @@ public class Admin_MedicalHistory extends JFrame {
 //        JLabel lblHeightVal = createLabel(pnlHeight, "175", 10, 5, 70, 24);
 //        applyFont(lblHeightVal, "Seoge UI", Font.BOLD, 18);
 //        JTextField txtHeightVal = createHiddenField(pnlHeight, "175", 10, 5, 70, 24);
+//        setupEditableComponent(pnlHeight, lblHeightVal, txtHeightVal);
 //
 //        // --- Pressure Panel ---
 //        JPanel pnlPressure = createSmallPanel(pnlpatient, 585, 75, 120, 60);
@@ -512,6 +611,7 @@ public class Admin_MedicalHistory extends JFrame {
 //        JLabel lblPressureVal = createLabel(pnlPressure, "120/80", 10, 5, 70, 24);
 //        applyFont(lblPressureVal, "Seoge UI", Font.BOLD, 18);
 //        JTextField txtPressureVal = createHiddenField(pnlPressure, "120/80", 10, 5, 70, 24);
+//        setupEditableComponent(pnlPressure, lblPressureVal, txtPressureVal);
 //        
     }
     
@@ -525,7 +625,9 @@ public class Admin_MedicalHistory extends JFrame {
         JLabel lbltimeline = new JLabel("Medical Timeline");
         lbltimeline.setBounds(70, 20, 300, 15);
         pnltimeline.add(lbltimeline);
-
+        
+        JButton btnEditTimeline = createEditButton(300, 10);
+        pnltimeline.add(btnEditTimeline);
         
         pnltimeline.add(createLine(0,50,400,1, Color.LIGHT_GRAY));
         
@@ -545,6 +647,8 @@ public class Admin_MedicalHistory extends JFrame {
         
         JLabel lblhistory = createLabel(pnlhistory, "Medical History",  70, 20, 300, 15);
         pnlhistory.add(createLine(55,50,500,1, Color.LIGHT_GRAY));  
+        JButton btnEditHistory = createEditButton(500, 10);
+        pnlhistory.add(btnEditHistory);
 
         String[] panelTitles = {
             "Allergies", "Chronic Conditions", "Surgical History", "Family History"
@@ -584,7 +688,12 @@ public class Admin_MedicalHistory extends JFrame {
             lblTitle.setForeground(Color.LIGHT_GRAY);
             JLabel lblvalues = createLabel (pnl, historyValues[i],10, 25, 200, 20);
             JTextField txtvalues = createHiddenField(pnl, historyValues[i],10, 25, 200, 20);
+            setupEditableComponent(pnl, lblvalues, txtvalues);
         }
+            btnEditHistory.addActionListener(e -> {
+                editMode = !editMode;
+                btnEditHistory.setText(editMode ? "Save" : "Edit");
+            });
     }
     
     public void DiagnosticsPanel(){
@@ -657,7 +766,9 @@ public class Admin_MedicalHistory extends JFrame {
         centerPanel.add(pnldiet);
         
         JLabel lbldiet= createLabel(pnldiet, "Diet",  50, 20, 300, 15);
-        pnldiet.add(createLine(30,50,280,1, Color.LIGHT_GRAY));
+        pnldiet.add(createLine(30,50,280,1, Color.LIGHT_GRAY));  
+        JButton btnEditHistory = createEditButton(250, 10);
+        pnldiet.add(btnEditHistory);
         
         int starty = 50 ;
         int gap = 60;
@@ -695,8 +806,12 @@ public class Admin_MedicalHistory extends JFrame {
             {"Multivitamins", "Not Adherent", "05/04/2026", "12/04/2026", "Patient", "Ran out"},
         };
         
-        JTable tblMedications = new JTable(rowMedications, columnMedications);
-                
+        JTable tblMedications = new JTable(rowMedications, columnMedications){
+            @Override
+            public boolean isCellEditable(int row, int column){
+            return editMode;
+                    }
+        };
         tblMedications.setRowHeight(30);
 //        tblMedications.setFont(new Font("Seoge UI", Font.PLAIN, 13));
 //        tblMedications.getTableHeader().setFont(new Font("Seoge UI", Font.PLAIN, 13));
@@ -753,6 +868,7 @@ public class Admin_MedicalHistory extends JFrame {
         
         String[] status = {"", "Adherent", "Somehow Adherent", "Not Adherent"};
         TableColumn statusColumn = tblMedications.getColumnModel().getColumn(1);
+        statusColumn.setCellEditor(new DefaultCellEditor(new JComboBox<>(status)));
         
         statusColumn.setCellRenderer((table, value, isSelected, hasFocus, row, column) -> {
             JLabel lblStatus = new JLabel(value != null ? value.toString() : "", SwingConstants.CENTER);
@@ -770,5 +886,24 @@ public class Admin_MedicalHistory extends JFrame {
             }
             return lblStatus;
                 });
+        
+        JButton btnEditMedications = createEditButton(550, 20);
+        btnEditMedications.addActionListener(e -> {
+            editMode = !editMode;
+
+            // Stop editing when saving
+            if (!editMode && tblMedications.isEditing()) {
+                tblMedications.getCellEditor().stopCellEditing();
+            }
+
+            btnEditMedications.setText(editMode ? "Save" : "Edit");
+            tblMedications.repaint();
+        });
+        pnlmedications.add(btnEditMedications);
     }
-}
+   
+    }
+
+
+    
+
