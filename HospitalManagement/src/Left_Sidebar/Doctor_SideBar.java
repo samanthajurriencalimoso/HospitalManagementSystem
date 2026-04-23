@@ -2,6 +2,7 @@ package Left_Sidebar;
 
 import static Color_Palette.ColorPalette.*;
 import Login_Startup.Login;
+import Patient_Information.PatientInfo_Doctor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,7 +11,7 @@ import javax.swing.*;
 
 public class Doctor_SideBar extends JPanel implements ActionListener{
     
-    private JButton btnLogout;
+    private JButton btnLogout, btnPInfo;
     private Doctor_SideBarFrame navPage;
     
     public Doctor_SideBar(Doctor_SideBarFrame navPage) {
@@ -49,7 +50,7 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
         btnDashboard.setMargin(new Insets(0, 10, 0, 0));
         leftSidebar.add(btnDashboard);
         
-        JButton btnPInfo = new JButton("Patient Information  +");
+        btnPInfo = new JButton("Patient Information  +");
         btnPInfo.setLayout(null);
         btnPInfo.setBounds(20, 320, 260, 45);
         btnPInfo.setFont(new Font("Calibri", Font.BOLD, 20));
@@ -245,6 +246,7 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
         btnLogout.setHorizontalAlignment(SwingConstants.CENTER);
         leftSidebar.add(btnLogout);
         
+        btnPInfo.addActionListener(this);
         btnLogout.addActionListener(this);
     }
 
@@ -264,6 +266,9 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
                 lg.setVisible(true);
                 navPage.dispose();
             }
+        } else if (ae.getSource() == btnPInfo) {
+            PatientInfo_Doctor pi = new PatientInfo_Doctor();
+            pi.setVisible(true);
         }
     }
 }

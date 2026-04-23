@@ -4,6 +4,12 @@ package Patient_Information;
 import javax.swing.*;
 import java.awt.*;
 
+/*Make it so that instead of JFrame. It should be JPanel.
+    Make it a little bigger in size so that it accommodates the whole right side MAIN PANEL. 
+
+*/
+
+
 public class PatientInfo_Doctor extends JFrame {
 
     public PatientInfo_Doctor(){
