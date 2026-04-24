@@ -8,27 +8,17 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
-public class Doctor_MedicalHistory extends JFrame {
+public class Doctor_MedicalHistory extends JPanel {
     private boolean editMode = false;
     private JPanel selectedRow = null, centerPanel;
     private java.util.List<Runnable> saveTasks = new java.util.ArrayList<>();
     
-    Doctor_MedicalHistory(){
-        setTitle("Hospital Appointment System");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        
-        // For screen size
-        setBackground(Color.WHITE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setMinimumSize(new Dimension(1000, 1000));
+    public Doctor_MedicalHistory(){
         setLayout(null);
-        setLocationRelativeTo(null);
-        
-        //Left Sidebar
-        LeftSideBar();
+     
         
         JTabbedPane AppPane = new JTabbedPane();
-        AppPane.setBounds(300, 70, 1620, 920);
+        AppPane.setBounds(0, 0, 1620, 920);
         AppPane.setBackground(new Color(0xA3, 0xCA, 0xE9));
         AppPane.setForeground(Color.BLACK);
         AppPane.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -92,235 +82,6 @@ public class Doctor_MedicalHistory extends JFrame {
 
         { setOpaque(false); }
     };
-}
-   
-    public void LeftSideBar() {
-    JPanel leftSidebar = new JPanel();
-        leftSidebar.setLayout(null);
-        leftSidebar.setBounds(0, 0, 300, 1000);
-        leftSidebar.setBackground(new Color(0x39, 0x5A, 0x7F));
-        add(leftSidebar);
-        
-        JLabel lblDlogo = new JLabel(new ImageIcon("logo.png"));
-        lblDlogo.setLayout(null);
-        lblDlogo.setBounds(100, 30, 100, 100);
-        leftSidebar.add(lblDlogo);
-        
-        JButton btnDashboard = new JButton("Dashboard");
-        btnDashboard.setLayout(null);
-        btnDashboard.setBounds(20, 150, 260, 45);
-        btnDashboard.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnDashboard.setForeground(Color.WHITE);
-        btnDashboard.setBackground(new Color(0x39, 0x5A, 0x7F));
-        btnDashboard.setBorderPainted(false);
-        btnDashboard.setFocusPainted(false);
-        btnDashboard.setContentAreaFilled(false);
-        btnDashboard.setOpaque(true);
-        btnDashboard.setHorizontalAlignment(SwingConstants.LEFT);
-        btnDashboard.setMargin(new Insets(0, 10, 0, 0));
-        leftSidebar.add(btnDashboard);
-        
-        JButton btnPInfo = new JButton("Patient Records  +");
-        btnPInfo.setBounds(20, 200, 260, 45);
-        btnPInfo.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnPInfo.setForeground(Color.WHITE);
-        btnPInfo.setBackground(new Color(0x39, 0x5A, 0x7F));
-        btnPInfo.setBorderPainted(false);
-        btnPInfo.setFocusPainted(false);
-        btnPInfo.setContentAreaFilled(false);
-        btnPInfo.setOpaque(true);
-        btnPInfo.setHorizontalAlignment(SwingConstants.LEFT);
-        btnPInfo.setMargin(new Insets(0, 10, 0, 0));
-        leftSidebar.add(btnPInfo);
-        
-        JPanel pnlPatientInfo = new JPanel();
-        pnlPatientInfo.setLayout(null);
-        pnlPatientInfo.setBounds(40, 245, 240, 160);
-        pnlPatientInfo.setBackground(new Color(0x39, 0x5A, 0x7F));
-        pnlPatientInfo.setVisible(false);
-        leftSidebar.add(pnlPatientInfo);
-        
-        String[] PatientOptions = {"History", "Appointment", "Prescriptions", "Patient Report Care(PRC)"};
-        int POption = 0;
-        for (String PatientOp : PatientOptions) {
-            JButton btnPOptions = new JButton(PatientOp);
-            btnPOptions.setBounds(0, POption, 240, 35);
-            btnPOptions.setForeground(Color.WHITE);
-            btnPOptions.setBackground(new Color(0x39, 0x5A, 0x7F));
-            btnPOptions.setBorderPainted(false);
-            btnPOptions.setFocusPainted(false);
-            btnPOptions.setContentAreaFilled(false);
-            btnPOptions.setOpaque(true);
-            btnPOptions.setHorizontalAlignment(SwingConstants.LEFT);
-            btnPOptions.setMargin(new Insets(0, 10, 0, 0));
-            pnlPatientInfo.add(btnPOptions);
-            POption += 40;
-        }
-        
-        JButton btnInventory = new JButton("Inventory  +");
-        btnInventory.setBounds(20, 250, 260, 45);
-        btnInventory.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnInventory.setForeground(Color.WHITE);
-        btnInventory.setBackground(new Color(0x39, 0x5A, 0x7F));
-        btnInventory.setBorderPainted(false);
-        btnInventory.setFocusPainted(false);
-        btnInventory.setContentAreaFilled(false);
-        btnInventory.setOpaque(true);
-        btnInventory.setHorizontalAlignment(SwingConstants.LEFT);
-        btnInventory.setMargin(new Insets(0, 10, 0, 0));
-        leftSidebar.add(btnInventory);
-        
-        JPanel pnlInventory = new JPanel();
-        pnlInventory.setLayout(null);
-        pnlInventory.setBounds(40, 475, 240, 200);
-        pnlInventory.setBackground(new Color(0x39, 0x5A, 0x7F));
-        pnlInventory.setVisible(false);
-        leftSidebar.add(pnlInventory);
-        
-        String[] InventoryOptions = {"Stock Orders", "Logistics", "Supplies", "Pharmacy Inventory", "Equipment"};
-        int InveOption = 0;
-        for (String InventoryOp : InventoryOptions) {
-            JButton btnPOptions = new JButton(InventoryOp);
-            btnPOptions.setBounds(0, InveOption, 240, 35);
-            btnPOptions.setForeground(Color.WHITE);
-            btnPOptions.setBackground(new Color(0x39, 0x5A, 0x7F));
-            btnPOptions.setBorderPainted(false);
-            btnPOptions.setFocusPainted(false);
-            btnPOptions.setContentAreaFilled(false);
-            btnPOptions.setOpaque(true);
-            btnPOptions.setHorizontalAlignment(SwingConstants.LEFT);
-            btnPOptions.setMargin(new Insets(0, 10, 0, 0));
-            pnlInventory.add(btnPOptions);
-            InveOption += 40;
-        }
-        
-        JButton btnReport = new JButton("Report");
-        btnReport.setLayout(null);
-        btnReport.setBounds(20, 300, 260, 45);
-        btnReport.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnReport.setForeground(Color.WHITE);
-        btnReport.setBackground(new Color(0x39, 0x5A, 0x7F));
-        btnReport.setBorderPainted(false);
-        btnReport.setFocusPainted(false);
-        btnReport.setContentAreaFilled(false);
-        btnReport.setOpaque(true);
-        btnReport.setHorizontalAlignment(SwingConstants.LEFT);
-        btnReport.setMargin(new Insets(0, 10, 0, 0));
-        leftSidebar.add(btnReport);
-        
-        btnPInfo.addActionListener(e -> {
-            boolean expandPOptions = !pnlPatientInfo.isVisible();
-            pnlPatientInfo.setVisible(expandPOptions);
-
-            if (expandPOptions) {
-                pnlPatientInfo.setBounds(40, 245, 240, 160);
-                btnInventory.setBounds(20, 420, 260, 45);
-                
-                if (pnlInventory.isVisible()) {
-                    pnlInventory.setBounds(40, 465, 240, 200);
-                    btnReport.setBounds(20, 680, 260, 45);
-                } else {
-                    pnlInventory.setBounds(40, 465, 240, 0);
-                    btnReport.setBounds(20, 465, 260, 45);
-                }
-                btnPInfo.setText("Patient Records  -");
-            } else {
-                pnlPatientInfo.setBounds(40, 245, 240, 0);
-                btnInventory.setBounds(20, 245, 260, 45);
-
-                if (pnlInventory.isVisible()) {
-                    pnlInventory.setBounds(40, 290, 240, 200);
-                    btnReport.setBounds(20, 510, 260, 45);
-                } else {
-                    pnlInventory.setBounds(40, 290, 240, 0);
-                    btnReport.setBounds(20, 290, 260, 45);
-                }
-                btnPInfo.setText("Patient Records  +");
-            }
-            leftSidebar.repaint();
-            leftSidebar.revalidate();
-        });
-        
-        btnInventory.addActionListener(e -> {
-            boolean expandIOptions = !pnlInventory.isVisible();
-            pnlInventory.setVisible(expandIOptions);
-            
-            if (expandIOptions) {
-                pnlInventory.setBounds(40, 465, 240, 200);
-                
-                if (pnlPatientInfo.isVisible()) {
-                    btnInventory.setBounds(20, 420, 260, 45);
-                    pnlInventory.setBounds(40, 465, 240, 200);
-                    btnReport.setBounds(20, 680, 260, 45);
-                } else {
-                    btnInventory.setBounds(20, 245, 260, 45);
-                    pnlInventory.setBounds(40, 290, 240, 200);
-                    btnReport.setBounds(20, 510, 260, 45);
-                }
-                btnInventory.setText("Inventory  -");
-            } else {
-                pnlInventory.setBounds(40, 475, 240, 0);
-                
-                if (pnlPatientInfo.isVisible()) {
-                    btnReport.setBounds(20, 465, 260, 45);
-                } else {
-                    btnReport.setBounds(20, 290, 260, 45);
-                }
-                btnInventory.setText("Inventory  +");
-            }
-            leftSidebar.repaint();
-            leftSidebar.revalidate();
-        });
-
-        JButton btnAppearance = new JButton("Appearance");
-        btnAppearance.setLayout(null);
-        btnAppearance.setBounds(20, 880, 260, 45);
-        btnAppearance.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnAppearance.setForeground(Color.WHITE);
-        btnAppearance.setBackground(new Color(0x39, 0x5A, 0x7F));
-        btnAppearance.setBorderPainted(false);
-        btnAppearance.setFocusPainted(false);
-        btnAppearance.setContentAreaFilled(false);
-        btnAppearance.setOpaque(true);
-        btnAppearance.setHorizontalAlignment(SwingConstants.LEFT);
-        btnAppearance.setMargin(new Insets(0, 10, 0, 0));
-        leftSidebar.add(btnAppearance);
-        
-        JRadioButton rbtnDarkMode = new JRadioButton("Dark Mode");
-        rbtnDarkMode.setBounds(60, 930, 200, 30);
-        rbtnDarkMode.setForeground(Color.WHITE);
-        rbtnDarkMode.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        rbtnDarkMode.setBackground(new Color(0x39, 0x5A, 0x7F));
-        rbtnDarkMode.setOpaque(true);
-        leftSidebar.add(rbtnDarkMode);
-
-        // Doctor profile section
-        JPanel HPanel = new JPanel();
-        HPanel.setLayout(null);
-        HPanel.setBounds(300, 0, 1620, 70);
-        HPanel.setBackground(new Color(0xA3, 0xCA, 0xE9));
-        add(HPanel);
-        
-        JLabel lblTabtlt = new JLabel("Patient Name");
-        lblTabtlt.setBounds(20, 15, 300, 40);
-        lblTabtlt.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblTabtlt.setForeground(Color.BLACK);
-        HPanel.add(lblTabtlt);
-        
-        ImageIcon DoctorPic = new ImageIcon("doctorPic");
-        JLabel lblDocPic = new JLabel(DoctorPic);
-        lblDocPic.setBounds(1500, 5, 50, 50);
-        HPanel.add(lblDocPic);
-        
-        JLabel lblDoctorName = new JLabel("Dr. John Smith");
-        lblDoctorName.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblDoctorName.setBounds(1280, 15, 200, 40);
-        HPanel.add(lblDoctorName);
-        
-        JTextField txtSearch = new JTextField("Search...");
-        txtSearch.setBounds(950, 15, 300, 35);
-        txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-        HPanel.add(txtSearch);
 }
     
     public JPanel createLine(int x, int y, int width, int height, Color color) {
@@ -699,7 +460,7 @@ public class Doctor_MedicalHistory extends JFrame {
     public void DiagnosticsPanel(){
         JPanel pnldiagnostics = new JPanel();
         pnldiagnostics.setLayout(null);
-        pnldiagnostics.setBounds(20, 380, 650, 300);
+        pnldiagnostics.setBounds(1080, 20, 700, 400);
         pnldiagnostics.setBackground(Color.WHITE);
         centerPanel.add(pnldiagnostics);
         
@@ -787,7 +548,7 @@ public class Doctor_MedicalHistory extends JFrame {
     public void MedicationsPanel(){
         JPanel pnlmedications = new JPanel();
         pnlmedications.setLayout(null);
-        pnlmedications.setBounds(20, 700, 650, 240);
+        pnlmedications.setBounds(20, 380, 650, 240);
         pnlmedications.setBackground(Color.WHITE);
         centerPanel.add(pnlmedications);
     

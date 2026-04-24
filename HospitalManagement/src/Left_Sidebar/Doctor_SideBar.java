@@ -2,6 +2,7 @@ package Left_Sidebar;
 
 import static Color_Palette.ColorPalette.*;
 import Login_Startup.Login;
+import MedicalHistory.Doctor_MedicalHistory;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -84,6 +85,11 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
             btnPInfoOptions.setOpaque(true);
             btnPInfoOptions.setHorizontalAlignment(SwingConstants.LEFT);
             btnPInfoOptions.setMargin(new Insets(0, 10, 0, 0));
+            btnPInfoOptions.addActionListener(e -> {
+            if (PInfOption.equals("Medical History")) {
+                navPage.turnPage(new Doctor_MedicalHistory());
+            }
+            });
             pnlPInfo.add(btnPInfoOptions);
             PInfoOption += 40;
         }
