@@ -1,5 +1,8 @@
 package Left_Sidebar;
 
+import Appointments.Admin_SchedAppointment;
+import static Color_Palette.ColorPalette.*;
+import Dashboard.Admin_Dashboard;
 import Login_Startup.Login;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,7 +11,7 @@ import javax.swing.*;
 
 public class Admin_Sidebar extends JPanel implements ActionListener{
 
-    private JButton btnLogout;
+    private JButton btnDashboard, btnLogout, btnAppointment;
     private Admin_SideBarFrame navPage;
     
     public Admin_Sidebar(Admin_SideBarFrame navPage) {
@@ -18,7 +21,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         JPanel leftSidebar = new JPanel();
         leftSidebar.setLayout(null);
         leftSidebar.setBounds(0, 0, 300, 1000);
-        leftSidebar.setBackground(new Color(0x39, 0x5A, 0x7F));
+        leftSidebar.setBackground(darkBlue);
         add(leftSidebar);
         
         ImageIcon imgDlogo = new ImageIcon(getClass().getResource("/resources/eTriage.Logo.png"));
@@ -33,12 +36,12 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         lblLogoTitle.setFont(new Font("Calibri", Font.BOLD, 28));
         leftSidebar.add(lblLogoTitle);
         
-        JButton btnDashboard = new JButton("Dashboard");
+        btnDashboard = new JButton("Dashboard");
         btnDashboard.setLayout(null);
         btnDashboard.setBounds(20, 260, 260, 45);
         btnDashboard.setFont(new Font("Calibri", Font.BOLD, 20));
         btnDashboard.setForeground(Color.WHITE);
-        btnDashboard.setBackground(new Color(0x39, 0x5A, 0x7F));
+        btnDashboard.setBackground(darkBlue);
         btnDashboard.setBorderPainted(false);
         btnDashboard.setFocusPainted(false);
         btnDashboard.setContentAreaFilled(true);
@@ -52,7 +55,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnUManagement.setBounds(20, 320, 260, 45);
         btnUManagement.setFont(new Font("Calibri", Font.BOLD, 20));
         btnUManagement.setForeground(Color.WHITE);
-        btnUManagement.setBackground(new Color(0x39, 0x5A, 0x7F));
+        btnUManagement.setBackground(darkBlue);
         btnUManagement.setBorderPainted(false);
         btnUManagement.setFocusPainted(false);
         btnUManagement.setContentAreaFilled(true);
@@ -65,7 +68,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnPInfo.setBounds(20, 380, 260, 45);
         btnPInfo.setFont(new Font("Calibri", Font.BOLD, 20));
         btnPInfo.setForeground(Color.WHITE);
-        btnPInfo.setBackground(new Color(0x39, 0x5A, 0x7F));
+        btnPInfo.setBackground(darkBlue);
         btnPInfo.setBorderPainted(false);
         btnPInfo.setFocusPainted(false);
         btnPInfo.setContentAreaFilled(false);
@@ -74,24 +77,24 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnPInfo.setMargin(new Insets(0, 10, 0, 0));
         leftSidebar.add(btnPInfo);
         
-        JButton btAppointment = new JButton("Appointment");
-        btAppointment.setBounds(20, 440, 260, 45);
-        btAppointment.setFont(new Font("Calibri", Font.BOLD, 20));
-        btAppointment.setForeground(Color.WHITE);
-        btAppointment.setBackground(new Color(0x39, 0x5A, 0x7F));
-        btAppointment.setBorderPainted(false);
-        btAppointment.setFocusPainted(false);
-        btAppointment.setContentAreaFilled(false);
-        btAppointment.setOpaque(true);
-        btAppointment.setHorizontalAlignment(SwingConstants.LEFT);
-        btAppointment.setMargin(new Insets(0, 10, 0, 0));
-        leftSidebar.add(btAppointment);
+        btnAppointment = new JButton("Appointment");
+        btnAppointment.setBounds(20, 440, 260, 45);
+        btnAppointment.setFont(new Font("Calibri", Font.BOLD, 20));
+        btnAppointment.setForeground(Color.WHITE);
+        btnAppointment.setBackground(darkBlue);
+        btnAppointment.setBorderPainted(false);
+        btnAppointment.setFocusPainted(false);
+        btnAppointment.setContentAreaFilled(false);
+        btnAppointment.setOpaque(true);
+        btnAppointment.setHorizontalAlignment(SwingConstants.LEFT);
+        btnAppointment.setMargin(new Insets(0, 10, 0, 0));
+        leftSidebar.add(btnAppointment);
         
         JButton btnInventory = new JButton("Inventory  +");
         btnInventory.setBounds(20, 500, 260, 45);
         btnInventory.setFont(new Font("Calibri", Font.BOLD, 20));
         btnInventory.setForeground(Color.WHITE);
-        btnInventory.setBackground(new Color(0x39, 0x5A, 0x7F));
+        btnInventory.setBackground(darkBlue);
         btnInventory.setBorderPainted(false);
         btnInventory.setFocusPainted(false);
         btnInventory.setContentAreaFilled(false);
@@ -103,7 +106,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         JPanel pnlInventory = new JPanel();
         pnlInventory.setLayout(null);
         pnlInventory.setBounds(40, 545, 240, 200);
-        pnlInventory.setBackground(new Color(0x39, 0x5A, 0x7F));
+        pnlInventory.setBackground(darkBlue);
         pnlInventory.setVisible(false);
         leftSidebar.add(pnlInventory);
         
@@ -113,7 +116,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
             JButton btnPOptions = new JButton(InventoryOp);
             btnPOptions.setBounds(0, InveOption, 240, 35);
             btnPOptions.setForeground(Color.WHITE);
-            btnPOptions.setBackground(new Color(0x39, 0x5A, 0x7F));
+            btnPOptions.setBackground(darkBlue);
             btnPOptions.setFont(new Font("Calibri", Font.BOLD, 18));
             btnPOptions.setBorderPainted(false);
             btnPOptions.setFocusPainted(false);
@@ -130,7 +133,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnReport.setBounds(20, 560, 260, 45);
         btnReport.setFont(new Font("Calibri", Font.BOLD, 20));
         btnReport.setForeground(Color.WHITE);
-        btnReport.setBackground(new Color(0x39, 0x5A, 0x7F));
+        btnReport.setBackground(darkBlue);
         btnReport.setBorderPainted(false);
         btnReport.setFocusPainted(false);
         btnReport.setContentAreaFilled(false);
@@ -161,7 +164,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnAppearance.setBounds(20, 830, 260, 45);
         btnAppearance.setFont(new Font("Calibri", Font.BOLD, 20));
         btnAppearance.setForeground(Color.WHITE);
-        btnAppearance.setBackground(new Color(0x39, 0x5A, 0x7F));
+        btnAppearance.setBackground(darkBlue);
         btnAppearance.setBorderPainted(false);
         btnAppearance.setFocusPainted(false);
         btnAppearance.setContentAreaFilled(false);
@@ -174,7 +177,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         rbtnDarkMode.setBounds(60, 880, 200, 30);
         rbtnDarkMode.setForeground(Color.WHITE);
         rbtnDarkMode.setFont(new Font("Calibri", Font.PLAIN, 18));
-        rbtnDarkMode.setBackground(new Color(0x39, 0x5A, 0x7F));
+        rbtnDarkMode.setBackground(darkBlue);
         rbtnDarkMode.setOpaque(true);
         leftSidebar.add(rbtnDarkMode);
         
@@ -182,7 +185,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnLogout.setBounds(20, 930, 260, 45);
         btnLogout.setFont(new Font("Calibri", Font.BOLD, 18));
         btnLogout.setForeground(Color.BLACK);
-        btnLogout.setBackground(new Color(0xE9, 0xEC, 0xEE));
+        btnLogout.setBackground(veryLightBlue);
         btnLogout.setBorderPainted(false);
         btnLogout.setFocusPainted(false);
         btnLogout.setContentAreaFilled(true);
@@ -190,7 +193,10 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnLogout.setHorizontalAlignment(SwingConstants.CENTER);
         leftSidebar.add(btnLogout);
         
+        btnDashboard.addActionListener(this);
+        btnAppointment.addActionListener(this);
         btnLogout.addActionListener(this);
+        
         
     }
 
@@ -204,14 +210,17 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
                 "Logout Confirmation",
                 JOptionPane.YES_NO_OPTION
         );
-
             if (confirm == JOptionPane.YES_OPTION) {
                 Login lg = new Login();
                 lg.setVisible(true);
                 navPage.dispose();
             }
-        }
-    }
+        } else if (ae.getSource() == btnDashboard) {
+            navPage.turnPage(new Admin_Dashboard());
+        } else if (ae.getSource() == btnAppointment) {
+        navPage.turnPage(new Admin_SchedAppointment());
+    } 
+    } 
 
 }
     
