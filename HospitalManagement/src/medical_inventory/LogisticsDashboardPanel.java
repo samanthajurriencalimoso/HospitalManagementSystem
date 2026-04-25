@@ -23,14 +23,14 @@ public class LogisticsDashboardPanel extends JPanel {
         pnlMain.setBounds(0, 0, 1620, 930);
         add(pnlMain);
         
-        // TITLE
+      
         JLabel title = new JLabel("Logistics Dashboard");
         title.setFont(new Font("Segoe UI", Font.BOLD, 24));
         title.setForeground(ColorPalette.darkBlue);
         title.setBounds(30, 20, 400, 40);
         pnlMain.add(title);
         
-        // SUMMARY CARDS
+      
         JPanel tab1 = createTab("Pending Orders", "0", ColorPalette.Yellow);
         tab1.setBounds(30, 80, 500, 100);
         pnlMain.add(tab1);
@@ -46,7 +46,7 @@ public class LogisticsDashboardPanel extends JPanel {
         pnlMain.add(tab3);
         lblTotalValue = (JLabel) tab3.getComponent(1);
         
-        // FORM PANEL
+     
         JPanel formPanel = new JPanel();
         formPanel.setLayout(null);
         formPanel.setBackground(Color.WHITE);
@@ -79,7 +79,7 @@ public class LogisticsDashboardPanel extends JPanel {
         btnAdd.addActionListener(e -> addOrder());
         formPanel.add(btnAdd);
         
-        // TABLE
+       
         String[] cols = {"Item", "Amount", "Status"};
         tableModel = new DefaultTableModel(cols, 0);
         table = new JTable(tableModel);
@@ -91,8 +91,8 @@ public class LogisticsDashboardPanel extends JPanel {
         JScrollPane scroll = new JScrollPane(table);
         scroll.setBounds(30, 310, 1560, 510);
         pnlMain.add(scroll);
+       
         
-        // BOTTOM BUTTONS
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(null);
         btnPanel.setBackground(Color.WHITE);

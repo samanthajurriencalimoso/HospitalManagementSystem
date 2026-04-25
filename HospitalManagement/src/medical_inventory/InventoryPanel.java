@@ -23,14 +23,13 @@ public class InventoryPanel extends JPanel {
         pnlMain.setBounds(0, 0, 1620, 930);
         add(pnlMain);
         
-        // TITLE
+      
         JLabel title = new JLabel("Inventory Management");
         title.setFont(new Font("Segoe UI", Font.BOLD, 24));
         title.setForeground(ColorPalette.darkBlue);
         title.setBounds(30, 20, 400, 40);
         pnlMain.add(title);
-        
-        // SUMMARY CARDS
+   
         JPanel tab1 = createTab("Total Items", "0", ColorPalette.darkBlue);
         tab1.setBounds(30, 80, 500, 100);
         pnlMain.add(tab1);
@@ -46,7 +45,7 @@ public class InventoryPanel extends JPanel {
         pnlMain.add(tab3);
         lblTotalValue = (JLabel) tab3.getComponent(1);
         
-        // FORM PANEL
+      
         JPanel formPanel = new JPanel();
         formPanel.setLayout(null);
         formPanel.setBackground(Color.WHITE);
@@ -87,7 +86,7 @@ public class InventoryPanel extends JPanel {
         btnAdd.addActionListener(e -> addItem());
         formPanel.add(btnAdd);
         
-        // TABLE
+       
         String[] cols = {"Item", "Quantity", "Price", "Status"};
         tableModel = new DefaultTableModel(cols, 0);
         table = new JTable(tableModel);
@@ -100,7 +99,7 @@ public class InventoryPanel extends JPanel {
         scroll.setBounds(30, 310, 1560, 510);
         pnlMain.add(scroll);
         
-        // BOTTOM BUTTONS
+        
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(null);
         btnPanel.setBackground(Color.WHITE);

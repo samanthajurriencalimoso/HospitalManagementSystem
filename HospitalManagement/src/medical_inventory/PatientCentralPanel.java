@@ -28,14 +28,14 @@ public class PatientCentralPanel extends JPanel {
         int panelWidth = 1620;
         int startX = 30;
         
-        // TITLE
+       
         JLabel title = new JLabel("Patient Central Dashboard");
         title.setFont(new Font("Segoe UI", Font.BOLD, 24));
         title.setForeground(ColorPalette.darkBlue);
         title.setBounds(startX, 20, 400, 40);
         pnlMain.add(title);
         
-        // SUMMARY CARDS
+    
         int tabWidth = (panelWidth - 120) / 4;
         int tabHeight = 100;
         int tabY = 80;
@@ -58,7 +58,7 @@ public class PatientCentralPanel extends JPanel {
         tab4.setBounds(startX + (tabWidth + 20) * 3, tabY, tabWidth, tabHeight);
         pnlMain.add(tab4);
         
-        // FORM PANEL
+     
         JPanel formPanel = new JPanel();
         formPanel.setLayout(null);
         formPanel.setBackground(Color.WHITE);
@@ -91,7 +91,7 @@ public class PatientCentralPanel extends JPanel {
         btnAdd.addActionListener(e -> addPatient());
         formPanel.add(btnAdd);
         
-        // TABLE
+       
         String[] cols = {"Name", "Room", "Status"};
         tableModel = new DefaultTableModel(cols, 0);
         table = new JTable(tableModel);
@@ -104,7 +104,7 @@ public class PatientCentralPanel extends JPanel {
         scroll.setBounds(startX, 310, panelWidth - 60, 450);
         pnlMain.add(scroll);
         
-        // FOOTER (Search + Info)
+       
         JTextField txtSearch = new JTextField("Search...");
         txtSearch.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         txtSearch.setForeground(Color.GRAY);
@@ -118,7 +118,7 @@ public class PatientCentralPanel extends JPanel {
         lblInfo.setHorizontalAlignment(SwingConstants.RIGHT);
         pnlMain.add(lblInfo);
         
-        // BOTTOM BUTTONS
+       
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(null);
         btnPanel.setBackground(Color.WHITE);

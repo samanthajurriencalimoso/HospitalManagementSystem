@@ -99,7 +99,7 @@ public class UserManagementPanel extends JPanel {
         btnSave.addActionListener(e -> addUser());
         formPanel.add(btnSave);
         
-        JButton btnEdit = new JButton("✏️ EDIT");
+        JButton btnEdit = new JButton("EDIT");
         btnEdit.setBackground(ColorPalette.darkBlue);
         btnEdit.setForeground(Color.WHITE);
         btnEdit.setFont(new Font("Segoe UI", Font.BOLD, 12));
