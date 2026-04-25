@@ -30,9 +30,9 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
         leftSidebar.add(lblLogo);
         
         JLabel lblLogoTitle = new JLabel("eTriage");
-        lblLogoTitle.setBounds(110, 210, 120, 30);
+        lblLogoTitle.setBounds(105, 200, 120, 30);
         lblLogoTitle.setForeground(Color.WHITE);
-        lblLogoTitle.setFont(new Font("Calibri", Font.BOLD, 28));
+        lblLogoTitle.setFont(new Font("Calibri", Font.ITALIC, 28));
         leftSidebar.add(lblLogoTitle);
         
         JButton btnDashboard = new JButton("Dashboard");
