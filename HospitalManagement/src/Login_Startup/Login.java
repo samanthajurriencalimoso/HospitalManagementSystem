@@ -1,5 +1,6 @@
 package Login_Startup;
 
+import static Color_Palette.ColorPalette.*;
 import Left_Sidebar.Admin_SideBarFrame;
 import Left_Sidebar.Doctor_SideBarFrame;
 import Left_Sidebar.Nurse_SideBarFrame;
@@ -37,12 +38,12 @@ public class Login extends JFrame implements ActionListener{
         pnlLogin.setBounds(700, 340, 520, 400);
         pnlLogin.setBackground(new Color(245, 245, 245, 235));
         pnlLogin.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(0xAC, 0xAC, 0xAC), 1, true), // rounded border
+            BorderFactory.createLineBorder(borderLBLUE, 1, true), // rounded border
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
         
         pnlLogin.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(172, 172, 172), 1, true),
+                BorderFactory.createLineBorder(borderLBLUE, 1, true),
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
 
@@ -61,7 +62,7 @@ public class Login extends JFrame implements ActionListener{
         
         txtUsername = new JTextField();
         txtUsername.setBounds(200, 130, 240, 35);
-        txtUsername.setBackground(new Color(163, 202, 233));
+        txtUsername.setBackground(LightGray);
         txtUsername.setFont(new Font("Calibri", Font.PLAIN, 16));
         txtUsername.setBorder(createInputBorder());
         pnlLogin.add(txtUsername);
@@ -73,7 +74,7 @@ public class Login extends JFrame implements ActionListener{
 
         txtPassword = new JPasswordField();
         txtPassword.setBounds(200, 190, 240, 35);
-        txtPassword.setBackground(new Color(0xA3, 0xCA, 0xE9));
+        txtPassword.setBackground(LightGray);
         txtPassword.setFont(new Font("Calibri", Font.PLAIN, 16));
         txtPassword.setBorder(createInputBorder());
         pnlLogin.add(txtPassword);
@@ -87,7 +88,7 @@ public class Login extends JFrame implements ActionListener{
 
         btnLogin = new JButton("LOGIN");
         btnLogin.setBounds(240, 290, 150, 45);
-        btnLogin.setBackground(new Color(57, 90, 127));
+        btnLogin.setBackground(darkBlue);
         btnLogin.setFocusPainted(false);
         btnLogin.setBorderPainted(false);
         btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -100,11 +101,11 @@ public class Login extends JFrame implements ActionListener{
         btnLogin.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnLogin.setBackground(new Color(85, 130, 180));
+                btnLogin.setBackground(mediumBlue);
             }
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnLogin.setBackground(new Color(57, 90, 127));
+                btnLogin.setBackground(darkBlue);
             }
         });
         
@@ -113,7 +114,7 @@ public class Login extends JFrame implements ActionListener{
     
     private Border createInputBorder() {
         return BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(120, 120, 120, 80), 1, true),
+                BorderFactory.createLineBorder(darkBlue, 1, true),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         );
     }

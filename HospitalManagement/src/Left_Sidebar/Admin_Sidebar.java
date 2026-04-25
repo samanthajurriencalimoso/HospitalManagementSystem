@@ -218,7 +218,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         } else if (ae.getSource() == btnDashboard) {
             navPage.turnPage(new Admin_Dashboard());
         } else if (ae.getSource() == btnAppointment) {
-        navPage.turnPage(new Admin_SchedAppointment());
+            navPage.turnPage(new Admin_SchedAppointment());
     } 
     } 
 

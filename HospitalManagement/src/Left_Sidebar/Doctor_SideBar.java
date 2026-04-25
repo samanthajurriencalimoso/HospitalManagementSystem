@@ -1,6 +1,8 @@
 package Left_Sidebar;
 
+import Appointments.Doctor_SchedAppointment;
 import static Color_Palette.ColorPalette.*;
+import Dashboard.Doctor_Dashboard;
 import Login_Startup.Login;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,7 +12,7 @@ import javax.swing.*;
 
 public class Doctor_SideBar extends JPanel implements ActionListener{
     
-    private JButton btnLogout;
+    private JButton btnDashboard, btnAppointment, btnLogout;
     private Doctor_SideBarFrame navPage;
     
     public Doctor_SideBar(Doctor_SideBarFrame navPage) {
@@ -35,7 +37,7 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
         lblLogoTitle.setFont(new Font("Calibri", Font.ITALIC, 28));
         leftSidebar.add(lblLogoTitle);
         
-        JButton btnDashboard = new JButton("Dashboard");
+        btnDashboard = new JButton("Dashboard");
         btnDashboard.setLayout(null);
         btnDashboard.setBounds(20, 260, 260, 45);
         btnDashboard.setFont(new Font("Calibri", Font.BOLD, 20));
@@ -88,18 +90,18 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
             PInfoOption += 40;
         }
         
-        JButton btAppointment = new JButton("Appointment");
-        btAppointment.setBounds(20, 380, 260, 45);
-        btAppointment.setFont(new Font("Calibri", Font.BOLD, 20));
-        btAppointment.setForeground(Color.WHITE);
-        btAppointment.setBackground(darkBlue);
-        btAppointment.setBorderPainted(false);
-        btAppointment.setFocusPainted(false);
-        btAppointment.setContentAreaFilled(false);
-        btAppointment.setOpaque(true);
-        btAppointment.setHorizontalAlignment(SwingConstants.LEFT);
-        btAppointment.setMargin(new Insets(0, 10, 0, 0));
-        leftSidebar.add(btAppointment);
+        btnAppointment = new JButton("Appointment");
+        btnAppointment.setBounds(20, 380, 260, 45);
+        btnAppointment.setFont(new Font("Calibri", Font.BOLD, 20));
+        btnAppointment.setForeground(Color.WHITE);
+        btnAppointment.setBackground(darkBlue);
+        btnAppointment.setBorderPainted(false);
+        btnAppointment.setFocusPainted(false);
+        btnAppointment.setContentAreaFilled(false);
+        btnAppointment.setOpaque(true);
+        btnAppointment.setHorizontalAlignment(SwingConstants.LEFT);
+        btnAppointment.setMargin(new Insets(0, 10, 0, 0));
+        leftSidebar.add(btnAppointment);
         
         JButton btnInventory = new JButton("Inventory  +");
         btnInventory.setBounds(20, 440, 260, 45);
@@ -159,7 +161,7 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
             
             if (expandIOptions) {
                 btnPInfo.setText("Patient Information  -");
-                btAppointment.setBounds(20, 460, 260, 45);
+                btnAppointment.setBounds(20, 460, 260, 45);
                 btnInventory.setBounds(20, 520, 260, 45);
                 
                 if (pnlInventory.isVisible()) {
@@ -171,7 +173,7 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
                 
             } else {
                 btnPInfo.setText("Patient Information  +");
-                btAppointment.setBounds(20, 380, 260, 45);
+                btnAppointment.setBounds(20, 380, 260, 45);
                 btnInventory.setBounds(20, 440, 260, 45);
 
                 if (pnlInventory.isVisible()) {
@@ -245,6 +247,8 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
         btnLogout.setHorizontalAlignment(SwingConstants.CENTER);
         leftSidebar.add(btnLogout);
         
+        btnDashboard.addActionListener(this);
+        btnAppointment.addActionListener(this);
         btnLogout.addActionListener(this);
     }
 
@@ -264,6 +268,10 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
                 lg.setVisible(true);
                 navPage.dispose();
             }
+        } else if (ae.getSource() == btnDashboard) {
+            navPage.turnPage(new Doctor_Dashboard());
+        } else if (ae.getSource() == btnAppointment) {
+            navPage.turnPage(new  Doctor_SchedAppointment());
         }
     }
 }
