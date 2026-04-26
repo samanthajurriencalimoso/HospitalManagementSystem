@@ -51,7 +51,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener{
         JLabel lblAvail = new JLabel("4 Doctor's Available", SwingConstants.CENTER);
         lblAvail.setBounds(0, 0, 250, 40);
         lblAvail.setFont(new Font("Calibri", Font.BOLD, 18));
-        lblAvail.setForeground(Color.WHITE);
+        lblAvail.setForeground(Color.BLACK);
         pnlAvail.add(lblAvail);
         
         JPanel pnlUrgent = new JPanel();
@@ -63,7 +63,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener{
         JLabel lblUrgent = new JLabel("6 Urgent Cases", SwingConstants.CENTER);
         lblUrgent.setBounds(0, 0, 250, 40);
         lblUrgent.setFont(new Font("Calibri", Font.BOLD, 18));
-        lblUrgent.setForeground(Color.WHITE);
+        lblUrgent.setForeground(Color.BLACK);
         pnlUrgent.add(lblUrgent);
         
         JPanel pnlApp = new JPanel();
@@ -75,7 +75,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener{
         JLabel lblApp = new JLabel("18 Pending Appointments", SwingConstants.CENTER);
         lblApp.setBounds(0, 0, 250, 40);
         lblApp.setFont(new Font("Calibri", Font.BOLD, 18));
-        lblApp.setForeground(Color.WHITE);
+        lblApp.setForeground(Color.BLACK);
         pnlApp.add(lblApp);
         
         JPanel pnlSelection = new JPanel();
@@ -100,7 +100,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener{
         pnlQuickStats.setLayout(null);
         pnlQuickStats.setBounds(130, 90, 300, 120);
         pnlQuickStats.setBackground(Color.WHITE);
-        pnlQuickStats.setBorder(BorderFactory.createLineBorder(new Color(0xA3, 0xCA, 0xE9), 2));
+        pnlQuickStats.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
         pnlSelection.add(pnlQuickStats);
         
         JLabel lblQSTitle = new JLabel("Quick Stats");
@@ -119,7 +119,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener{
         pnlUpcoming.setLayout(null);
         pnlUpcoming.setBounds(440, 90, 300, 120);
         pnlUpcoming.setBackground(Color.WHITE);
-        pnlUpcoming.setBorder(BorderFactory.createLineBorder(new Color(0xA3, 0xCA, 0xE9), 2));
+        pnlUpcoming.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
         pnlSelection.add(pnlUpcoming);
         
         JLabel lblUpTitle = new JLabel("Upcoming Appointments");
@@ -138,7 +138,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener{
         pnlAlerts.setLayout(null);
         pnlAlerts.setBounds(750, 90, 300, 120);
         pnlAlerts.setBackground(Color.WHITE);
-        pnlAlerts.setBorder(BorderFactory.createLineBorder(new Color(0xA3, 0xCA, 0xE9), 2));
+        pnlAlerts.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
         pnlSelection.add(pnlAlerts);
         
         JLabel lblAlertsTitle = new JLabel("Alerts & Notifications");
@@ -157,7 +157,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener{
         pnlAvail2.setLayout(null);
         pnlAvail2.setBounds(1070, 90, 300, 120);
         pnlAvail2.setBackground(Color.WHITE);
-        pnlAvail2.setBorder(BorderFactory.createLineBorder(new Color(0xA3, 0xCA, 0xE9), 2));
+        pnlAvail2.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
         pnlSelection.add(pnlAvail2);
         
         JLabel lblAvailTitle = new JLabel("Doctor Availability");

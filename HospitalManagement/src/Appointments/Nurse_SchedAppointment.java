@@ -315,13 +315,13 @@ public class Nurse_SchedAppointment extends JPanel{
         btnEdit2.setFocusPainted(false);
         pnlSched.add(btnEdit2);
         
-        JButton btnCancel = new JButton("Mark Done");
-        btnCancel.setBounds(630, 750, 120, 35);
-        btnCancel.setFont(new Font("Calibri", Font.PLAIN, 16));
-        btnCancel.setBackground(darkBlue);
-        btnCancel.setForeground(Color.WHITE);
-        btnCancel.setFocusPainted(false);
-        pnlSched.add(btnCancel);
+        JButton btnDone = new JButton("Mark Done");
+        btnDone.setBounds(630, 750, 120, 35);
+        btnDone.setFont(new Font("Calibri", Font.PLAIN, 16));
+        btnDone.setBackground(darkBlue);
+        btnDone.setForeground(Color.WHITE);
+        btnDone.setFocusPainted(false);
+        pnlSched.add(btnDone);
         
         JButton btnView = new JButton("View All Tasks");
         btnView.setBounds(770, 750, 220, 35);

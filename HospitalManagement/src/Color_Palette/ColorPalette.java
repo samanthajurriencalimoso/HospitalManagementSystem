@@ -23,10 +23,10 @@ public class ColorPalette {
     public static final Color LightGray = new Color(235, 235, 235);
     
     //Color for Buttons, Summary Buttons
-    public static final Color LightRed =  new Color(0x5DAA9C);
-    public static final Color Green =  new Color(0xE06666);
-    public static final Color Yellow =  new Color(0xE69138);
-    public static final Color Blue =  new Color(0x6FA8DC);
+    public static final Color LightRed = new Color(0xFF6666);
+    public static final Color Green = new Color(0x66CC66);
+    public static final Color Yellow = new Color(0xFFD966);
+    public static final Color Blue = new Color(0x6FA8DC);
 
     //Border Colors
     public static final Color borderBLACK = Color.BLACK;

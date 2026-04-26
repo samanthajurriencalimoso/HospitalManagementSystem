@@ -140,7 +140,7 @@ public class Nurse_SideBar extends JPanel implements ActionListener{
             InveOption += 35;
         }
         
-        JButton btnReport = new JButton("Generating Report");
+        JButton btnReport = new JButton("Report & Documents");
         btnReport.setLayout(null);
         btnReport.setBounds(20, 500, 260, 45);
         btnReport.setFont(new Font("Calibri", Font.BOLD, 20));

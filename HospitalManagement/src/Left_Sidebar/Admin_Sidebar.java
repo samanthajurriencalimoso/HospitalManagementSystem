@@ -3,6 +3,7 @@ package Left_Sidebar;
 import Appointments.Admin_SchedAppointment;
 import static Color_Palette.ColorPalette.*;
 import Dashboard.Admin_Dashboard;
+import Generating_Reports.Admin_Reports;
 import Login_Startup.Login;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,7 +12,7 @@ import javax.swing.*;
 
 public class Admin_Sidebar extends JPanel implements ActionListener{
 
-    private JButton btnDashboard, btnLogout, btnAppointment;
+    private JButton btnDashboard, btnAppointment, btnReport, btnLogout;
     private Admin_SideBarFrame navPage;
     
     public Admin_Sidebar(Admin_SideBarFrame navPage) {
@@ -105,12 +106,12 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         
         JPanel pnlInventory = new JPanel();
         pnlInventory.setLayout(null);
-        pnlInventory.setBounds(40, 545, 240, 200);
+        pnlInventory.setBounds(40, 545, 240, 90);
         pnlInventory.setBackground(darkBlue);
         pnlInventory.setVisible(false);
         leftSidebar.add(pnlInventory);
         
-        String[] InventoryOptions = {"Stock Orders", "Logistics", "Supplies", "Pharmacy Inventory", "Equipment"};
+        String[] InventoryOptions = {"Inventory Management", "Logistics"};
         int InveOption = 0;
         for (String InventoryOp : InventoryOptions) {
             JButton btnPOptions = new JButton(InventoryOp);
@@ -128,7 +129,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
             InveOption += 40;
         }
         
-        JButton btnReport = new JButton("Generating Report");
+        btnReport = new JButton("Report & Documents");
         btnReport.setLayout(null);
         btnReport.setBounds(20, 560, 260, 45);
         btnReport.setFont(new Font("Calibri", Font.BOLD, 20));
@@ -148,8 +149,8 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
             
                 if (expandIOptions) {
                     btnInventory.setText("Inventory  -");
-                    pnlInventory.setBounds(40, 545, 240, 200);
-                    btnReport.setBounds(20, 760, 260, 45);
+                    pnlInventory.setBounds(40, 545, 240, 90);
+                    btnReport.setBounds(20, 650, 260, 45);
                 } else {
                     btnInventory.setText("Inventory  +");
                     pnlInventory.setVisible(false);
@@ -195,6 +196,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         
         btnDashboard.addActionListener(this);
         btnAppointment.addActionListener(this);
+        btnReport.addActionListener(this);
         btnLogout.addActionListener(this);
         
         
@@ -219,7 +221,9 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
             navPage.turnPage(new Admin_Dashboard());
         } else if (ae.getSource() == btnAppointment) {
             navPage.turnPage(new Admin_SchedAppointment());
-    } 
+        } else if (ae.getSource() == btnReport) {
+            navPage.turnPage(new Admin_Reports());
+        }
     } 
 
 }
