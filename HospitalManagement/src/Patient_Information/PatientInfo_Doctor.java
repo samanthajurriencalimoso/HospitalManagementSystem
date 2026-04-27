@@ -10,85 +10,27 @@ import java.awt.*;
 */
 
 
-public class PatientInfo_Doctor extends JFrame {
-
+public class PatientInfo_Doctor extends JPanel {
+    
     public PatientInfo_Doctor(){
-
-        setTitle("eTriage PATIENT INFORMATION");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setMinimumSize(new Dimension(1000,1000));
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        setResizable(false);
-
+        
+        setLayout(null);
+        setBounds(0, 0, 1620, 930);
+       
         Font titleFont = new Font("Calibri", Font.BOLD, 16);
         Font bodyFont = new Font("Calibri", Font.PLAIN, 13);
-
-        //left sidebar
-        JPanel leftSideBar = new JPanel();
-        leftSideBar.setLayout(new BoxLayout(leftSideBar, BoxLayout.Y_AXIS));
-        leftSideBar.setBackground(new Color(0x39, 0x5A, 0x7F));
-        leftSideBar.setPreferredSize(new Dimension(250, getHeight()));
-        add(leftSideBar, BorderLayout.WEST);
-
-        JLabel lblmedical = new JLabel("eTriage");
-        lblmedical.setFont(new Font("Calibri", Font.BOLD, 20));
-        lblmedical.setForeground(Color.WHITE);
-        lblmedical.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblmedical.setBorder(BorderFactory.createEmptyBorder(40, 0, 40, 0));
-        leftSideBar.add(lblmedical);
-
-        String[] MenuOptions = {"Medical History", "Prescriptions", "Appointments", "Inventory", "Reports"};
-        for (String opt : MenuOptions) {
-            JButton btn = new JButton(opt);
-            btn.setMaximumSize(new Dimension(230, 45));
-            btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-            btn.setForeground(Color.WHITE);
-            btn.setFont(new Font("Calibri", Font.BOLD, 15));
-            btn.setBackground(new Color(0x39, 0x5A, 0x7F));
-            btn.setBorderPainted(false);
-            btn.setFocusPainted(false);
-            leftSideBar.add(btn);
-            leftSideBar.add(Box.createVerticalStrut(10));
-        }
-
-        //right panel
-        JPanel rightpanel = new JPanel(new BorderLayout());
-        add(rightpanel, BorderLayout.CENTER);
-
-        // top panel
-        JPanel topPanel = new JPanel(null);
-        topPanel.setPreferredSize(new Dimension(getWidth(), 80));
-        topPanel.setBackground(new Color(0xA3, 0xCA, 0xE9));
-        rightpanel.add(topPanel, BorderLayout.NORTH);
-
-        JLabel lblname = new JLabel("Patient Central");
-        lblname.setFont(new Font("Calibri", Font.BOLD, 20));
-        lblname.setBounds(30, 25, 300, 30);
-        topPanel.add(lblname);
-
-        JTextField txtsearch = new JTextField("Search...");
-        txtsearch.setBounds(700, 25, 300, 30);
-        topPanel.add(txtsearch);
-
-
-        //center panel
-        JPanel centerPanel = new JPanel(null);
-        centerPanel.setBackground(new Color(245,245,245));
-        rightpanel.add(centerPanel, BorderLayout.CENTER);
-
-        
-        //petient profiule card
+                
+        //patient profile card
         RoundedPanel profileCard = new RoundedPanel("#E9ECEE", Color.GRAY, 20, 1);
         profileCard.setBounds(30, 20, 1000, 120);
         profileCard.setLayout(null);
-        centerPanel.add(profileCard);
+        add(profileCard);
 
         ImageIcon img = new ImageIcon(getClass().getResource("/resources/PATIENT.PHOTO.png"));
-        Image imgScaled = img.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+        Image imgScaled = img.getImage().getScaledInstance(100, 120, Image.SCALE_SMOOTH);
 
         JLabel pic = new JLabel(new ImageIcon(imgScaled));
-        pic.setBounds(20, 20, 80, 80);
+        pic.setBounds(10, 20, 100, 100);
         profileCard.add(pic);
 
         
@@ -118,7 +60,7 @@ public class PatientInfo_Doctor extends JFrame {
         RoundedPanel details = new RoundedPanel("#E9ECEE", Color.GRAY, 20, 1);
         details.setBounds(30, 160, 600, 200);
         details.setLayout(null);
-        centerPanel.add(details);
+        add(details);
 
         JLabel lblDetails = new JLabel("Patient Details");
         lblDetails.setFont(titleFont);
@@ -172,7 +114,7 @@ public class PatientInfo_Doctor extends JFrame {
         RoundedPanel doctorNotes = new RoundedPanel("#FFFFFF", Color.GRAY, 20, 1);
         doctorNotes.setBounds(30, 380, 600, 220);
         doctorNotes.setLayout(null);
-        centerPanel.add(doctorNotes);
+        add(doctorNotes);
 
         JLabel lblNotes = new JLabel("Doctor's Notes");
         lblNotes.setFont(titleFont);
@@ -191,7 +133,7 @@ public class PatientInfo_Doctor extends JFrame {
         RoundedPanel vitals = new RoundedPanel("#A3CAE9", Color.BLACK, 20, 1);
         vitals.setBounds(650, 160, 380, 140);
         vitals.setLayout(null);
-        centerPanel.add(vitals);
+        add(vitals);
 
         JLabel lblVitals = new JLabel("Vitals Snapshot");
         lblVitals.setFont(titleFont);
@@ -209,7 +151,7 @@ public class PatientInfo_Doctor extends JFrame {
         RoundedPanel emergency = new RoundedPanel("#ACACAC", Color.BLACK, 20, 1);
         emergency.setBounds(650, 320, 380, 140);
         emergency.setLayout(null);
-        centerPanel.add(emergency);
+        add(emergency);
 
         JLabel lblEmergency = new JLabel("Emergency Contact");
         lblEmergency.setFont(titleFont);
@@ -227,7 +169,7 @@ public class PatientInfo_Doctor extends JFrame {
         RoundedPanel appointment = new RoundedPanel("#A3CAE9", Color.BLACK, 20, 1);
         appointment.setBounds(650, 480, 380, 120);
         appointment.setLayout(null);
-        centerPanel.add(appointment);
+        add(appointment);
 
         JLabel lblApp = new JLabel("Next Appointment");
         lblApp.setFont(titleFont);
@@ -241,6 +183,5 @@ public class PatientInfo_Doctor extends JFrame {
         appText.setOpaque(false);
         appointment.add(appText);
 
-        setVisible(true);
     }
 }

@@ -268,7 +268,7 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
             }
         } else if (ae.getSource() == btnPInfo) {
             PatientInfo_Doctor pi = new PatientInfo_Doctor();
-            pi.setVisible(true);
+            navPage.turnPage(pi);
         }
     }
 }
