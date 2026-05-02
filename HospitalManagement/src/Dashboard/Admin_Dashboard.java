@@ -1,5 +1,6 @@
 package Dashboard;
 
+import static Color_Palette.ColorPalette.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,7 +20,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         //Main Panel
         pnlMain = new JPanel();
         pnlMain.setLayout(null);
-        pnlMain.setBackground(new Color(0xE9, 0xEC, 0xEE));
+        pnlMain.setBackground(veryLightBlue);
         pnlMain.setBounds(0, 0, 1620, 930);
         add(pnlMain);
         
@@ -31,7 +32,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         JPanel pnlPatients = new JPanel();
         pnlPatients.setLayout(null);
         pnlPatients.setBounds(70, 100, 280, 120);
-        pnlPatients.setBackground(new Color(0x5DAA9C));
+        pnlPatients.setBackground(TealGreen);
         pnlMain.add(pnlPatients);
         
         JLabel lblPatients = new JLabel("Total Patients");
@@ -49,7 +50,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         JPanel pnlAppointment = new JPanel();
         pnlAppointment.setLayout(null);
         pnlAppointment.setBounds(370, 100, 280, 120);
-        pnlAppointment.setBackground(new Color(0x6FA8DC));
+        pnlAppointment.setBackground(Blue);
         pnlMain.add(pnlAppointment);
 
         JLabel lblATitle = new JLabel("Today's Appointments");
@@ -67,7 +68,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         JPanel pnlPrescription = new JPanel();
         pnlPrescription.setLayout(null);
         pnlPrescription.setBounds(670, 100, 220, 120);
-        pnlPrescription.setBackground(new Color(0xE69138));
+        pnlPrescription.setBackground(orange);
         pnlMain.add(pnlPrescription);
 
         JLabel lblPrTitle = new JLabel("Active Prescriptions");
@@ -85,7 +86,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         JPanel pnlBeds = new JPanel();
         pnlBeds.setLayout(null);
         pnlBeds.setBounds(910, 100, 220, 120);
-        pnlBeds.setBackground(new Color(0xE06666));
+        pnlBeds.setBackground(LightRed);
         pnlMain.add(pnlBeds);
 
         JLabel lblBTitle = new JLabel("Available Beds");
@@ -104,7 +105,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         lblMonth.setFont(new Font("Calibri", Font.BOLD, 24));
         lblMonth.setBounds(1170, 100, 420, 50);
         lblMonth.setOpaque(true);
-        lblMonth.setBackground(new Color(0x39, 0x5A, 0x7F));
+        lblMonth.setBackground(darkBlue);
         lblMonth.setForeground(Color.WHITE);
         pnlMain.add(lblMonth);
         
@@ -120,7 +121,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         TblCalendar.setFont(new Font("Calibri", Font.PLAIN, 18));
         TblCalendar.setGridColor(Color.LIGHT_GRAY);
         TblCalendar.setBackground(Color.WHITE);
-        TblCalendar.setSelectionBackground(new Color(0x5A, 0x8F, 0xC9));
+        TblCalendar.setSelectionBackground(SBlue);
         TblCalendar.setSelectionForeground(Color.WHITE);
         
         JScrollPane scrCalendar = new JScrollPane(TblCalendar);
@@ -131,7 +132,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         pnlSupplies.setLayout(null);
         pnlSupplies.setBounds(70, 250, 350, 130);
         pnlSupplies.setBackground(Color.WHITE);
-        pnlSupplies.setBorder(BorderFactory.createLineBorder(new Color(0xA3, 0xCA, 0xE9), 2));
+        pnlSupplies.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
         pnlMain.add(pnlSupplies);
 
         JLabel lblSupplies = new JLabel("Medical Supplies");
@@ -148,7 +149,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         pnlEquipment.setLayout(null);
         pnlEquipment.setBounds(440, 250, 320, 130);
         pnlEquipment.setBackground(Color.WHITE);
-        pnlEquipment.setBorder(BorderFactory.createLineBorder(new Color(0xA3, 0xCA, 0xE9), 2));
+        pnlEquipment.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
         pnlMain.add(pnlEquipment);
         
         JLabel lblEquipment = new JLabel("Equipment");
@@ -165,7 +166,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         pnlStock.setLayout(null);
         pnlStock.setBounds(780, 250, 350, 130);
         pnlStock.setBackground(Color.WHITE);
-        pnlStock.setBorder(BorderFactory.createLineBorder(new Color(0xA3, 0xCA, 0xE9), 2));
+        pnlStock.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
         pnlMain.add(pnlStock);
         
         JLabel lblStock = new JLabel("Equipment");

@@ -198,7 +198,8 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener{
         
         JComboBox<String> cmbstatus = new JComboBox<>(status); 
         cmbstatus.setFont(new Font("Calibri", Font.PLAIN, 16)); 
-        cmbstatus.setBounds(560, 10, 300, 30); pnlDepart.add(cmbstatus); 
+        cmbstatus.setBounds(560, 10, 300, 30); 
+        pnlDepart.add(cmbstatus); 
         
         String[] dateOptions = { "Date: All", "Today", "Tomorrow", "This Week", "Next Week"}; 
         

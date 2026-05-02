@@ -27,7 +27,12 @@ public class ColorPalette {
     public static final Color Green = new Color(0x66CC66);
     public static final Color Yellow = new Color(0xFFD966);
     public static final Color Blue = new Color(0x6FA8DC);
+    public static final Color TealGreen = new Color(0x5DAA9C);
+    public static final Color orange = new Color(0xFFD966);
 
+    //SelectionBlue
+    public static final Color SBlue = new Color(0x5A, 0x8F, 0xC9);
+    
     //Border Colors
     public static final Color borderBLACK = Color.BLACK;
     public static final Color borderLBLUE = new Color(0xA3, 0xCA, 0xE9);

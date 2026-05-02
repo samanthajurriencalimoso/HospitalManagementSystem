@@ -38,7 +38,7 @@ public class Login extends JFrame implements ActionListener{
         pnlLogin.setBounds(700, 340, 520, 400);
         pnlLogin.setBackground(new Color(245, 245, 245, 235));
         pnlLogin.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(borderLBLUE, 1, true), // rounded border
+            BorderFactory.createLineBorder(borderLBLUE, 1, true),
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
         
@@ -96,6 +96,7 @@ public class Login extends JFrame implements ActionListener{
         btnLogin.setFont(new Font("Calibri", Font.BOLD, 18));
         pnlLogin.add(btnLogin);
         
+        getRootPane().setDefaultButton(btnLogin);
         btnLogin.addActionListener(this);
         
         btnLogin.addMouseListener(new java.awt.event.MouseAdapter() {
