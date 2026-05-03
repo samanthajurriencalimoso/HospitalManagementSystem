@@ -13,9 +13,12 @@ public class Doctor_MedicalHistory extends JPanel {
     private JPanel selectedRow = null, centerPanel;
     private java.util.List<Runnable> saveTasks = new java.util.ArrayList<>();
     
-    public Doctor_MedicalHistory(){
+   public Doctor_MedicalHistory(){
+        
+        // For screen size
+        setBackground(Color.WHITE);
         setLayout(null);
-     
+        
         
         JTabbedPane AppPane = new JTabbedPane();
         AppPane.setBounds(0, 0, 1620, 920);
@@ -43,21 +46,17 @@ public class Doctor_MedicalHistory extends JPanel {
         //======================History Panel==============
         HistoryPanel();
         
-        //======================Diagnostics Panel==============
-        DiagnosticsPanel();
-        
         //======================Medications Panel==============
         MedicationsPanel();
+        
+        //======================Diagnostics Panel==============
+        DiagnosticsPanel();
         
         //======================Diet Panel==============
         DietPanel();
         
         JScrollPane mainScroll = new JScrollPane(centerPanel);
-        mainScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        mainScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        mainScroll.getVerticalScrollBar().setUnitIncrement(16);
-        AppPane.setComponentAt(0, mainScroll);
-//        AppPane.setComponentAt(0, centerPanel);
+        AppPane.setComponentAt(0, centerPanel);
 
     
     }
@@ -93,8 +92,8 @@ public class Doctor_MedicalHistory extends JPanel {
     
     public JButton createEditButton(int x, int y){
        JButton btn = new JButton("Edit");
-            btn.setBounds(x, y, 80, 25);
-
+            btn.setBounds(x, y, 90, 30);
+            btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
             btn.setFocusPainted(false);
             btn.setBackground(Color.WHITE);
             btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
@@ -136,8 +135,8 @@ public class Doctor_MedicalHistory extends JPanel {
             row.setBackground(Color.WHITE);
 
             JLabel lblDate = new JLabel(date);
-            lblDate.setBounds(10, 10, 100, 20);
-            lblDate.setFont(new Font("Seoge UI", Font.BOLD, 12));
+            lblDate.setBounds(15, 5, 100, 20);
+            lblDate.setFont(new Font("Segoe UI", Font.BOLD, 14));
             lblDate.setForeground(Color.GRAY);
             row.add(lblDate);
 
@@ -149,17 +148,17 @@ public class Doctor_MedicalHistory extends JPanel {
                     g.fillOval(0, 0, 10, 10);
                 }
             };
-            circle.setBounds(80, 5, 10, 10);
+            circle.setBounds(90, 5, 10, 10);
             row.add(circle);
             
             JPanel verticalLine = new JPanel();
             verticalLine.setBackground(Color.GRAY);
-            verticalLine.setBounds(84, 18, 2, 30);
+            verticalLine.setBounds(94, 18, 2, 30);
             row.add(verticalLine);
 
             JLabel lblIllness = new JLabel(illness);
-            lblIllness.setBounds(100, 10, 300, 20);
-            lblIllness.setFont(new Font("Seoge UI", Font.BOLD, 12));
+            lblIllness.setBounds(115, 15, 300, 20);
+            lblIllness.setFont(new Font("Segoe UI", Font.PLAIN, 16));
             row.add(lblIllness);
 
             return row;
@@ -235,11 +234,11 @@ public class Doctor_MedicalHistory extends JPanel {
     public void PatientPanel(){
         JPanel pnlpatient = new JPanel();
         pnlpatient.setLayout(null);
-        pnlpatient.setBounds(30,20,1030, 150);
+        pnlpatient.setBounds(20,20,1180, 200);
         pnlpatient.setBackground(Color.WHITE);
         centerPanel.add(pnlpatient);
     
-        JButton btnEditPatient = createEditButton(940, 15);
+        JButton btnEditPatient = createEditButton(1070, 15);
         pnlpatient.add(btnEditPatient);
         
         btnEditPatient.addActionListener(e -> {
@@ -254,11 +253,11 @@ public class Doctor_MedicalHistory extends JPanel {
             pnlpatient.repaint();
         });
         
-        JPanel pnlImageFrame = createSmallPanel(pnlpatient, 20, 15, 135, 120);
+        JPanel pnlImageFrame = createSmallPanel(pnlpatient, 20, 25, 150, 150);
         JLabel lblImage = createLabel(pnlImageFrame, "", 0, 0, 180, 180);
     
         JButton btnUpload = new JButton("Upload");
-        btnUpload.setBounds(40, 60, 100, 30);
+        btnUpload.setBounds(45, 90, 100, 30);
         btnUpload.setBackground(Color.WHITE);
         pnlpatient.add(btnUpload);
         
@@ -284,39 +283,39 @@ public class Doctor_MedicalHistory extends JPanel {
         }
     });
         
-        JLabel lblpatient = createLabel(pnlpatient, "Patient's Name", 180, 15, 300, 24);
-        applyFont (lblpatient, "Seoge UI", Font.PLAIN, 18);
-        JTextField txtpatient = createHiddenField(pnlpatient, "Patient's Name", 180, 15, 300, 24);
+        JLabel lblpatient = createLabel(pnlpatient, "Patient's Name", 200, 25, 300, 24);
+        applyFont (lblpatient, "Segoe UI", Font.BOLD, 20);
+        JTextField txtpatient = createHiddenField(pnlpatient, "Patient's Name", 200, 25, 300, 24);
         configureEdit(btnEditPatient, lblpatient, txtpatient);
         setupEditableComponent(pnlpatient, lblpatient, txtpatient);
-        pnlpatient.add(createLine(180,45,500,1,Color.LIGHT_GRAY));
+        pnlpatient.add(createLine(200,55,500,1,Color.GRAY));
         
-        JLabel lbldiagnosis = createLabel(pnlpatient, " Diagnosis", 940, 50, 100, 24);
-        applyFont (lbldiagnosis, "Seoge UI", Font.BOLD, 12);
+        JLabel lbldiagnosis = createLabel(pnlpatient, " Diagnosis", 1030, 70, 160, 24);
+        applyFont (lbldiagnosis, "Segoe UI", Font.BOLD, 15);
         
-        JLabel lblbarrier = createLabel(pnlpatient, "Health Barriers", 940, 95, 100, 24);
-        applyFont (lblbarrier, "Seoge UI", Font.BOLD, 12);
+        JLabel lblbarrier = createLabel(pnlpatient, "Health Barriers", 1030, 125, 150, 24);
+        applyFont (lblbarrier, "Segoe UI", Font.BOLD, 15);
         
-        JPanel pnldiagnosis = createSmallPanel(pnlpatient, 940, 75, 80, 20);
+        JPanel pnldiagnosis = createSmallPanel(pnlpatient, 1030, 100, 80, 20);
         JLabel lbldiag = createLabel(pnldiagnosis, "Leukemia", 10, 2, 100, 15);
         pnldiagnosis.setBackground(Color.WHITE);
         
         String[][] patientData = {{"BMI", "22.4"},{"Weight", "70 kg"},{"Height", "175 cm"},{"Pressure", "120/80"}};
-        int startx = 180;
-        int gap = 140;
-        int panelWidth = 120;
+        int startx = 200;
+        int gap = 170;
+        int panelWidth = 140;
         int numberofPanels = 4;
         
         for (int i = 0; i < patientData.length; i++){
             int x = startx + (i*gap);
-            JPanel pnl  = createSmallPanel(pnlpatient, x, 75, panelWidth,60);      
-            JLabel lbl = createLabel(pnl, patientData[i][0], 10, 35, 120, 15);
-            applyFont (lbl, "Seoge UI", Font.BOLD, 12);
+            JPanel pnl  = createSmallPanel(pnlpatient, x, 100, panelWidth,75);      
+            JLabel lbl = createLabel(pnl, patientData[i][0], 10, 40, 120, 25);
+            applyFont (lbl, "Segoe UI", Font.BOLD, 18);
             lbl.setForeground(Color.GRAY);
             
-            JLabel lblvalues = createLabel(pnl, patientData[i][1], 10, 5, 70, 24);
-            applyFont (lblvalues, "Seoge UI", Font.BOLD, 18);
-            JTextField txtvalues = createHiddenField(pnl, patientData[i][1], 10, 5, 50, 24);
+            JLabel lblvalues = createLabel(pnl, patientData[i][1], 10, 10, 90, 25);
+            applyFont (lblvalues, "Segoe UI", Font.BOLD, 20);
+            JTextField txtvalues = createHiddenField(pnl, patientData[i][1], 10, 10, 90, 25);
             setupEditableComponent(pnl, lblvalues, txtvalues);
 
         }
@@ -324,91 +323,43 @@ public class Doctor_MedicalHistory extends JPanel {
                 editMode = !editMode;
                 btnEditPatient.setText(editMode ? "Save" : "Edit");
             });
-//        JPanel pnlBMI = createSmallPanel(pnlpatient, 180, 75, 120, 60);
-//        JLabel lblbmi = createLabel(pnlBMI, "BMI", 10, 35, 120, 15);
-//        applyFont (lblbmi, "Seoge UI", Font.BOLD, 12);
-//        lblbmi.setForeground(Color.GRAY);
-//        
-//        JLabel lblBMIVal = createLabel(pnlBMI, "22.4", 10, 5, 50, 24);
-//        applyFont (lblBMIVal, "Seoge UI", Font.BOLD, 18);
-//        JTextField txtBMIVal = createHiddenField(pnlBMI, "22.4", 10, 5, 50, 24);
-//        setupEditableComponent(pnlBMI, lblBMIVal, txtBMIVal);
-//        configureEdit(btnEditPatient, lblBMIVal, txtBMIVal);
-//        
-//        JPanel pnlWeight = createSmallPanel(pnlpatient, 315, 75, 120, 60);
-//        JLabel lblWeight = createLabel(pnlWeight, "Weight", 10, 35, 120, 15);
-//        applyFont(lblWeight, "Seoge UI", Font.BOLD, 12);
-//        lblWeight.setForeground(Color.GRAY);
-//        JLabel lblkg = createLabel(pnlWeight, "kg", 45, 7, 50, 22);
-//        applyFont(lblkg, "Seoge UI", Font.BOLD, 16);
-//        lblkg.setForeground(Color.GRAY);
-//        
-//        
-//        JLabel lblWeightVal = createLabel(pnlWeight, "70", 10, 5, 50, 24);
-//        applyFont(lblWeightVal, "Seoge UI", Font.BOLD, 18);
-//        JTextField txtWeightVal = createHiddenField(pnlWeight, "70", 10, 5, 50, 24);
-//        setupEditableComponent(pnlWeight, lblWeightVal, txtWeightVal);
-//
-//        // --- Height Panel ---
-//        JPanel pnlHeight = createSmallPanel(pnlpatient, 450, 75, 120, 60);
-//        JLabel lblHeight = createLabel(pnlHeight, "Height", 10, 35, 120, 15);
-//        applyFont(lblHeight, "Seoge UI", Font.BOLD, 12);
-//        lblHeight.setForeground(Color.GRAY);
-//        JLabel lblcm = createLabel(pnlHeight, "cm", 45, 7, 50, 22);
-//        applyFont(lblcm, "Seoge UI", Font.BOLD, 16);
-//        lblcm.setForeground(Color.GRAY);
-//
-//        JLabel lblHeightVal = createLabel(pnlHeight, "175", 10, 5, 70, 24);
-//        applyFont(lblHeightVal, "Seoge UI", Font.BOLD, 18);
-//        JTextField txtHeightVal = createHiddenField(pnlHeight, "175", 10, 5, 70, 24);
-//        setupEditableComponent(pnlHeight, lblHeightVal, txtHeightVal);
-//
-//        // --- Pressure Panel ---
-//        JPanel pnlPressure = createSmallPanel(pnlpatient, 585, 75, 120, 60);
-//        JLabel lblPressure = createLabel(pnlPressure, "Pressure", 10, 35, 120, 15);
-//        applyFont(lblPressure, "Seoge UI", Font.BOLD, 12);
-//        lblPressure.setForeground(Color.GRAY);
-//
-//        JLabel lblPressureVal = createLabel(pnlPressure, "120/80", 10, 5, 70, 24);
-//        applyFont(lblPressureVal, "Seoge UI", Font.BOLD, 18);
-//        JTextField txtPressureVal = createHiddenField(pnlPressure, "120/80", 10, 5, 70, 24);
-//        setupEditableComponent(pnlPressure, lblPressureVal, txtPressureVal);
-//        
     }
     
     public void TimeLinePanel(){
         JPanel pnltimeline = new JPanel();
         pnltimeline.setLayout(null);
-        pnltimeline.setBounds(20,180,400,190);
+        pnltimeline.setBounds(745,240,460,250);
         pnltimeline.setBackground(Color.WHITE);
         centerPanel.add(pnltimeline);
         
         JLabel lbltimeline = new JLabel("Medical Timeline");
-        lbltimeline.setBounds(70, 20, 300, 15);
+        lbltimeline.setFont(new Font("Segoe UI", Font.BOLD, 17));
+        lbltimeline.setBounds(60, 22, 300, 20);
         pnltimeline.add(lbltimeline);
         
-        JButton btnEditTimeline = createEditButton(300, 10);
+        JButton btnEditTimeline = createEditButton(350, 15);
         pnltimeline.add(btnEditTimeline);
         
-        pnltimeline.add(createLine(0,50,400,1, Color.LIGHT_GRAY));
+        pnltimeline.add(createLine(30,60,400,1, Color.GRAY));
         
-        pnltimeline.add(createHistoryRow("Apr 2022", "Pre-Diabetes", 60 ));
-        pnltimeline.add(createHistoryRow("May 2024", "Diabetic", 100 ));
-        pnltimeline.add(createHistoryRow("Sept 2025", "Leukemia", 140));
+        pnltimeline.add(createHistoryRow("Apr 2022", "Pre-Diabetes", 75 ));
+        pnltimeline.add(createHistoryRow("May 2024", "Diabetic", 130 ));
+        pnltimeline.add(createHistoryRow("Sept 2025", "Leukemia", 185));
         
     }
               
     public void HistoryPanel(){
         JPanel pnlhistory = new JPanel();
-        pnlhistory.setBounds(440, 180, 620, 190);
+        pnlhistory.setBounds(20, 240, 700, 230);
 //      pnlhistory.setBounds(20, 180, 620, 230);
         pnlhistory.setLayout(null);
         pnlhistory.setBackground(Color.WHITE);
         centerPanel.add(pnlhistory);
         
-        JLabel lblhistory = createLabel(pnlhistory, "Medical History",  70, 20, 300, 15);
-        pnlhistory.add(createLine(55,50,500,1, Color.LIGHT_GRAY));  
-        JButton btnEditHistory = createEditButton(500, 10);
+        JLabel lblhistory = createLabel(pnlhistory, "Medical History",  60, 22, 300, 20);
+        lblhistory.setFont(new Font("Segoe UI", Font.BOLD, 17));
+        pnlhistory.add(createLine(30,60,640,1, Color.GRAY));  
+        JButton btnEditHistory = createEditButton(590, 15);
         pnlhistory.add(btnEditHistory);
 
         String[] panelTitles = {
@@ -426,14 +377,11 @@ public class Doctor_MedicalHistory extends JPanel {
 //            JPanel pnl  = createSmallPanel(pnlhistory, x, 60, panelWidth,100);      
 //            JLabel lblTitles = createLabel(pnl, panelTitles[i], 10, 15, 120,20);
 //        }
-        int startX = 20;
-        int startY = 60;
-
-        int panelWidth = 280;
-        int panelHeight = 50;
-
-        int gapX = 290; 
-        int gapY = 60; 
+        int startX = 15;
+        int startY = 75;
+        
+        int gapX = 340; 
+        int gapY = 80; 
 
         for (int i = 0; i < panelTitles.length; i++) {
 
@@ -443,12 +391,13 @@ public class Doctor_MedicalHistory extends JPanel {
             int x = startX + (col * gapX);
             int y = startY + (row * gapY);
 
-            JPanel pnl = createSmallPanel(pnlhistory, x, y, panelWidth, panelHeight);
-            JLabel lblTitle = createLabel(pnl, panelTitles[i], 10, 5, 200, 20);
-            applyFont (lblTitle, "Seoge UI", Font.BOLD, 12);
-            lblTitle.setForeground(Color.LIGHT_GRAY);
-            JLabel lblvalues = createLabel (pnl, historyValues[i],10, 25, 200, 20);
-            JTextField txtvalues = createHiddenField(pnl, historyValues[i],10, 25, 200, 20);
+            JPanel pnl = createSmallPanel(pnlhistory, x, y, 320, 60);
+            JLabel lblTitle = createLabel(pnl, panelTitles[i], 10, 5, 200, 22);
+            applyFont (lblTitle, "Segoe UI", Font.BOLD, 16);
+            lblTitle.setForeground(Color.GRAY);
+            JLabel lblvalues = createLabel (pnl, historyValues[i],10, 32, 200, 25);
+            applyFont (lblvalues, "Segoe UI", Font.BOLD, 16);
+            JTextField txtvalues = createHiddenField(pnl, historyValues[i],10, 32, 200, 25);
             setupEditableComponent(pnl, lblvalues, txtvalues);
         }
             btnEditHistory.addActionListener(e -> {
@@ -460,21 +409,22 @@ public class Doctor_MedicalHistory extends JPanel {
     public void DiagnosticsPanel(){
         JPanel pnldiagnostics = new JPanel();
         pnldiagnostics.setLayout(null);
-        pnldiagnostics.setBounds(1080, 20, 700, 400);
+        pnldiagnostics.setBounds(20, 490, 700, 370);
         pnldiagnostics.setBackground(Color.WHITE);
         centerPanel.add(pnldiagnostics);
         
         
-        JLabel lbldiagnostics = createLabel(pnldiagnostics, "Diagnostic Results",  70, 20, 300, 15);
-        
-        
+        JLabel lbldiagnostics = createLabel(pnldiagnostics, "Diagnostic Results",  60, 22, 300, 20);
+        applyFont(lbldiagnostics, "Segoe UI", Font.BOLD, 17);
+        pnldiagnostics.add(createLine(30,60,640,1, Color.GRAY));
+         
         JPanel pnlResultsContainer = new JPanel();
         pnlResultsContainer.setLayout(null);
-        pnlResultsContainer.setPreferredSize(new Dimension(500, 800));
+        pnlResultsContainer.setPreferredSize(new Dimension(500, 700));
         pnlResultsContainer.setBackground(Color.WHITE);
 
         JScrollPane scrollPane = new JScrollPane(pnlResultsContainer);
-        scrollPane.setBounds(10, 51, 630, 230);
+        scrollPane.setBounds(10, 62, 680, 290);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -504,55 +454,64 @@ public class Doctor_MedicalHistory extends JPanel {
         });
         
         pnldiagnostics.add(scrollPane);
-        pnldiagnostics.add(createLine(0,50,620,1,Color.LIGHT_GRAY));
         
         int starty = 10 ;
-        int gap = 100;
-        int numberofPanels = 7;
+        int gap = 170;
+        int numberofPanels = 4;
         
         for (int i = 0; i < numberofPanels; i++){
             int y = starty + (i*gap);
-            JPanel pnl  = createSmallPanel(pnlResultsContainer, 30, y, 530,90);
+            JPanel pnl  = createSmallPanel(pnlResultsContainer, 20, y, 630,150);
             pnl.setBackground(new Color(0xA3, 0xCA, 0xE9));
-            JPanel pnlcenter = createSmallPanel (pnl, 0, 40, 530, 50);
-            JLabel lbl = createLabel(pnl, " Results", 10, 10, 300, 15);
+            JPanel pnlcenter = createSmallPanel (pnl, 0, 50, 630, 100);
+            JLabel lbl = createLabel(pnl, " Results", 10, 20, 300, 15);
+             applyFont(lbl, "Segoe UI", Font.BOLD, 16);
         }
     }
     
     public void DietPanel(){
         JPanel pnldiet = new JPanel();
         pnldiet.setLayout(null);
-        pnldiet.setBounds(690, 380, 350, 300);
+        pnldiet.setBounds(1230, 20, 360, 470);
         pnldiet.setBackground(Color.WHITE);
         centerPanel.add(pnldiet);
         
-        JLabel lbldiet= createLabel(pnldiet, "Diet",  50, 20, 300, 15);
-        pnldiet.add(createLine(30,50,280,1, Color.LIGHT_GRAY));  
-        JButton btnEditHistory = createEditButton(250, 10);
+        JLabel lbldiagnostics = createLabel(pnldiet, "Diet",  60, 22, 300, 20);
+        applyFont(lbldiagnostics, "Segoe UI", Font.BOLD, 17);
+        pnldiet.add(createLine(30,60,300,1, Color.GRAY));
+        JButton btnEditHistory = createEditButton(250, 15);
         pnldiet.add(btnEditHistory);
         
-        int starty = 50 ;
-        int gap = 60;
+        int starty = 80 ;
+        int gap = 90;
         int numberofPanels = 4;
         String[] lblcontent = {"8 cups", "Table Sugar, Daily Avg 3/6", "Lactose, Beans", "8h Sleeping"};
         
         for (int i = 0; i < numberofPanels; i++){
             int y = starty + (i*gap);
-            JPanel pnl  = createSmallPanel(pnldiet, 30, y, 290,50);
+            JPanel pnl  = createSmallPanel(pnldiet, 30, y, 300,75);
             pnl.setBackground(Color.WHITE);
-            JLabel lbl = createLabel(pnl, lblcontent[i], 40, 20, 300, 15);
-            
+            JLabel lbl = createLabel(pnl, lblcontent[i], 40, 20, 300, 22);
+            applyFont(lbl, "Segoe UI", Font.BOLD, 16);
+            JTextField txtvalues = createHiddenField(pnl, lblcontent[i],40, 20, 200, 22);
+            setupEditableComponent(pnl, lbl, txtvalues);
         }
+            btnEditHistory.addActionListener(e -> {
+                editMode = !editMode;
+                btnEditHistory.setText(editMode ? "Save" : "Edit");
+            });
+        
     }
 
     public void MedicationsPanel(){
         JPanel pnlmedications = new JPanel();
         pnlmedications.setLayout(null);
-        pnlmedications.setBounds(20, 380, 650, 240);
+        pnlmedications.setBounds(750, 510, 840, 350);
         pnlmedications.setBackground(Color.WHITE);
         centerPanel.add(pnlmedications);
     
-        JLabel lblTitle = createLabel(pnlmedications,"Medications",50,15,200,30);
+        JLabel lblTitle = createLabel(pnlmedications,"Medications",  60, 22, 300, 20);
+        applyFont(lblTitle, "Segoe UI", Font.BOLD, 17);
         
         
         String[] columnMedications = {"Name", "Status", "Recent","Start Date", "Assign By", "Note"};
@@ -573,9 +532,9 @@ public class Doctor_MedicalHistory extends JPanel {
             return editMode;
                     }
         };
-        tblMedications.setRowHeight(30);
-//        tblMedications.setFont(new Font("Seoge UI", Font.PLAIN, 13));
-//        tblMedications.getTableHeader().setFont(new Font("Seoge UI", Font.PLAIN, 13));
+        tblMedications.setRowHeight(55);
+        tblMedications.setFont(new Font("Sego UI", Font.PLAIN, 16));
+        tblMedications.getTableHeader().setFont(new Font("Segoe UI", Font.PLAIN, 16));
         tblMedications.setGridColor(Color.LIGHT_GRAY);
         tblMedications.setBackground(Color.WHITE);
         tblMedications.setShowGrid(false);
@@ -583,11 +542,11 @@ public class Doctor_MedicalHistory extends JPanel {
         
         JTableHeader TblHApp = tblMedications.getTableHeader();
         TblHApp.setBackground(new Color(0xA3, 0xCA, 0xE9));
-        TblHApp.setFont(new Font("Seoge UI", Font.BOLD, 13));
+        TblHApp.setFont(new Font("Segoe UI", Font.BOLD, 16));
         TblHApp.setForeground(Color.DARK_GRAY);
         
         JScrollPane srcMedications = new JScrollPane(tblMedications);
-        srcMedications.setBounds(0, 50, 650, 190);
+        srcMedications.setBounds(0, 60, 840, 290);
         srcMedications.getVerticalScrollBar().setUnitIncrement(16);
        
         JScrollBar vertical = srcMedications.getVerticalScrollBar();
@@ -634,7 +593,7 @@ public class Doctor_MedicalHistory extends JPanel {
         statusColumn.setCellRenderer((table, value, isSelected, hasFocus, row, column) -> {
             JLabel lblStatus = new JLabel(value != null ? value.toString() : "", SwingConstants.CENTER);
             lblStatus.setOpaque(true);
-//            lblStatus.setFont(new Font("Seoge UI", Font.PLAIN, 13));
+            lblStatus.setFont(new Font("Seoge UI", Font.PLAIN, 16));
             
             if ("Adherent".equals(value)) {
                 lblStatus.setBackground(new Color(204, 255, 204));
@@ -648,7 +607,7 @@ public class Doctor_MedicalHistory extends JPanel {
             return lblStatus;
                 });
         
-        JButton btnEditMedications = createEditButton(550, 20);
+        JButton btnEditMedications = createEditButton(730, 15);
         btnEditMedications.addActionListener(e -> {
             editMode = !editMode;
 
@@ -664,7 +623,3 @@ public class Doctor_MedicalHistory extends JPanel {
     }
    
     }
-
-
-    
-

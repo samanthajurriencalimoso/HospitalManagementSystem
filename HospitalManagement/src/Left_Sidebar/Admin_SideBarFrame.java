@@ -19,7 +19,7 @@ public class Admin_SideBarFrame extends JFrame{
     
      public Admin_SideBarFrame() {
         setTitle("eTriage | Hospital Management System");
-        setSize(1920, 1080);
+//        setSize(1920, 1080);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLayout(null);
