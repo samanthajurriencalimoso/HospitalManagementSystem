@@ -1,19 +1,26 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package MedicalHistory;
-
 import java.awt.*;
 import javax.swing.*;
-
+import javax.swing.table.*;
+/**
+ *
+ * @author Zaphkiel
+ */
 public class AppointmentHistory extends JPanel {
 
     public AppointmentHistory() {
-        setBackground(Color.WHITE);
-        setMinimumSize(new Dimension(1000, 1000));
         setLayout(null);
+        setBounds(0, 0, 1620, 930);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(null);
         mainPanel.setBounds(0, 0, 1620, 920);
-        mainPanel.setBackground(new Color(0xEAF3F3));
+        mainPanel.setOpaque(false);
+        mainPanel.setBackground(new Color(0, 0, 0, 0));
         add(mainPanel);
 
         JLabel lblTitle = new JLabel("Appointment history");
@@ -38,7 +45,7 @@ public class AppointmentHistory extends JPanel {
     private JPanel createAppointmentCard(String status, Color statusColor, int yPos) {
         JPanel card = new JPanel();
         card.setLayout(null);
-        card.setBounds(40, yPos, 1400, 120);
+        card.setBounds(40, yPos, 1540, 120);
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
 
@@ -54,34 +61,41 @@ public class AppointmentHistory extends JPanel {
         JLabel type = new JLabel("Type of Appointment");
         type.setBounds(20, 50, 200, 20);
         type.setForeground(Color.GRAY);
+        type.setFont(new Font("Segoe UI", Font.BOLD, 16));
         card.add(type);
 
         JLabel typeVal = new JLabel("Wellness checkup");
-        typeVal.setBounds(20, 70, 200, 20);
+        typeVal.setBounds(20, 75, 200, 25);
+        typeVal.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         card.add(typeVal);
 
         JLabel complaint = new JLabel("Chief Complaint");
-        complaint.setBounds(250, 50, 200, 20);
+        complaint.setBounds(350, 50, 200, 20);
         complaint.setForeground(Color.GRAY);
+        complaint.setFont(new Font("Segoe UI", Font.BOLD, 16));
         card.add(complaint);
 
         JLabel complaintVal = new JLabel("Specific symptoms or illness");
-        complaintVal.setBounds(250, 70, 250, 20);
+        complaintVal.setBounds(350, 75, 400, 25);
+        complaintVal.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         card.add(complaintVal);
 
         JLabel symptoms = new JLabel("Symptoms");
-        symptoms.setBounds(550, 50, 150, 20);
+        symptoms.setBounds(850, 50, 150, 20);
         symptoms.setForeground(Color.GRAY);
+        symptoms.setFont(new Font("Segoe UI", Font.BOLD, 16));
         card.add(symptoms);
 
         JLabel symptomsVal = new JLabel("Coughing");
-        symptomsVal.setBounds(550, 70, 150, 20);
+        symptomsVal.setBounds(850, 75, 150, 25);
+        symptomsVal.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         card.add(symptomsVal);
 
         JButton btn = new JButton("Show details");
-        btn.setBounds(1200, 40, 150, 35);
+        btn.setBounds(1370, 40, 150, 35);
         btn.setFocusPainted(false);
         btn.setBackground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         btn.setBorder(BorderFactory.createLineBorder(new Color(100, 150, 200)));
         card.add(btn);
 
