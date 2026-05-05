@@ -81,6 +81,45 @@ public class Nurse_Dashboard extends JPanel{
         lblPrCount.setFont(new Font("Calibri", Font.BOLD, 28));
         pnlPrescription.add(lblPrCount);
         
+                // ===== TABLE (FROM DOCTOR DATA STYLE) =====
+        String[] col = {"Patient","Drug","Dosage","Frequency","Duration"};
+        DefaultTableModel model = new DefaultTableModel(col,0);
+
+        model.addRow(new String[]{"John Doe","Paracetamol","500mg","2x/day","5 days"});
+
+        JTable table = new JTable(model);
+        table.setFont(new Font("Calibri", Font.PLAIN, 16));
+        table.setRowHeight(30);
+
+        JScrollPane sp = new JScrollPane(table);
+        sp.setBounds(70, 250, 900, 200);
+        pnlMain.add(sp);
+
+        // INPUTS
+        JTextField txtFreq = new JTextField();
+        txtFreq.setBounds(200, 470, 120, 30);
+        pnlMain.add(txtFreq);
+
+        JTextField txtDur = new JTextField();
+        txtDur.setBounds(350, 470, 120, 30);
+        pnlMain.add(txtDur);
+
+        // BUTTON
+        JButton btnUpdate = new JButton("Update");
+        btnUpdate.setBounds(500, 470, 120, 30);
+        pnlMain.add(btnUpdate);
+
+        // ACTION
+        btnUpdate.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if(row >= 0){
+                model.setValueAt(txtFreq.getText(), row, 3);
+                model.setValueAt(txtDur.getText(), row, 4);
+            } else {
+                JOptionPane.showMessageDialog(null, "Select a patient first!");
+            }
+        });
+        
         JPanel pnlCritical = new JPanel();
         pnlCritical.setLayout(null);
         pnlCritical.setBounds(970, 100, 280, 120);
