@@ -15,7 +15,6 @@ public class Nurse_Dashboard extends JPanel{
     public Nurse_Dashboard() {
         setLayout(null);
         
-        //Main Panel
         pnlMain = new JPanel();
         pnlMain.setLayout(null);
         pnlMain.setBackground(veryLightBlue);
@@ -81,7 +80,6 @@ public class Nurse_Dashboard extends JPanel{
         lblPrCount.setFont(new Font("Calibri", Font.BOLD, 28));
         pnlPrescription.add(lblPrCount);
         
-                // ===== TABLE (FROM DOCTOR DATA STYLE) =====
         String[] col = {"Patient","Drug","Dosage","Frequency","Duration"};
         DefaultTableModel model = new DefaultTableModel(col,0);
 
@@ -95,7 +93,6 @@ public class Nurse_Dashboard extends JPanel{
         sp.setBounds(70, 250, 900, 200);
         pnlMain.add(sp);
 
-        // INPUTS
         JTextField txtFreq = new JTextField();
         txtFreq.setBounds(200, 470, 120, 30);
         pnlMain.add(txtFreq);
@@ -104,12 +101,10 @@ public class Nurse_Dashboard extends JPanel{
         txtDur.setBounds(350, 470, 120, 30);
         pnlMain.add(txtDur);
 
-        // BUTTON
         JButton btnUpdate = new JButton("Update");
         btnUpdate.setBounds(500, 470, 120, 30);
         pnlMain.add(btnUpdate);
 
-        // ACTION
         btnUpdate.addActionListener(e -> {
             int row = table.getSelectedRow();
             if(row >= 0){
