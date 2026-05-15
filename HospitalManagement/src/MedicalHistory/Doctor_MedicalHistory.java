@@ -14,8 +14,7 @@ public class Doctor_MedicalHistory extends JPanel {
     private java.util.List<Runnable> saveTasks = new java.util.ArrayList<>();
     
    public Doctor_MedicalHistory(){
-        
-        // For screen size
+       
         setBackground(Color.WHITE);
         setLayout(null);
         
@@ -36,7 +35,6 @@ public class Doctor_MedicalHistory extends JPanel {
         
         centerPanel = new JPanel();
         centerPanel.setLayout(null);
-        centerPanel.setPreferredSize(new Dimension(1600, 1600)); 
         // ==================Patient Panel =================
         PatientPanel();
         
@@ -61,28 +59,6 @@ public class Doctor_MedicalHistory extends JPanel {
     
     }
     
-    public static JPanel RoundPanel(String hexColor, Color borderColor, int radius, int thickness) {
-    return new JPanel() {
-        private Color bgColor = Color.decode(hexColor);
-        
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            
-            g2.setColor(bgColor);
-            g2.fillRoundRect(0, 0, getWidth()-1, getHeight()-1, radius, radius);
-            
-            g2.setColor(borderColor);
-            g2.setStroke(new BasicStroke(thickness));
-            g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, radius, radius);
-        }
-
-        { setOpaque(false); }
-    };
-}
-    
     public JPanel createLine(int x, int y, int width, int height, Color color) {
         JPanel line = new JPanel();
         line.setBounds(x, y, width, height);
@@ -97,29 +73,26 @@ public class Doctor_MedicalHistory extends JPanel {
             btn.setFocusPainted(false);
             btn.setBackground(Color.WHITE);
             btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
-
             return btn;
     }
     
     public void makeEditable(JButton btn, JLabel label, JTextField field) {
 
-        field.setVisible(false); // safety default
+        field.setVisible(false); 
 
         btn.addActionListener(e -> {
 
             if (field.isVisible()) {
-                // SAVE MODE
                 label.setText(field.getText());
                 field.setVisible(false);
                 label.setVisible(true);
                 btn.setText("Edit");
             } else {
-                // EDIT MODE
                 field.setVisible(true);
                 label.setVisible(false);
                 btn.setText("Save");
 
-                field.setText(label.getText()); // sync latest value
+                field.setText(label.getText()); 
             }
 
             revalidate();
@@ -272,7 +245,6 @@ public class Doctor_MedicalHistory extends JPanel {
 
             ImageIcon icon = new ImageIcon(file.getAbsolutePath());
 
-            // resize image to fit frame
             Image img = icon.getImage().getScaledInstance(
                     lblImage.getWidth(),
                     lblImage.getHeight(),
@@ -351,7 +323,6 @@ public class Doctor_MedicalHistory extends JPanel {
     public void HistoryPanel(){
         JPanel pnlhistory = new JPanel();
         pnlhistory.setBounds(20, 240, 700, 230);
-//      pnlhistory.setBounds(20, 180, 620, 230);
         pnlhistory.setLayout(null);
         pnlhistory.setBackground(Color.WHITE);
         centerPanel.add(pnlhistory);
@@ -367,16 +338,6 @@ public class Doctor_MedicalHistory extends JPanel {
         };
         String[] historyValues = { "Pennicilin", "Obesity", "Liposuction", "Obesity"};
         
-//        int startx = 20;
-//        int gap = 150;
-//        int panelWidth = 140;
-//        int numberofPanels = 4;
-//        
-//        for (int i = 0; i < numberofPanels; i++){
-//            int x = startx + (i*gap);
-//            JPanel pnl  = createSmallPanel(pnlhistory, x, 60, panelWidth,100);      
-//            JLabel lblTitles = createLabel(pnl, panelTitles[i], 10, 15, 120,20);
-//        }
         int startX = 15;
         int startY = 75;
         
@@ -610,8 +571,7 @@ public class Doctor_MedicalHistory extends JPanel {
         JButton btnEditMedications = createEditButton(730, 15);
         btnEditMedications.addActionListener(e -> {
             editMode = !editMode;
-
-            // Stop editing when saving
+            
             if (!editMode && tblMedications.isEditing()) {
                 tblMedications.getCellEditor().stopCellEditing();
             }
