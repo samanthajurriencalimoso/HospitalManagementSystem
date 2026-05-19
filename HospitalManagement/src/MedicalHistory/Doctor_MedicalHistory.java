@@ -7,34 +7,50 @@ package MedicalHistory;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
+import static Color_Palette.ColorPalette.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Doctor_MedicalHistory extends JPanel {
+public class Doctor_MedicalHistory extends JPanel implements ActionListener {
     private boolean editMode = false;
     private JPanel selectedRow = null, centerPanel;
     private java.util.List<Runnable> saveTasks = new java.util.ArrayList<>();
-    
+    private JButton btnmedical, btnhistory;
+    private AppointmentHistory mainPanel;
    public Doctor_MedicalHistory(){
-       
+
         setBackground(Color.WHITE);
         setLayout(null);
         
-        
-        JTabbedPane AppPane = new JTabbedPane();
-        AppPane.setBounds(0, 0, 1620, 920);
-        AppPane.setBackground(new Color(0xA3, 0xCA, 0xE9));
-        AppPane.setForeground(Color.BLACK);
-        AppPane.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        UIManager.put("TabbedPane.selected", new Color(0x5A, 0x8F, 0xC9));
-        
-        AppPane.addTab("Medical History", new JPanel());
-        
-        AppointmentHistory doctorAvailabilityPanel = new AppointmentHistory();
-        AppPane.addTab("Appointment History", doctorAvailabilityPanel);
-
-        add(AppPane);
-        
         centerPanel = new JPanel();
         centerPanel.setLayout(null);
+        centerPanel.setBounds(0,25,1920,1055);
+        centerPanel.setVisible(true);
+        add(centerPanel);
+        
+        mainPanel = new AppointmentHistory();
+        mainPanel.setBounds(0,25,1920,1055);
+        mainPanel.setVisible(false);
+        add(mainPanel);
+        
+        
+        btnmedical = new JButton("Medical History");
+        btnmedical.setBounds(0, 0, 150, 25);
+        btnmedical.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        btnmedical.setForeground(Color.black);
+        btnmedical.setBackground(lightBlue);
+        add(btnmedical);
+        
+        btnhistory = new JButton("Appointment History");
+        btnhistory.setBounds(150, 0, 200, 25);
+        btnhistory.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        btnhistory.setForeground(Color.black);
+        btnhistory.setBackground(lightBlue);
+        add(btnhistory);
+        
+        btnmedical.addActionListener(this);
+        btnhistory.addActionListener(this);
+        
         // ==================Patient Panel =================
         PatientPanel();
         
@@ -53,8 +69,6 @@ public class Doctor_MedicalHistory extends JPanel {
         //======================Diet Panel==============
         DietPanel();
         
-        JScrollPane mainScroll = new JScrollPane(centerPanel);
-        AppPane.setComponentAt(0, centerPanel);
 
     
     }
@@ -207,7 +221,7 @@ public class Doctor_MedicalHistory extends JPanel {
     public void PatientPanel(){
         JPanel pnlpatient = new JPanel();
         pnlpatient.setLayout(null);
-        pnlpatient.setBounds(20,20,1180, 200);
+        pnlpatient.setBounds(20,30,1180, 190);
         pnlpatient.setBackground(Color.WHITE);
         centerPanel.add(pnlpatient);
     
@@ -233,27 +247,6 @@ public class Doctor_MedicalHistory extends JPanel {
         btnUpload.setBounds(45, 90, 100, 30);
         btnUpload.setBackground(Color.WHITE);
         pnlpatient.add(btnUpload);
-        
-        btnUpload.addActionListener(e -> {
-
-        JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(null);
-
-        if (result == JFileChooser.APPROVE_OPTION) {
-
-            java.io.File file = fileChooser.getSelectedFile();
-
-            ImageIcon icon = new ImageIcon(file.getAbsolutePath());
-
-            Image img = icon.getImage().getScaledInstance(
-                    lblImage.getWidth(),
-                    lblImage.getHeight(),
-                    Image.SCALE_SMOOTH
-            );
-
-            lblImage.setIcon(new ImageIcon(img));
-        }
-    });
         
         JLabel lblpatient = createLabel(pnlpatient, "Patient's Name", 200, 25, 300, 24);
         applyFont (lblpatient, "Segoe UI", Font.BOLD, 20);
@@ -581,5 +574,16 @@ public class Doctor_MedicalHistory extends JPanel {
         });
         pnlmedications.add(btnEditMedications);
     }
-   
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+            if(e.getSource() == btnhistory){
+          centerPanel.setVisible(false);
+          mainPanel.setVisible(true);         
+        }
+           if(e.getSource() == btnmedical){
+          mainPanel.setVisible(false);
+          centerPanel.setVisible(true);         
+        }
     }
+}

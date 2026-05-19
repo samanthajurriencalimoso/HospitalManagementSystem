@@ -6,22 +6,25 @@ package MedicalHistory;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
+import static Color_Palette.ColorPalette.*;
 /**
  *
  * @author Zaphkiel
  */
-public class AppointmentHistory extends JPanel {
-
+public class AppointmentHistory extends JPanel{
+        private JButton btnmedical, btnhistory;
     public AppointmentHistory() {
         setLayout(null);
         setBounds(0, 0, 1620, 930);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(null);
-        mainPanel.setBounds(0, 0, 1620, 920);
+        mainPanel.setBounds(0,25,1920,1055);
         mainPanel.setOpaque(false);
         mainPanel.setBackground(new Color(0, 0, 0, 0));
         add(mainPanel);
+        
+
 
         JLabel lblTitle = new JLabel("Appointment history");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));

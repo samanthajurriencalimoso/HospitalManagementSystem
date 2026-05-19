@@ -7,34 +7,49 @@ package MedicalHistory;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
+import static Color_Palette.ColorPalette.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Nurse_MedicalHistory extends JPanel {
+public class Nurse_MedicalHistory extends JPanel implements ActionListener {
     private boolean editMode = false;
     private JPanel selectedRow = null, centerPanel;
     private java.util.List<Runnable> saveTasks = new java.util.ArrayList<>();
-    
-    public Nurse_MedicalHistory(){
-     
+    private JButton btnmedical, btnhistory;
+    private AppointmentHistory mainPanel;
+   public Nurse_MedicalHistory(){
+
         setBackground(Color.WHITE);
         setLayout(null);
         
-        JTabbedPane AppPane = new JTabbedPane();
-        AppPane.setBounds(0, 0, 1620, 920);
-        AppPane.setBackground(new Color(0xA3, 0xCA, 0xE9));
-        AppPane.setForeground(Color.BLACK);
-        AppPane.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        UIManager.put("TabbedPane.selected", new Color(0x5A, 0x8F, 0xC9));
-        
-        AppPane.addTab("Medical History", new JPanel());
-        
-        AppointmentHistory doctorAvailabilityPanel = new AppointmentHistory();
-        AppPane.addTab("Appointment History", doctorAvailabilityPanel);
-
-        add(AppPane);
-        
         centerPanel = new JPanel();
         centerPanel.setLayout(null);
-        centerPanel.setPreferredSize(new Dimension(1600, 1600)); 
+        centerPanel.setBounds(0,25,1920,1055);
+        centerPanel.setVisible(true);
+        add(centerPanel);
+        
+        mainPanel = new AppointmentHistory();
+        mainPanel.setBounds(0,25,1920,1055);
+        mainPanel.setVisible(false);
+        add(mainPanel);
+        
+        
+        btnmedical = new JButton("Medical History");
+        btnmedical.setBounds(0, 0, 150, 25);
+        btnmedical.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        btnmedical.setForeground(Color.black);
+        btnmedical.setBackground(lightBlue);
+        add(btnmedical);
+        
+        btnhistory = new JButton("Appointment History");
+        btnhistory.setBounds(150, 0, 200, 25);
+        btnhistory.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        btnhistory.setForeground(Color.black);
+        btnhistory.setBackground(lightBlue);
+        add(btnhistory);
+        
+        btnmedical.addActionListener(this);
+        btnhistory.addActionListener(this);
         // ==================Patient Panel =================
         PatientPanel();
         
@@ -53,8 +68,6 @@ public class Nurse_MedicalHistory extends JPanel {
         //======================Diet Panel==============
         DietPanel();
         
-        JScrollPane mainScroll = new JScrollPane(centerPanel);
-        AppPane.setComponentAt(0, centerPanel);
 
     
     }
@@ -566,5 +579,15 @@ public class Nurse_MedicalHistory extends JPanel {
         });
         pnlmedications.add(btnEditMedications);
     }
-   
+    @Override
+    public void actionPerformed(ActionEvent e) {
+            if(e.getSource() == btnhistory){
+          centerPanel.setVisible(false);
+          mainPanel.setVisible(true);         
+        }
+           if(e.getSource() == btnmedical){
+          mainPanel.setVisible(false);
+          centerPanel.setVisible(true);         
+        }
+    }
     }
