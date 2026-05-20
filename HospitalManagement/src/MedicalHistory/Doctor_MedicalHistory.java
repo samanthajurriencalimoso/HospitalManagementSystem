@@ -377,37 +377,15 @@ public class Doctor_MedicalHistory extends JPanel implements ActionListener {
         pnlResultsContainer.setPreferredSize(new Dimension(500, 700));
         pnlResultsContainer.setBackground(Color.WHITE);
 
-        JScrollPane scrollPane = new JScrollPane(pnlResultsContainer);
-        scrollPane.setBounds(10, 62, 680, 290);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-       
-        JScrollBar vertical = scrollPane.getVerticalScrollBar();
-        vertical.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
-            @Override
-            protected void configureScrollBarColors() {
-                this.thumbColor = Color.LIGHT_GRAY;
-                this.trackColor = Color.WHITE;      
-            }
-            @Override
-            protected JButton createDecreaseButton(int orientation) {
-                return createZeroButton();
-            }
-            @Override
-            protected JButton createIncreaseButton(int orientation) {
-                return createZeroButton();
-            }
-            private JButton createZeroButton() {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(0, 0));
-                button.setBackground(Color.lightGray);
-                return button;
-            }
-        });
-        
-        pnldiagnostics.add(scrollPane);
+        JScrollPane scroll = new JScrollPane(pnlResultsContainer);
+        scroll.setBounds(10, 62, 680, 290); 
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.getVerticalScrollBar().setBackground(Color.WHITE);      
+        scroll.getVerticalScrollBar().setForeground(Color.LIGHT_GRAY); 
+        pnldiagnostics.add(scroll);
         
         int starty = 10 ;
         int gap = 170;
@@ -502,29 +480,12 @@ public class Doctor_MedicalHistory extends JPanel implements ActionListener {
         JScrollPane srcMedications = new JScrollPane(tblMedications);
         srcMedications.setBounds(0, 60, 840, 290);
         srcMedications.getVerticalScrollBar().setUnitIncrement(16);
-       
-        JScrollBar vertical = srcMedications.getVerticalScrollBar();
-        vertical.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
-            @Override
-            protected void configureScrollBarColors() {
-                this.thumbColor = Color.LIGHT_GRAY;
-                this.trackColor = Color.WHITE;      
-            }
-            @Override
-            protected JButton createDecreaseButton(int orientation) {
-                return createZeroButton();
-            }
-            @Override
-            protected JButton createIncreaseButton(int orientation) {
-                return createZeroButton();
-            }
-            private JButton createZeroButton() {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(0, 0));
-                button.setBackground(Color.lightGray);
-                return button;
-            }
-        });
+        srcMedications.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        srcMedications.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        srcMedications.setBorder(BorderFactory.createEmptyBorder());
+        srcMedications.getVerticalScrollBar().setUnitIncrement(16);
+        srcMedications.getVerticalScrollBar().setBackground(Color.WHITE);      
+        srcMedications.getVerticalScrollBar().setForeground(Color.LIGHT_GRAY); 
         pnlmedications.add(srcMedications);
         
         DefaultTableCellRenderer center = new DefaultTableCellRenderer();
