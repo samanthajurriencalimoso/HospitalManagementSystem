@@ -12,10 +12,8 @@ public class nurse_Prescription extends JPanel {
     private JPanel pnlMain;
     private JTable table;
     private DefaultTableModel model;
-
     private JTextField txtFreq;
     private JTextField txtDur;
-
     private JButton btnUpdate;
 
     public nurse_Prescription() {

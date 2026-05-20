@@ -13,21 +13,14 @@ import javax.swing.table.JTableHeader;
 public class doctor_Prescription extends JPanel implements ActionListener {
 
     private JPanel pnlMain, pnlForm, pnlBottom;
-
     private JLabel lblTitle, lblDate;
     private JLabel lblTPrescription, lblTPatients, lblTMedicine;
-
     private JLabel lblPatient, lblDrug, lblDose, lblFreq, lblDur;
-
     private JTextField txtPat, txtDrug, txtFreq, txtDur;
-
     private JComboBox<String> cbDose;
-
     private JButton btnAdd, btnDelete, btnUpdate;
-
     private JTable table;
     private DefaultTableModel model;
-
     private ArrayList<String[]> prescriptions = new ArrayList<>();
 
     public doctor_Prescription() {
