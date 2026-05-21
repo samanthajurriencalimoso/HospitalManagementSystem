@@ -17,18 +17,18 @@ public class VitalSignsReport extends JPanel {
     
     public VitalSignsReport() {
         setLayout(null);
-        setBounds(0, 0, 1060, 650);
         setBackground(Color.WHITE);
         
         pnlMain = new JPanel();
         pnlMain.setLayout(null);
-        pnlMain.setPreferredSize(new Dimension(1040, 900));
+        pnlMain.setPreferredSize(new Dimension(1000, 570));
         pnlMain.setBackground(Color.WHITE);
         pnlMain.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
         scrVitals = new JScrollPane(pnlMain);
-        scrVitals.setBounds(0, 0, 1060, 650);
-        scrVitals.setBorder(BorderFactory.createEmptyBorder());
+        scrVitals.setBounds(0, 0, 1020, 620);
+        scrVitals.setBorder(null);
+        scrVitals.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         scrVitals.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(scrVitals);
 
@@ -56,7 +56,7 @@ public class VitalSignsReport extends JPanel {
 
         lblTitle = new JLabel("VITAL SIGNS REPORT");
         lblTitle.setFont(new Font("Calibri", Font.BOLD, 22));
-        lblTitle.setBounds(680, 35, 400, 30);
+        lblTitle.setBounds(620, 35, 400, 30);
         pnlMain.add(lblTitle);
 
         lblRefNo = new JLabel("Ref No.: VS-2026-001");
@@ -70,13 +70,13 @@ public class VitalSignsReport extends JPanel {
         pnlMain.add(lblDate);
 
         lineTop = new JPanel();
-        lineTop.setBounds(30, 130, 980, 2);
+        lineTop.setBounds(30, 130, 940, 2);
         lineTop.setBackground(neutralGray);
         pnlMain.add(lineTop);
 
         pnlPatient = new JPanel();
         pnlPatient.setLayout(null);
-        pnlPatient.setBounds(30, 150, 980, 80);
+        pnlPatient.setBounds(30, 150, 940, 100);
         pnlPatient.setBorder(BorderFactory.createTitledBorder("Patient Information"));
         pnlMain.add(pnlPatient);
 
@@ -97,7 +97,7 @@ public class VitalSignsReport extends JPanel {
 
         pnlTable = new JPanel();
         pnlTable.setLayout(null);
-        pnlTable.setBounds(30, 250, 980, 250);
+        pnlTable.setBounds(30, 270, 940, 200);
         pnlTable.setBorder(BorderFactory.createTitledBorder("Vital Signs Record"));
         pnlMain.add(pnlTable);
 
@@ -119,13 +119,13 @@ public class VitalSignsReport extends JPanel {
         pnlTable.add(scrTable);
 
         lineFooter = new JPanel();
-        lineFooter.setBounds(30, 530, 980, 2);
+        lineFooter.setBounds(30, 490, 940, 2);
         lineFooter.setBackground(neutralGray);
         pnlMain.add(lineFooter);
 
         lblFooter = new JLabel("Vital signs monitored by: Nurse Angela Cruz");
         lblFooter.setFont(new Font("Calibri", Font.ITALIC, 12));
-        lblFooter.setBounds(60, 550, 400, 20);
+        lblFooter.setBounds(60, 510, 300, 20);
         pnlMain.add(lblFooter);
     }
 }

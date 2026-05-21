@@ -2,13 +2,11 @@ package Dashboard;
 
 import static Color_Palette.ColorPalette.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.*;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.table.*;
 
-public class Admin_Dashboard extends JPanel implements ActionListener{
+public class Admin_Dashboard extends JPanel{
     
     private JPanel pnlMain, pnlPatients, pnlAppointment, pnlPrescription, pnlBeds, pnlSupplies, pnlEquipment, pnlStock, pnlActivity, pnlSummary;
     private JLabel lblOverview, lblDT, lblPatients, lblPCount, lblATitle, lblACount, lblPrTitle, lblPrCount, lblBTitle, lblBCount, lblMonth,
@@ -228,14 +226,7 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
             {"Inventory audit completed", "04/23/2026"},
             {"New staff added: Nurse Maria Lopez", "04/25/2026"},
             {"Updated role: Dr. Santos promoted to Senior Physician", "04/25/2026"},
-            {"Staff schedule updated for Week 17", "04/24/2026"},
-            {"Deactivated account: staff_203 (resigned)", "04/24/2026"},
-            {"Attendance report generated for April", "04/23/2026"},
-            {"Multiple failed login attempts detected", "04/23/2026"},
-            {"User permissions updated for Admin group", "04/23/2026"},
-            {"Audit logs exported successfully", "04/22/2026"},
-            {"System maintenance mode enabled", "04/22/2026"},
-            {"System maintenance mode disabled", "04/22/2026"}
+            {"Staff schedule updated for Week 17", "04/24/2026"}
             };
         
         tblActivities = new JTable(RwActivities, clmActivities);
@@ -301,10 +292,5 @@ public class Admin_Dashboard extends JPanel implements ActionListener{
         pnlSummary.add(scrSummary);
         
         setVisible(true);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        
     }
 }

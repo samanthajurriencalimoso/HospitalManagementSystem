@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Appointments;
 
 import static Color_Palette.ColorPalette.*;
@@ -9,11 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
-import javax.swing.table.JTableHeader;
-/**
- *
- * @author Jm's Laptop
- */
+
 public class Doctor_SchedAppointment extends JPanel implements ActionListener{
     
     private JPanel pnlMain, pnlPatients, pnlAvail, pnlUrgent, pnlApp, pnlRecent, dvdType, dvdStatus, pnlNote,
@@ -23,8 +15,7 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener{
                    lblMonth, lblTDAp;
     private ImageIcon imgPatient;
     private Image imgPat;
-    private JButton btnRecord, btnNote, btnEdit, btnPrev, btnNext, btnToday, btnDay, btnWeek, btnMonth, btnNew, btnEdit2,
-                    btnCancel, btnView;
+    private JButton btnRecord, btnNote, btnEdit, btnPrev, btnNext, btnToday, btnDay, btnWeek, btnMonth, btnNew, btnEdit2, btnCancel, btnView;
     private JTextArea txtNote;
     private JScrollPane scrNote, scrCalendar, srcAppointments;
     private JTable tblCalendar, tblApp;

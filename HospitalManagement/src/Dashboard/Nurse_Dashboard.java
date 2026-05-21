@@ -140,11 +140,7 @@ public class Nurse_Dashboard extends JPanel{
             {"P007", "Mark Villanueva", "Room 107", "11:00 AM", "76", "117/76", "36.5°C", "Omeprazole 20mg", "Given"},
             {"P008", "Sofia Ramos", "Room 108", "11:30 AM", "92", "135/88", "37.3°C", "Nebulization", "Ongoing"},
             {"P009", "Daniel Cruz", "Room 109", "12:00 PM", "85", "122/80", "37.1°C", "Paracetamol 500mg", "Pending"},
-            {"P010", "Isabella Flores", "Room 110", "12:30 PM", "89", "128/84", "37.0°C", "IV Antibiotic", "Ongoing"},
-            {"P011", "John Garcia", "Room 111", "01:00 PM", "72", "110/70", "36.4°C", "Aspirin 80mg", "Given"},
-            {"P012", "Carla Fernandez", "Room 112", "01:30 PM", "95", "140/90", "37.5°C", "Metformin 500mg", "Pending"},
-            {"P013", "Ethan Aquino", "Room 113", "02:00 PM", "87", "126/82", "37.2°C", "Insulin", "Pending"},
-            {"P014", "Nicole Torres", "Room 114", "02:30 PM", "74", "115/75", "36.6°C", "Pain Reliever", "Given"}
+            {"P010", "Isabella Flores", "Room 110", "12:30 PM", "89", "128/84", "37.0°C", "IV Antibiotic", "Ongoing"}
         };
 
         tblMSched = new JTable(RwMSched, clmMSched);

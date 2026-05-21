@@ -18,18 +18,18 @@ public class CareTaskSummary extends JPanel {
     
     public CareTaskSummary() {
         setLayout(null);
-        setBounds(0, 0, 1060, 650);
         setBackground(Color.WHITE);
         
         pnlMain = new JPanel();
         pnlMain.setLayout(null);
-        pnlMain.setPreferredSize(new Dimension(1040, 900));
+        pnlMain.setPreferredSize(new Dimension(1000, 570));
         pnlMain.setBackground(Color.WHITE);
         pnlMain.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
         scrCareTask = new JScrollPane(pnlMain);
-        scrCareTask.setBounds(0, 0, 1060, 650);
-        scrCareTask.setBorder(BorderFactory.createEmptyBorder());
+        scrCareTask.setBounds(0, 0, 1020, 620);
+        scrCareTask.setBorder(null);
+        scrCareTask.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         scrCareTask.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(scrCareTask);
 
@@ -57,7 +57,7 @@ public class CareTaskSummary extends JPanel {
 
         lblTitle = new JLabel("CARE TASK SUMMARY");
         lblTitle.setFont(new Font("Calibri", Font.BOLD, 22));
-        lblTitle.setBounds(680, 35, 400, 30);
+        lblTitle.setBounds(620, 35, 400, 30);
         pnlMain.add(lblTitle);
 
         lblRefNo = new JLabel("Ref No.: CT-2026-001");
@@ -71,13 +71,13 @@ public class CareTaskSummary extends JPanel {
         pnlMain.add(lblDate);
 
         lineTop = new JPanel();
-        lineTop.setBounds(30, 130, 980, 2);
+        lineTop.setBounds(30, 130, 940, 2);
         lineTop.setBackground(neutralGray);
         pnlMain.add(lineTop);
 
         pnlPatient = new JPanel();
         pnlPatient.setLayout(null);
-        pnlPatient.setBounds(30, 150, 980, 80);
+        pnlPatient.setBounds(30, 150, 940, 100);
         pnlPatient.setBorder(BorderFactory.createTitledBorder("Patient Information"));
         pnlMain.add(pnlPatient);
 
@@ -98,7 +98,7 @@ public class CareTaskSummary extends JPanel {
 
         pnlTable = new JPanel();
         pnlTable.setLayout(null);
-        pnlTable.setBounds(30, 250, 980, 280);
+        pnlTable.setBounds(30, 270, 940, 200);
         pnlTable.setBorder(BorderFactory.createTitledBorder("Care Tasks"));
         pnlMain.add(pnlTable);
 
@@ -121,13 +121,13 @@ public class CareTaskSummary extends JPanel {
         pnlTable.add(scrTable);
 
         lineFooter = new JPanel();
-        lineFooter.setBounds(30, 560, 980, 2);
+        lineFooter.setBounds(30, 490, 940, 2);
         lineFooter.setBackground(neutralGray);
         pnlMain.add(lineFooter);
 
         lblFooter = new JLabel("Total Tasks: 5 | Completed: 2 | In Progress: 1 | Pending: 1 | Scheduled: 1");
         lblFooter.setFont(new Font("Calibri", Font.ITALIC, 12));
-        lblFooter.setBounds(280, 580, 550, 20);
+        lblFooter.setBounds(60, 510, 300, 20);
         pnlMain.add(lblFooter);
     }
 }

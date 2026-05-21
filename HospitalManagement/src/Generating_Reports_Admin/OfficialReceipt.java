@@ -24,7 +24,7 @@ public class OfficialReceipt extends JPanel {
         
         pnlOR = new JPanel();
         pnlOR.setLayout(null);
-        pnlOR.setPreferredSize(new Dimension(1040, 760));
+        pnlOR.setPreferredSize(new Dimension(1040, 900));
         pnlOR.setBackground(Color.WHITE);
         pnlOR.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
@@ -71,14 +71,7 @@ public class OfficialReceipt extends JPanel {
         pnlPatient.setLayout(null);
         pnlPatient.setBounds(30, 190, 470, 120);
         pnlPatient.setBackground(Color.WHITE);
-        pnlPatient.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(neutralGray),
-                "Patient Information",
-                TitledBorder.LEFT,
-                TitledBorder.TOP,
-                new Font("Calibri", Font.BOLD, 14),
-                darkBlue
-        ));
+        pnlPatient.setBorder(BorderFactory.createTitledBorder("Patient Information"));
         pnlOR.add(pnlPatient);
 
         lblPID = new JLabel("Patient ID:");
@@ -105,14 +98,7 @@ public class OfficialReceipt extends JPanel {
         pnlPayment.setLayout(null);
         pnlPayment.setBounds(520, 190, 490, 120);
         pnlPayment.setBackground(Color.WHITE);
-        pnlPayment.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(neutralGray),
-                "Payment Details",
-                TitledBorder.LEFT,
-                TitledBorder.TOP,
-                new Font("Calibri", Font.BOLD, 14),
-                darkBlue
-        ));
+        pnlPayment.setBorder(BorderFactory.createTitledBorder("Payment Details"));
         pnlOR.add(pnlPayment);
 
         lblMethod = new JLabel("Payment Method:");

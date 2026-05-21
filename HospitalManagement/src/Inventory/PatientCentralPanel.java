@@ -24,14 +24,11 @@ public class PatientCentralPanel extends JPanel {
         pnlMain.setBackground(veryLightBlue);
         pnlMain.setBounds(0, 0, 1620, 930);
         add(pnlMain);
-        
-        int panelWidth = 1620;
-        int startX = 30;
        
         lbltitle = new JLabel("Patient Central Dashboard");
         lbltitle.setFont(new Font("Calibri", Font.BOLD, 24));
         lbltitle.setForeground(Color.BLACK);
-        lbltitle.setBounds(startX, 20, 400, 40);
+        lbltitle.setBounds(30, 20, 400, 40);
         pnlMain.add(lbltitle);
         
         lblDT = new JLabel("May 21, 2026 | 10:00 AM");
@@ -39,34 +36,30 @@ public class PatientCentralPanel extends JPanel {
         lblDT.setForeground(Color.darkGray);
         lblDT.setBounds(1390, 20, 400, 40);
         pnlMain.add(lblDT);
-    
-        int tabWidth = (panelWidth - 300) / 4;
-        int tabHeight = 100;
-        int tabY = 80;
         
         tabPatient = createTab("Total Patients", "0", darkBlue);
-        tabPatient.setBounds(startX, tabY, tabWidth, tabHeight);
+        tabPatient.setBounds(30, 80, 300, 100);
         pnlMain.add(tabPatient);
         lblTPatient = (JLabel) tabPatient.getComponent(1);
         
         tabAdmission = createTab("Active Admissions", "0", mediumBlue);
-        tabAdmission.setBounds(startX + tabWidth + 20, tabY, tabWidth, tabHeight);
+        tabAdmission.setBounds(350, 80, 300, 100);
         pnlMain.add(tabAdmission);
         lblAct = (JLabel) tabAdmission.getComponent(1);
         
         tabBed = createTab("Available Beds", "50", Green);
-        tabBed.setBounds(startX + (tabWidth + 20) * 2, tabY, tabWidth, tabHeight);
+        tabBed.setBounds(670, 80, 300,100);
         pnlMain.add(tabBed);
         
         tabApp = createTab("Today's Appointments", "24", Yellow);
-        tabApp.setBounds(startX + (tabWidth + 20) * 3, tabY, tabWidth, tabHeight);
+        tabApp.setBounds(990, 80, 300, 100);
         pnlMain.add(tabApp);
      
         pnlSelection = new JPanel();
         pnlSelection.setLayout(null);
         pnlSelection.setBackground(Color.WHITE);
         pnlSelection.setBorder(BorderFactory.createLineBorder(borderLBLUE));
-        pnlSelection.setBounds(startX, 210, 650, 80);
+        pnlSelection.setBounds(30, 210, 650, 80);
         pnlMain.add(pnlSelection);
         
         lblName = new JLabel("Name:");
@@ -105,14 +98,14 @@ public class PatientCentralPanel extends JPanel {
         tblPC.getTableHeader().setBackground(lightBlue);
         
         srcRoom = new JScrollPane(tblPC);
-        srcRoom.setBounds(startX, 310, panelWidth - 60, 530);
+        srcRoom.setBounds(30, 310, 1560, 530);
         pnlMain.add(srcRoom);
        
         pnlBot = new JPanel();
         pnlBot.setLayout(null);
         pnlBot.setBackground(Color.WHITE);
         pnlBot.setBorder(BorderFactory.createLineBorder(borderLBLUE));
-        pnlBot.setBounds(startX, 860, panelWidth - 60, 50);
+        pnlBot.setBounds(30, 860, 1560, 50);
         pnlMain.add(pnlBot);
         
         btnAdmit = new JButton("Admit Selected");

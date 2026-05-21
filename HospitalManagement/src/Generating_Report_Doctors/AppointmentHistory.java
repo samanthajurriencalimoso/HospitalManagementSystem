@@ -5,29 +5,31 @@ import java.awt.*;
 import javax.swing.*;
 
 public class AppointmentHistory extends JPanel {
-    
-    private JPanel pnlMain,lineTop, lineFooter, pnlPatient, pnlTable;
-    private JLabel lblLogo, lblHospital, lblAddress, lblContact,lblTitle, lblRefNo, lblDate,lblPName, lblPID,lblFooter;
+
+    private JPanel pnlMain, lineTop, lineFooter, pnlPatient, pnlTable;
+    private JLabel lblLogo, lblHospital, lblAddress, lblContact, lblTitle, lblRefNo, lblDate,
+            lblPName, lblPID, lblFooter;
     private Image imgLG;
     private JTable tblApp;
-    private JScrollPane scrTable,scrAppHistory;
+    private JScrollPane scrTable, scrAppHistory;
     private ImageIcon imgLogo;
-    
+
     public AppointmentHistory() {
         setLayout(null);
-        setBounds(0, 0, 1060, 650);
         setBackground(Color.WHITE);
-        
+
         pnlMain = new JPanel();
         pnlMain.setLayout(null);
-        pnlMain.setPreferredSize(new Dimension(1040, 900));
+        pnlMain.setPreferredSize(new Dimension(1000, 630));
         pnlMain.setBackground(Color.WHITE);
         pnlMain.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
         scrAppHistory = new JScrollPane(pnlMain);
-        scrAppHistory.setBounds(0, 0, 1060, 650);
-        scrAppHistory.setBorder(BorderFactory.createEmptyBorder());
+        scrAppHistory.setBounds(0, 0, 1020, 680);
+        scrAppHistory.setBorder(null);
+        scrAppHistory.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         scrAppHistory.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrAppHistory.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrAppHistory);
 
         imgLogo = new ImageIcon(getClass().getResource("/resources/eTriage.DOCUMENT.LOGO.png"));
@@ -68,13 +70,13 @@ public class AppointmentHistory extends JPanel {
         pnlMain.add(lblDate);
 
         lineTop = new JPanel();
-        lineTop.setBounds(30, 130, 980, 2);
+        lineTop.setBounds(30, 130, 940, 2);
         lineTop.setBackground(neutralGray);
         pnlMain.add(lineTop);
 
         pnlPatient = new JPanel();
         pnlPatient.setLayout(null);
-        pnlPatient.setBounds(30, 150, 980, 80);
+        pnlPatient.setBounds(30, 150, 940, 80);
         pnlPatient.setBorder(BorderFactory.createTitledBorder("Patient Information"));
         pnlMain.add(pnlPatient);
 
@@ -90,7 +92,7 @@ public class AppointmentHistory extends JPanel {
 
         pnlTable = new JPanel();
         pnlTable.setLayout(null);
-        pnlTable.setBounds(30, 250, 980, 280);
+        pnlTable.setBounds(30, 250, 940, 280);
         pnlTable.setBorder(BorderFactory.createTitledBorder("Appointment Records"));
         pnlMain.add(pnlTable);
 
@@ -109,17 +111,17 @@ public class AppointmentHistory extends JPanel {
         tblApp.getTableHeader().setFont(new Font("Calibri", Font.BOLD, 13));
 
         scrTable = new JScrollPane(tblApp);
-        scrTable.setBounds(20, 30, 940, 220);
+        scrTable.setBounds(20, 30, 900, 220);
         pnlTable.add(scrTable);
 
         lineFooter = new JPanel();
-        lineFooter.setBounds(30, 560, 980, 2);
+        lineFooter.setBounds(30, 550, 940, 2);
         lineFooter.setBackground(neutralGray);
         pnlMain.add(lineFooter);
 
         lblFooter = new JLabel("Total Appointments: 5 | Completed: 4 | Cancelled: 1");
         lblFooter.setFont(new Font("Calibri", Font.ITALIC, 12));
-        lblFooter.setBounds(350, 580, 400, 20);
+        lblFooter.setBounds(300, 570, 400, 20);
         pnlMain.add(lblFooter);
     }
 }

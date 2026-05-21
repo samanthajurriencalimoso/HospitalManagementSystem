@@ -3,15 +3,19 @@ package Generating_Report_Doctors;
 import static Color_Palette.ColorPalette.*;
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.*;
 
 public class PrescriptionReport extends JPanel {
     
     private JPanel pnlMain;
-    private JLabel lblLogo, lblHospital, lblAddress, lblContact, lblRxSymbol,lblPatientName, lblPatientNameValue, lblPatientAddress, lblPatientAddressValue,
-            lblAge, lblAgeValue, lblGender, lblGenderValue, lblDate, lblDateValue, lblDoctor, lblDoctorValue,lblDiagnosis, lblDiagnosisValue, lblMed1, 
-            lblForm1, lblQty1, lblSig1, lblRefill1,lblMed2, lblForm2, lblQty2, lblSig2, lblRefill2,lblMed3, lblForm3, lblQty3, lblSig3, lblRefill3, 
-            lblDASection, lblDARemarks,lblPrescriberName, lblPrescriberLicense, lblPrescriberPTR,lblSignature, lblValidity;
+    private JLabel lblLogo, lblHospital, lblAddress, lblContact,
+            lblPatientName, lblPatientNameValue, lblPatientAddress, lblPatientAddressValue,
+            lblAge, lblAgeValue, lblGender, lblGenderValue, lblDate, lblDateValue, 
+            lblDoctor, lblDoctorValue, lblDiagnosis, lblDiagnosisValue, 
+            lblMed1, lblForm1, lblQty1, lblSig1, lblRefill1,
+            lblMed2, lblForm2, lblQty2, lblSig2, lblRefill2,
+            lblMed3, lblForm3, lblQty3, lblSig3, lblRefill3,
+            lblPrescriberName, lblPrescriberLicense, lblPrescriberPTR,
+            lblSignature, lblValidity;
     private JPanel lineTop, lineMeds, lineDA, lineFooter, lineSignature;
     private JScrollPane scrPrescription;
     private ImageIcon imgLogo;
@@ -24,13 +28,14 @@ public class PrescriptionReport extends JPanel {
         
         pnlMain = new JPanel();
         pnlMain.setLayout(null);
-        pnlMain.setPreferredSize(new Dimension(1040, 1000));
+        pnlMain.setPreferredSize(new Dimension(1010, 780));
         pnlMain.setBackground(Color.WHITE);
         pnlMain.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
         scrPrescription = new JScrollPane(pnlMain);
         scrPrescription.setBounds(0, 0, 1060, 650);
         scrPrescription.setBorder(BorderFactory.createEmptyBorder());
+        scrPrescription.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         scrPrescription.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrPrescription.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrPrescription);
@@ -57,25 +62,19 @@ public class PrescriptionReport extends JPanel {
         lblContact.setBounds(130, 73, 300, 18);
         pnlMain.add(lblContact);
 
-        lblRxSymbol = new JLabel("℞");
-        lblRxSymbol.setFont(new Font("Segoe UI", Font.BOLD, 48));
-        lblRxSymbol.setForeground(Color.RED);
-        lblRxSymbol.setBounds(850, 25, 80, 80);
-        pnlMain.add(lblRxSymbol);
-
         lineTop = new JPanel();
-        lineTop.setBounds(30, 120, 980, 2);
+        lineTop.setBounds(30, 120, 960, 2);
         lineTop.setBackground(neutralGray);
         pnlMain.add(lineTop);
 
         lblPatientName = new JLabel("Patient Name:");
         lblPatientName.setFont(new Font("Calibri", Font.BOLD, 14));
-        lblPatientName.setBounds(30, 145, 100, 25);
+        lblPatientName.setBounds(30, 145, 110, 25);
         pnlMain.add(lblPatientName);
 
         lblPatientNameValue = new JLabel("GARCIA, JOSHUA S.");
         lblPatientNameValue.setFont(new Font("Calibri", Font.PLAIN, 14));
-        lblPatientNameValue.setBounds(140, 145, 250, 25);
+        lblPatientNameValue.setBounds(145, 145, 250, 25);
         pnlMain.add(lblPatientNameValue);
 
         lblPatientAddress = new JLabel("Address:");
@@ -115,31 +114,31 @@ public class PrescriptionReport extends JPanel {
 
         lblDateValue = new JLabel("April 15, 2026");
         lblDateValue.setFont(new Font("Calibri", Font.PLAIN, 12));
-        lblDateValue.setBounds(870, 145, 130, 25);
+        lblDateValue.setBounds(870, 145, 120, 25);
         pnlMain.add(lblDateValue);
 
         lblDoctor = new JLabel("Prescribing Physician:");
         lblDoctor.setFont(new Font("Calibri", Font.BOLD, 14));
-        lblDoctor.setBounds(30, 210, 150, 25);
+        lblDoctor.setBounds(30, 210, 155, 25);
         pnlMain.add(lblDoctor);
 
         lblDoctorValue = new JLabel("Dr. Isabella Ramos, MD");
         lblDoctorValue.setFont(new Font("Calibri", Font.PLAIN, 14));
-        lblDoctorValue.setBounds(185, 210, 250, 25);
+        lblDoctorValue.setBounds(190, 210, 250, 25);
         pnlMain.add(lblDoctorValue);
 
         lblDiagnosis = new JLabel("Clinical Diagnosis:");
         lblDiagnosis.setFont(new Font("Calibri", Font.BOLD, 14));
-        lblDiagnosis.setBounds(30, 245, 120, 25);
+        lblDiagnosis.setBounds(30, 245, 125, 25);
         pnlMain.add(lblDiagnosis);
 
         lblDiagnosisValue = new JLabel("Acute Bronchitis (J20.9)");
         lblDiagnosisValue.setFont(new Font("Calibri", Font.PLAIN, 14));
-        lblDiagnosisValue.setBounds(155, 245, 300, 25);
+        lblDiagnosisValue.setBounds(160, 245, 300, 25);
         pnlMain.add(lblDiagnosisValue);
 
         lineMeds = new JPanel();
-        lineMeds.setBounds(30, 285, 980, 2);
+        lineMeds.setBounds(30, 285, 960, 2);
         lineMeds.setBackground(neutralGray);
         pnlMain.add(lineMeds);
 
@@ -150,7 +149,7 @@ public class PrescriptionReport extends JPanel {
 
         lblForm1 = new JLabel("(Acetaminophen) 500mg tablet");
         lblForm1.setFont(new Font("Calibri", Font.PLAIN, 11));
-        lblForm1.setBounds(50, 325, 200, 20);
+        lblForm1.setBounds(50, 325, 220, 20);
         pnlMain.add(lblForm1);
 
         lblQty1 = new JLabel("Disp: 10 tablets");
@@ -165,7 +164,7 @@ public class PrescriptionReport extends JPanel {
 
         lblRefill1 = new JLabel("Refill: 0");
         lblRefill1.setFont(new Font("Calibri", Font.PLAIN, 11));
-        lblRefill1.setBounds(300, 345, 100, 20);
+        lblRefill1.setBounds(300, 325, 100, 20);
         pnlMain.add(lblRefill1);
 
         lblMed2 = new JLabel("2. Amoxicillin");
@@ -190,7 +189,7 @@ public class PrescriptionReport extends JPanel {
 
         lblRefill2 = new JLabel("Refill: 0");
         lblRefill2.setFont(new Font("Calibri", Font.PLAIN, 11));
-        lblRefill2.setBounds(300, 425, 100, 20);
+        lblRefill2.setBounds(300, 405, 100, 20);
         pnlMain.add(lblRefill2);
 
         lblMed3 = new JLabel("3. Ascorbic Acid");
@@ -215,59 +214,12 @@ public class PrescriptionReport extends JPanel {
 
         lblRefill3 = new JLabel("Refill: 2");
         lblRefill3.setFont(new Font("Calibri", Font.PLAIN, 11));
-        lblRefill3.setBounds(300, 505, 100, 20);
+        lblRefill3.setBounds(300, 485, 100, 20);
         pnlMain.add(lblRefill3);
 
         lineDA = new JPanel();
-        lineDA.setBounds(30, 545, 980, 2);
+        lineDA.setBounds(30, 545, 960, 2);
         lineDA.setBackground(neutralGray);
         pnlMain.add(lineDA);
-
-        lblDASection = new JLabel("DANGEROUS DRUG SECTION:");
-        lblDASection.setFont(new Font("Calibri", Font.BOLD, 12));
-        lblDASection.setForeground(Color.RED);
-        lblDASection.setBounds(30, 560, 200, 20);
-        pnlMain.add(lblDASection);
-
-        lblDARemarks = new JLabel("No dangerous drugs prescribed");
-        lblDARemarks.setFont(new Font("Calibri", Font.PLAIN, 11));
-        lblDARemarks.setBounds(50, 580, 300, 20);
-        pnlMain.add(lblDARemarks);
-
-        lineFooter = new JPanel();
-        lineFooter.setBounds(30, 620, 980, 2);
-        lineFooter.setBackground(neutralGray);
-        pnlMain.add(lineFooter);
-
-        lblPrescriberName = new JLabel("DR. ISABELLA RAMOS, MD");
-        lblPrescriberName.setFont(new Font("Calibri", Font.BOLD, 12));
-        lblPrescriberName.setBounds(60, 640, 300, 25);
-        pnlMain.add(lblPrescriberName);
-
-        lblPrescriberLicense = new JLabel("License No.: 123456");
-        lblPrescriberLicense.setFont(new Font("Calibri", Font.PLAIN, 10));
-        lblPrescriberLicense.setBounds(60, 665, 150, 20);
-        pnlMain.add(lblPrescriberLicense);
-
-        lblPrescriberPTR = new JLabel("PTR No.: 789012");
-        lblPrescriberPTR.setFont(new Font("Calibri", Font.PLAIN, 10));
-        lblPrescriberPTR.setBounds(60, 685, 150, 20);
-        pnlMain.add(lblPrescriberPTR);
-
-        lineSignature = new JPanel();
-        lineSignature.setBounds(60, 715, 250, 2);
-        lineSignature.setBackground(Color.BLACK);
-        pnlMain.add(lineSignature);
-
-        lblSignature = new JLabel("Signature over Printed Name");
-        lblSignature.setFont(new Font("Calibri", Font.PLAIN, 9));
-        lblSignature.setBounds(85, 720, 200, 15);
-        pnlMain.add(lblSignature);
-
-        lblValidity = new JLabel("This prescription is valid for 30 days from date of issue");
-        lblValidity.setFont(new Font("Calibri", Font.ITALIC, 9));
-        lblValidity.setForeground(Color.GRAY);
-        lblValidity.setBounds(330, 730, 400, 20);
-        pnlMain.add(lblValidity);
     }
 }

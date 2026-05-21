@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Appointments;
 
 import static Color_Palette.ColorPalette.*;
@@ -10,10 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
-/**
- *
- * @author Jm's Laptop
- */
+
 public class Nurse_SchedAppointment extends JPanel{
     
     JPanel pnlMain, pnlPatients, pnlAvail, pnlUrgent, pnlApp, pnlRecent, dvdType, dvdStatus, pnlNote,

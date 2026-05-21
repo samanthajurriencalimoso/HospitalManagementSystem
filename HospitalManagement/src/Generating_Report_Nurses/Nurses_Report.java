@@ -10,7 +10,7 @@ public class Nurses_Report extends JPanel implements ActionListener{
     
     private JButton btnMedication, btnVitals, btnCareTask, btnSend, btnEdit, btnPrint,btnMComplete, btnMIncomplete, btnMMissing;
     private JLabel lblType, lblStatus, lblDT,lblNurse,lbltext,lblRType,lblPrev;
-    private JPanel pnlMain, pnlPrev,pnlRType,pnlB;
+    private JPanel pnlMain, pnlPrev,pnlRType, pnlB;
     private JScrollPane scroll;
     private String currentReportType = "";
     
@@ -125,30 +125,33 @@ public class Nurses_Report extends JPanel implements ActionListener{
         pnlPrev = new JPanel();
         pnlPrev.setLayout(null);
         pnlPrev.setBackground(Color.WHITE);
+        pnlPrev.setPreferredSize(new Dimension(1020, 920));
+        pnlMain.add(pnlPrev);
         
         scroll = new JScrollPane(pnlPrev);
-        scroll.setBounds(30, 80, 1040, 610);
+        scroll.setBounds(30, 70, 1050, 650);
         scroll.setBorder(null);
+        scroll.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         pnlB.add(scroll);
         
         btnEdit = new JButton("Edit Report");
-        btnEdit.setBounds(500, 740, 150, 35);
+        btnEdit.setBounds(500, 730, 150, 35);
         btnEdit.setBackground(darkBlue);
         btnEdit.setForeground(Color.WHITE);
         btnEdit.addActionListener(e -> editReport());
         pnlB.add(btnEdit);
         
         btnSend = new JButton("Send to Doctor");
-        btnSend.setBounds(660, 740, 170, 35);
+        btnSend.setBounds(660, 730, 170, 35);
         btnSend.setBackground(Green);
         btnSend.setForeground(Color.BLACK);
         btnSend.addActionListener(e -> sendReport());
         pnlB.add(btnSend);
         
         btnPrint = new JButton("Print Report");
-        btnPrint.setBounds(840, 740, 180, 35);
+        btnPrint.setBounds(840, 730, 180, 35);
         btnPrint.setBackground(LightGray);
         btnPrint.setForeground(Color.BLACK);
         btnPrint.addActionListener(e -> printReport());
@@ -200,10 +203,12 @@ public class Nurses_Report extends JPanel implements ActionListener{
         if (ae.getSource() == btnMedication) {
             pnlPrev.removeAll();
             MedicationLog ml = new MedicationLog();
-            ml.setBounds(0, 0, 1060, 650);
+            ml.setBounds(0, 0, 1020, 820);
+            pnlPrev.setPreferredSize(new Dimension(1020, 820));
             pnlPrev.add(ml);
             pnlPrev.revalidate();
             pnlPrev.repaint();
+            scroll.getVerticalScrollBar().setValue(0);
             currentReportType = "Medication Log";
             lblStatus.setText("Status: Incomplete");
             lblStatus.setForeground(new Color(255, 140, 0));
@@ -211,10 +216,12 @@ public class Nurses_Report extends JPanel implements ActionListener{
         } else if (ae.getSource() == btnVitals) {
             pnlPrev.removeAll();
             VitalSignsReport vs = new VitalSignsReport();
-            vs.setBounds(0, 0, 1060, 650);
+            vs.setBounds(0, 0, 1020, 620);
+            pnlPrev.setPreferredSize(new Dimension(1020, 620));
             pnlPrev.add(vs);
             pnlPrev.revalidate();
             pnlPrev.repaint();
+            scroll.getVerticalScrollBar().setValue(0);
             currentReportType = "Vital Signs Report";
             lblStatus.setText("Status: Incomplete");
             lblStatus.setForeground(new Color(255, 140, 0));
@@ -222,10 +229,12 @@ public class Nurses_Report extends JPanel implements ActionListener{
         } else if (ae.getSource() == btnCareTask) {
             pnlPrev.removeAll();
             CareTaskSummary ct = new CareTaskSummary();
-            ct.setBounds(0, 0, 1060, 650);
+            ct.setBounds(0, 0, 1020, 680);
+            pnlPrev.setPreferredSize(new Dimension(1020, 680));
             pnlPrev.add(ct);
             pnlPrev.revalidate();
             pnlPrev.repaint();
+            scroll.getVerticalScrollBar().setValue(0);
             currentReportType = "Care Task Summary";
             lblStatus.setText("Status: Incomplete");
             lblStatus.setForeground(new Color(255, 140, 0));

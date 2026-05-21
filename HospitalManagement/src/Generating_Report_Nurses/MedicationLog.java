@@ -17,18 +17,18 @@ public class MedicationLog extends JPanel {
     
     public MedicationLog() {
         setLayout(null);
-        setBounds(0, 0, 1060, 650);
         setBackground(Color.WHITE);
         
         pnlMain = new JPanel();
         pnlMain.setLayout(null);
-        pnlMain.setPreferredSize(new Dimension(1040, 900));
+        pnlMain.setPreferredSize(new Dimension(11000, 570));
         pnlMain.setBackground(Color.WHITE);
         pnlMain.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
         scrMedLog = new JScrollPane(pnlMain);
-        scrMedLog.setBounds(0, 0, 1060, 650);
-        scrMedLog.setBorder(BorderFactory.createEmptyBorder());
+        scrMedLog.setBounds(0, 0, 1020, 620);
+        scrMedLog.setBorder(null);
+        scrMedLog.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         scrMedLog.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(scrMedLog);
 
@@ -56,7 +56,7 @@ public class MedicationLog extends JPanel {
 
         lblTitle = new JLabel("MEDICATION ADMINISTRATION LOG");
         lblTitle.setFont(new Font("Calibri", Font.BOLD, 20));
-        lblTitle.setBounds(660, 35, 420, 30);
+        lblTitle.setBounds(620, 35, 400, 30);
         pnlMain.add(lblTitle);
 
         lblRefNo = new JLabel("Log No.: MED-2026-001");
@@ -70,13 +70,13 @@ public class MedicationLog extends JPanel {
         pnlMain.add(lblDate);
 
         lineTop = new JPanel();
-        lineTop.setBounds(30, 130, 980, 2);
+        lineTop.setBounds(30, 130, 940, 2);
         lineTop.setBackground(neutralGray);
         pnlMain.add(lineTop);
 
         pnlPatient = new JPanel();
         pnlPatient.setLayout(null);
-        pnlPatient.setBounds(30, 150, 980, 80);
+        pnlPatient.setBounds(30, 150, 940, 100);
         pnlPatient.setBorder(BorderFactory.createTitledBorder("Patient Information"));
         pnlMain.add(pnlPatient);
 
@@ -97,7 +97,7 @@ public class MedicationLog extends JPanel {
 
         pnlTable = new JPanel();
         pnlTable.setLayout(null);
-        pnlTable.setBounds(30, 250, 980, 300);
+        pnlTable.setBounds(30, 270, 940, 200);
         pnlTable.setBorder(BorderFactory.createTitledBorder("Medication Records"));
         pnlMain.add(pnlTable);
 
@@ -119,7 +119,7 @@ public class MedicationLog extends JPanel {
         pnlTable.add(scrTable);
 
         lineFooter = new JPanel();
-        lineFooter.setBounds(30, 580, 980, 2);
+        lineFooter.setBounds(30, 490, 940, 2);
         lineFooter.setBackground(neutralGray);
         pnlMain.add(lineFooter);
 
@@ -130,7 +130,7 @@ public class MedicationLog extends JPanel {
 
         lblNurse = new JLabel("Nurse Signature: ____________________");
         lblNurse.setFont(new Font("Calibri", Font.PLAIN, 14));
-        lblNurse.setBounds(60, 630, 300, 20);
+        lblNurse.setBounds(60, 510, 300, 20);
         pnlMain.add(lblNurse);
     }
 }

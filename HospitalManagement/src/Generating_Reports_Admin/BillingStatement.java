@@ -83,13 +83,7 @@ public class BillingStatement extends JPanel {
         pnlPatientBox.setLayout(null);
         pnlPatientBox.setBounds(30, 145, 980, 110);
         pnlPatientBox.setBackground(Color.WHITE);
-        pnlPatientBox.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(neutralGray),
-                "Patient Information",
-                TitledBorder.LEFT,
-                TitledBorder.TOP,
-                new Font("Calibri", Font.BOLD, 14)
-        ));
+        pnlPatientBox.setBorder(BorderFactory.createTitledBorder("Patient Information"));
         pnlBS.add(pnlPatientBox);
         
         lblPName = new JLabel("Patient Name:");
@@ -136,13 +130,7 @@ public class BillingStatement extends JPanel {
         pnlBillingBox.setLayout(null);
         pnlBillingBox.setBounds(30, 270, 980, 110);
         pnlBillingBox.setBackground(Color.WHITE);
-        pnlBillingBox.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(neutralGray),
-                "Billing Details",
-                TitledBorder.LEFT,
-                TitledBorder.TOP,
-                new Font("Calibri", Font.BOLD, 14)
-        ));
+        pnlBillingBox.setBorder(BorderFactory.createTitledBorder("Billing Details"));
         pnlBS.add(pnlBillingBox);
         
         lblRoom = new JLabel("Room No.:");
@@ -189,13 +177,7 @@ public class BillingStatement extends JPanel {
         pnlChargesBox.setLayout(null);
         pnlChargesBox.setBounds(30, 395, 980, 260);
         pnlChargesBox.setBackground(Color.WHITE);
-        pnlChargesBox.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(neutralGray),
-                "Charges",
-                TitledBorder.LEFT,
-                TitledBorder.TOP,
-                new Font("Calibri", Font.BOLD, 14)
-        ));
+        pnlChargesBox.setBorder(BorderFactory.createTitledBorder("Charges"));
         pnlBS.add(pnlChargesBox);
         
         clmPrice = new String[]{"Date", "Description", "Qty", "Unit Price", "Amount (PHP)"};

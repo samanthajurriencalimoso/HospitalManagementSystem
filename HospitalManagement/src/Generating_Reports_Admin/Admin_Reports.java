@@ -126,16 +126,19 @@ public class Admin_Reports extends JPanel implements ActionListener{
         pnlPrev = new JPanel();
         pnlPrev.setLayout(null);
         pnlPrev.setBackground(Color.WHITE);
+        pnlPrev.setPreferredSize(new Dimension(1020, 920));
+        pnlMain.add(pnlPrev);
         
         scroll = new JScrollPane(pnlPrev);
-        scroll.setBounds(30, 80, 1040, 610);
+        scroll.setBounds(30, 70, 1050, 650);
         scroll.setBorder(null);
+        scroll.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         pnlB.add(scroll);
         
         btnEdit = new JButton("Edit Report");
-        btnEdit.setBounds(500, 740, 150, 35);
+        btnEdit.setBounds(500, 730, 150, 35);
         btnEdit.setFont(new Font("Calibri", Font.BOLD, 16));
         btnEdit.setBackground(darkBlue);
         btnEdit.setForeground(Color.WHITE);
@@ -143,7 +146,7 @@ public class Admin_Reports extends JPanel implements ActionListener{
         pnlB.add(btnEdit);
         
         btnSend = new JButton("Send to Patient");
-        btnSend.setBounds(660, 740, 170, 35);
+        btnSend.setBounds(660, 730, 170, 35);
         btnSend.setFont(new Font("Calibri", Font.BOLD, 16));
         btnSend.setBackground(Green);
         btnSend.setForeground(Color.BLACK);
@@ -151,7 +154,7 @@ public class Admin_Reports extends JPanel implements ActionListener{
         pnlB.add(btnSend);
         
         btnEx = new JButton("Export (CSV)");
-        btnEx.setBounds(840, 740, 180, 35);
+        btnEx.setBounds(840, 730, 180, 35);
         btnEx.setFont(new Font("Calibri", Font.BOLD, 16));
         btnEx.setBackground(LightGray);
         btnEx.setForeground(Color.BLACK);
@@ -208,10 +211,12 @@ public class Admin_Reports extends JPanel implements ActionListener{
         if (ae.getSource() == btnBill) {
             pnlPrev.removeAll();
             BillingStatement bs = new BillingStatement();
-            bs.setBounds(0, 0, 1060, 650);
+            bs.setBounds(0, 0, 1020, 820);
+            pnlPrev.setPreferredSize(new Dimension(1020, 820));
             pnlPrev.add(bs);
             pnlPrev.revalidate();
             pnlPrev.repaint();
+            scroll.getVerticalScrollBar().setValue(0);
             currentReportType = "Billing Statement";
             lblStatus.setText("Status: Incomplete");
             lblStatus.setForeground(orange);
@@ -220,10 +225,12 @@ public class Admin_Reports extends JPanel implements ActionListener{
         } else if (ae.getSource() == btnRt) {
             pnlPrev.removeAll();
             OfficialReceipt or = new OfficialReceipt();
-            or.setBounds(0, 0, 1060, 650);
+            or.setBounds(0, 0, 1020, 620);
+            pnlPrev.setPreferredSize(new Dimension(1020, 620));
             pnlPrev.add(or);
             pnlPrev.revalidate();
             pnlPrev.repaint();
+            scroll.getVerticalScrollBar().setValue(0);
             currentReportType = "Official Receipt";
             lblStatus.setText("Status: Incomplete");
             lblStatus.setForeground(orange);
@@ -232,10 +239,12 @@ public class Admin_Reports extends JPanel implements ActionListener{
         } else if (ae.getSource() == btnSf) {
             pnlPrev.removeAll();
             StaffAttendance sf = new StaffAttendance();
-            sf.setBounds(0, 0, 1060, 650);
+            sf.setBounds(0, 0, 1020, 680);
+            pnlPrev.setPreferredSize(new Dimension(1020, 680));
             pnlPrev.add(sf);
             pnlPrev.revalidate();
             pnlPrev.repaint();
+            scroll.getVerticalScrollBar().setValue(0);
             currentReportType = "Staff Attendance";
             lblStatus.setText("Status: Incomplete");
             lblStatus.setForeground(orange);

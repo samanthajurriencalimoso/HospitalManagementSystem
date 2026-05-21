@@ -2,8 +2,6 @@ package MedicalHistory;
 
 import static Color_Palette.ColorPalette.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.*;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.table.*;

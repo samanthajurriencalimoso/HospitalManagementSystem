@@ -5,30 +5,31 @@ import java.awt.*;
 import javax.swing.*;
 
 public class DiagnosisSummary extends JPanel {
-    
+
     private JPanel pnlMain;
-    private JLabel lblLogo, lblHospital, lblAddress, lblContact,lblTitle, lblRefNo, lblDate,lblPName, lblAge, lblGender,lblDiagnosis, 
-            lblSymptoms,lblTreatment, lblFollowUp,lblFooter;
+    private JLabel lblLogo, lblHospital, lblAddress, lblContact, lblTitle, lblRefNo, lblDate,
+            lblPName, lblAge, lblGender, lblDiagnosis, lblSymptoms, lblTreatment, lblFollowUp, lblFooter;
     private JPanel lineTop, lineFooter, pnlPatient, pnlDiagnosisDetails;
     private Image imgLG;
     private ImageIcon imgLogo;
     private JScrollPane scrDiagnosis;
-    
+
     public DiagnosisSummary() {
         setLayout(null);
-        setBounds(0, 0, 1060, 650);
         setBackground(Color.WHITE);
-        
+
         pnlMain = new JPanel();
         pnlMain.setLayout(null);
-        pnlMain.setPreferredSize(new Dimension(1040, 900));
+        pnlMain.setPreferredSize(new Dimension(1000, 570));
         pnlMain.setBackground(Color.WHITE);
         pnlMain.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
         scrDiagnosis = new JScrollPane(pnlMain);
-        scrDiagnosis.setBounds(0, 0, 1060, 650);
-        scrDiagnosis.setBorder(BorderFactory.createEmptyBorder());
+        scrDiagnosis.setBounds(0, 0, 1020, 620);
+        scrDiagnosis.setBorder(null);
+        scrDiagnosis.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         scrDiagnosis.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrDiagnosis.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrDiagnosis);
 
         imgLogo = new ImageIcon(getClass().getResource("/resources/eTriage.DOCUMENT.LOGO.png"));
@@ -55,7 +56,7 @@ public class DiagnosisSummary extends JPanel {
 
         lblTitle = new JLabel("PATIENT DIAGNOSIS SUMMARY");
         lblTitle.setFont(new Font("Calibri", Font.BOLD, 22));
-        lblTitle.setBounds(680, 35, 400, 30);
+        lblTitle.setBounds(620, 35, 400, 30);
         pnlMain.add(lblTitle);
 
         lblRefNo = new JLabel("Ref No.: DX-2026-001");
@@ -69,13 +70,13 @@ public class DiagnosisSummary extends JPanel {
         pnlMain.add(lblDate);
 
         lineTop = new JPanel();
-        lineTop.setBounds(30, 130, 980, 2);
+        lineTop.setBounds(30, 130, 940, 2);
         lineTop.setBackground(neutralGray);
         pnlMain.add(lineTop);
 
         pnlPatient = new JPanel();
         pnlPatient.setLayout(null);
-        pnlPatient.setBounds(30, 150, 980, 100);
+        pnlPatient.setBounds(30, 150, 940, 100);
         pnlPatient.setBorder(BorderFactory.createTitledBorder("Patient Information"));
         pnlMain.add(pnlPatient);
 
@@ -96,7 +97,7 @@ public class DiagnosisSummary extends JPanel {
 
         pnlDiagnosisDetails = new JPanel();
         pnlDiagnosisDetails.setLayout(null);
-        pnlDiagnosisDetails.setBounds(30, 270, 980, 200);
+        pnlDiagnosisDetails.setBounds(30, 270, 940, 200);
         pnlDiagnosisDetails.setBorder(BorderFactory.createTitledBorder("Diagnosis Details"));
         pnlMain.add(pnlDiagnosisDetails);
 
@@ -121,13 +122,13 @@ public class DiagnosisSummary extends JPanel {
         pnlDiagnosisDetails.add(lblFollowUp);
 
         lineFooter = new JPanel();
-        lineFooter.setBounds(30, 500, 980, 2);
+        lineFooter.setBounds(30, 490, 940, 2);
         lineFooter.setBackground(neutralGray);
         pnlMain.add(lineFooter);
 
         lblFooter = new JLabel("Diagnosed by: Dr. Isabella Ramos");
         lblFooter.setFont(new Font("Calibri", Font.ITALIC, 14));
-        lblFooter.setBounds(60, 520, 300, 20);
+        lblFooter.setBounds(60, 510, 300, 20);
         pnlMain.add(lblFooter);
     }
 }

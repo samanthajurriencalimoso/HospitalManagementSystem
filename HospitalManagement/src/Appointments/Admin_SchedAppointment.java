@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Appointments;
 
 import static Color_Palette.ColorPalette.*;
@@ -11,18 +7,13 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Jm's Laptop
- */
 public class Admin_SchedAppointment extends JPanel implements ActionListener{
 
     private JPanel pnlMain, tabPatients, tabUrgent, tabPending, pnlSelection, pnlBot, tabUpdate;
     private DefaultTableModel tblModel;
     private JTextField txtPatient, txtDoc, txtTreatment;
     private JTable tblAppoint;
-    private JLabel lblTitle, lblDT, lblPatient, lblDoc, lblTreatment, lblTPatient, lblUCases, lblPAppointments,
-                   lblTitle2, lblValue;
+    private JLabel lblTitle, lblDT, lblPatient, lblDoc, lblTreatment, lblTPatient, lblUCases, lblPAppointments, lblTitle2, lblValue;
     private JButton btnAdd, btnRef, btnAdmit, btnCom, btnUr, btnRev;
     private JScrollPane srcApp;
     
