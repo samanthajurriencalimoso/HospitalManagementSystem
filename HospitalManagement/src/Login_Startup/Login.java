@@ -17,7 +17,7 @@ public class Login extends JFrame implements ActionListener{
     private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JButton btnLogin;
-    private JLabel lblbackground, lblLogo, lblTitle, lblUser, lblPass, lblForgot;
+    private JLabel lblbackground, lblLogo, lblTitle, lblUser, lblPass, lblForgot, lblFooter;
     private ImageIcon imgBg, imgDlogo;
     private Image BgImage, imgbg;
     
@@ -32,7 +32,7 @@ public class Login extends JFrame implements ActionListener{
         setLayout(null);
         setLocationRelativeTo(null);
         
-        imgBg = new ImageIcon(getClass().getResource("/resources/OOP - LOGIN BG.jpg"));
+        imgBg = new ImageIcon(getClass().getResource("/resources/Login_BG.png"));
         BgImage = imgBg.getImage().getScaledInstance(1920, 1080, Image.SCALE_SMOOTH);
         lblbackground = new JLabel(new ImageIcon(BgImage));
         lblbackground.setBounds(0, 0, 1920, 1080);
@@ -40,7 +40,7 @@ public class Login extends JFrame implements ActionListener{
         
         pnlLogin = new JPanel();
         pnlLogin.setLayout(null);
-        pnlLogin.setBounds(700, 250, 520, 500);
+        pnlLogin.setBounds(0, 0, 900, 1080);
         pnlLogin.setBackground(Color.WHITE);
         pnlLogin.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(borderLBLUE, 1, true),
@@ -55,58 +55,71 @@ public class Login extends JFrame implements ActionListener{
         lblbackground.add(pnlLogin);
         
         imgDlogo = new ImageIcon(getClass().getResource("/resources/eTriage.Logo.png"));
-        imgbg = imgDlogo.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+        imgbg = imgDlogo.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         lblLogo = new JLabel(new ImageIcon(imgbg));
-        lblLogo.setBounds(170, 30, 180, 180);
+        lblLogo.setBounds(40, 40, 100, 100);
         pnlLogin.add(lblLogo);
         
-        lblTitle = new JLabel("eTriage", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Calibri", Font.ITALIC, 24));
-        lblTitle.setBounds(20, 170, 480, 40);
+        lblTitle = new JLabel("eTriage");
+        lblTitle.setFont(new Font("Calibri", Font.ITALIC, 22));
+        lblTitle.setBounds(150, 60, 300, 40);
+        lblTitle.setForeground(Color.BLACK);
+        pnlLogin.add(lblTitle);
+        
+        lblTitle = new JLabel("Welcome Back!");
+        lblTitle.setFont(new Font("Calibri", Font.BOLD, 40));
+        lblTitle.setBounds(80, 220, 600, 60);
+        lblTitle.setForeground(Color.BLACK);
+        pnlLogin.add(lblTitle);
+        
+        lblTitle = new JLabel("Please Log in to your Account.");
+        lblTitle.setFont(new Font("Calibri", Font.PLAIN, 20));
+        lblTitle.setBounds(80, 280, 600, 40);
         lblTitle.setForeground(Color.BLACK);
         pnlLogin.add(lblTitle);
         
         lblUser = new JLabel("Username: ");
         lblUser.setFont(new Font("Calibri", Font.BOLD, 18));
-        lblUser.setBounds(80, 230, 120, 30);
+        lblUser.setBounds(80, 370, 200, 30);
         pnlLogin.add(lblUser);
         
         txtUsername = new JTextField();
-        txtUsername.setBounds(200, 230, 240, 35);
+        txtUsername.setBounds(80, 410, 700, 40);
         txtUsername.setBackground(LightGray);
         txtUsername.setBorder(createInputBorder());
-        txtUsername.setFont(new Font("Calibri", Font.PLAIN, 16));
         pnlLogin.add(txtUsername);
 
         lblPass = new JLabel("Password:");
         lblPass.setFont(new Font("Calibri", Font.BOLD, 18));
-        lblPass.setBounds(80, 290, 120, 30);
+        lblPass.setBounds(80, 470, 200, 30);
         pnlLogin.add(lblPass);
 
         txtPassword = new JPasswordField();
-        txtPassword.setBounds(200, 290, 240, 35);
+        txtPassword.setBounds(80, 510, 700, 40);
         txtPassword.setBackground(LightGray);
-        txtPassword.setFont(new Font("Calibri", Font.PLAIN, 16));
         txtPassword.setBorder(createInputBorder());
         pnlLogin.add(txtPassword);
 
         lblForgot = new JLabel("Forgot Password?");
-        lblForgot.setFont(new Font("Calibri", Font.PLAIN, 16));
+        lblForgot.setFont(new Font("Calibri", Font.PLAIN, 18));
         lblForgot.setForeground(Color.BLUE);
-        lblForgot.setBounds(260, 350, 200, 30);
+        lblForgot.setBounds(370, 580, 200, 30);
         lblForgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
         pnlLogin.add(lblForgot);
 
         btnLogin = new JButton("LOGIN");
-        btnLogin.setBounds(240, 400, 150, 45);
+        btnLogin.setBounds(80, 630, 700, 50);
         btnLogin.setBackground(darkBlue);
-        btnLogin.setFocusPainted(false);
-        btnLogin.setBorderPainted(false);
-        btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLogin.setForeground(Color.WHITE);
-        btnLogin.setFont(new Font("Calibri", Font.BOLD, 18));
+        btnLogin.setFont(new Font("Calibri", Font.BOLD, 20));
         pnlLogin.add(btnLogin);
         
+        lblFooter = new JLabel("By sign up you agree to our terms and that you have read our data policy.");
+        lblFooter.setFont(new Font("Calibri", Font.PLAIN, 16));
+        lblFooter.setForeground(Color.LIGHT_GRAY);
+        lblFooter.setBounds(80, 920, 800, 30);
+        pnlLogin.add(lblFooter);
+
         getRootPane().setDefaultButton(btnLogin);
         btnLogin.addActionListener(this);
         
