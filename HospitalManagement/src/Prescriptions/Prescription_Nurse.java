@@ -32,9 +32,9 @@ public class Prescription_Nurse extends JPanel implements ActionListener{
         add(pnlMain);
 
         lblMainTitle = new JLabel("Nurse Prescription Dashboard");
-        lblMainTitle.setBounds(30, 20, 500, 45);
-        lblMainTitle.setFont(new Font("Calibri", Font.BOLD, 30));
-        lblMainTitle.setForeground(darkBlue);
+        lblMainTitle.setFont(new Font("Calibri", Font.BOLD, 24));
+        lblMainTitle.setForeground(Color.BLACK);
+        lblMainTitle.setBounds(30, 20, 400, 40);
         pnlMain.add(lblMainTitle);
 
         lblDT = new JLabel("May 21, 2026 | 10:00 AM");

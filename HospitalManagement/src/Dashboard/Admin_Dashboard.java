@@ -179,7 +179,7 @@ public class Admin_Dashboard extends JPanel{
         pnlStock.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
         pnlMain.add(pnlStock);
         
-        lblStock = new JLabel("Equipment");
+        lblStock = new JLabel("Medical Alerts");
         lblStock.setBounds(20, 20, 200, 25);
         lblStock.setFont(new Font("Calibri", Font.BOLD, 20));
         pnlStock.add(lblStock);

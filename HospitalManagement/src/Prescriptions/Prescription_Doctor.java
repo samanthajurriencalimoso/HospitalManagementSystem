@@ -35,9 +35,9 @@ public class Prescription_Doctor extends JPanel implements ActionListener {
         add(pnlMain);
 
         lblTitle = new JLabel("Prescription Dashboard");
-        lblTitle.setFont(new Font("Calibri", Font.BOLD, 30));
-        lblTitle.setForeground(darkBlue);
-        lblTitle.setBounds(30, 20, 500, 40);
+        lblTitle.setFont(new Font("Calibri", Font.BOLD, 24));
+        lblTitle.setForeground(Color.BLACK);
+        lblTitle.setBounds(30, 20, 400, 40);
         pnlMain.add(lblTitle);
 
         lblDate = new JLabel("May 21, 2026 | 10:00 AM");

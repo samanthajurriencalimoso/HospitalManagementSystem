@@ -8,6 +8,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.border.*;
 
@@ -20,7 +25,6 @@ public class Login extends JFrame implements ActionListener{
     private JLabel lblbackground, lblLogo, lblTitle, lblUser, lblPass, lblForgot, lblFooter;
     private ImageIcon imgBg, imgDlogo;
     private Image BgImage, imgbg;
-    
     
     public Login() {
         setTitle("Hospital Login");
@@ -150,23 +154,65 @@ public class Login extends JFrame implements ActionListener{
         String pass = new String(txtPassword.getPassword());
 
         if (ae.getSource() == btnLogin) {
-            if (user.equals("admin") && pass.equals("admin123")) {
-                Admin_SideBarFrame ad = new Admin_SideBarFrame();
-                ad.setVisible(true);
-                dispose();
-            } else if (user.equals("doctor") && pass.equals("doctor123")) {
-                Doctor_SideBarFrame dc = new Doctor_SideBarFrame();
-                dc.setVisible(true);
-                dispose();
-            } else if (user.equals("nurse") && pass.equals("nurse123")) {
-                Nurse_SideBarFrame nr = new Nurse_SideBarFrame();
-                nr.setVisible(true);
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid credentials!", "Login Error", JOptionPane.ERROR_MESSAGE);
+            try {
+                    Connection conn = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/HospitalManagement",
+                    "root",
+                    ""
+                    );
+                    
+                String sql = "SELECT ID, role FROM users WHERE username=? AND password=?";
+                
+                PreparedStatement pst = conn.prepareStatement(sql);
+
+                pst.setString(1, user);
+                pst.setString(2, pass);
+
+                ResultSet rs = pst.executeQuery();
+
+                if (rs.next()) {
+                    String ID = rs.getString("ID");
+
+                    String role = rs.getString("role");
+
+                    if (role.equalsIgnoreCase("admin")) {
+
+                        Admin_SideBarFrame sf = new Admin_SideBarFrame();
+                        sf.setVisible(true);
+                        dispose();
+
+                    } else if (role.equalsIgnoreCase("doctor")) {
+
+                        Doctor_SideBarFrame sf = new Doctor_SideBarFrame();
+                        sf.setVisible(true);
+                        dispose();
+                    }
+                    
+                    else if (role.equalsIgnoreCase("nurse")) {
+
+                        Nurse_SideBarFrame sf = new Nurse_SideBarFrame();
+                        sf.setVisible(true);
+                        dispose();
+                    }
+
+                } else {
+                    txtPassword.setText("");
+
+                    JOptionPane.showMessageDialog(null,"Incorrect Credentials. Try Again.","Login Failed", JOptionPane.ERROR_MESSAGE);
+                }
+
+                rs.close();
+                pst.close();
+                conn.close();
+
+            } catch (SQLException ex) {
+
+                ex.printStackTrace();
+
+                JOptionPane.showMessageDialog(null,"Database Connection Failed!");
             }
         }
-    }
+    } 
+}
     
      
-}

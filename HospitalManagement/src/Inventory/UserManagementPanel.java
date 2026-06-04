@@ -169,7 +169,7 @@ public class UserManagementPanel extends JPanel {
         btnRefresh.addActionListener(e -> refreshTable());
         pnlBot.add(btnRefresh);
         
-        addSampData();
+        //addSampData();
     }
     
     private void switchRole(String role) {
@@ -269,18 +269,18 @@ public class UserManagementPanel extends JPanel {
     
     private void refreshTable() {
         tblModel.setRowCount(0);
-        addSampData();
+        //addSampData();
         JOptionPane.showMessageDialog(this, "Table refreshed!");
     }
     
-    private void addSampData() {
-        tblModel.addRow(new Object[]{"Dr. John Smith", "DOC001", "45", "Doctor", "Active"});
-        tblModel.addRow(new Object[]{"Dr. Sarah Lee", "DOC002", "38", "Doctor", "Active"});
-        tblModel.addRow(new Object[]{"Nurse Emma Watson", "NRS001", "29", "Nurse", "Active"});
-        tblModel.addRow(new Object[]{"Nurse Olivia Brown", "NRS002", "32", "Nurse", "Active"});
-        tblModel.addRow(new Object[]{"Admin Mike Ross", "ADM001", "41", "Admin", "Active"});
-        tblModel.addRow(new Object[]{"Admin Rachel Green", "ADM002", "35", "Admin", "Active"});
-    
-        updateSummary();
-    }
+//    private void addSampData() {
+//        tblModel.addRow(new Object[]{"Dr. John Smith", "DOC001", "45", "Doctor", "Active"});
+//        tblModel.addRow(new Object[]{"Dr. Sarah Lee", "DOC002", "38", "Doctor", "Active"});
+//        tblModel.addRow(new Object[]{"Nurse Emma Watson", "NRS001", "29", "Nurse", "Active"});
+//        tblModel.addRow(new Object[]{"Nurse Olivia Brown", "NRS002", "32", "Nurse", "Active"});
+//        tblModel.addRow(new Object[]{"Admin Mike Ross", "ADM002", "41", "Admin", "Active"});
+//        tblModel.addRow(new Object[]{"Admin Rachel Green", "ADM002", "35", "Admin", "Active"});
+//    
+//        updateSummary();
+//    }
 }
