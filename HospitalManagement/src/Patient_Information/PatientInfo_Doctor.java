@@ -3,22 +3,27 @@ package Patient_Information;
 import static Color_Palette.ColorPalette.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class PatientInfo_Doctor extends JPanel {
+public class PatientInfo_Doctor extends JPanel implements ActionListener {
 
     private JPanel pnlMain, profileCard, accent, statusBadge, details, detailsLine, doctorNotes, notesLine,
                    vitals, vitalsLine, emergency, emergencyLine, appointment, appLine;
     private JLabel lbltitle, lblDT, lblPat, name, status, info, lblDetails, lblAdd, lblAddre, lblCnum,
-                   lblNum, lblAllergy, lblCondition, lblMed, lblNotes, lblVitals, lblVT, lblval, lblEmergency,
-                   lblApp, lblTime, lblT, lblRoom, lblR, lblType, lblTy, lblEditName, lblEditStatus,
-                   lblEditBlood;
+                   lblNum, lblAllergy, lblCondition, lblMed, lblNotes, lblVitals, lblVT, lblval, lblENum ,lblEmergency,
+                   lblApp, lblTime, lblT, lblRoom, lblR, lblType, lblTy, lblEName, lblENameVal, lblERelVal, lblENumVal, 
+                   lblERel, lblPhoto, lblFullName, lblPatientID, lblPatientAge, lblStatus, lblHRUnitDisplay, lblO2UnitDisplay, lblTempUnitDisplay, lblBPUnitDisplay,
+                   lblBlood, lblAddress, lblContact,lblAllergies, lblConditions, lblMedication, lblEEditName, lblEEditRel, lblEEditNum,
+                   lblBPValue, lblTempValue, lblSpO2Value, lblHRValue;
     private ImageIcon imgP;
     private Image ImgPT;
-    private JButton edit, notes, btnSave, btnCancel;
-    private JTextArea allergyText, conditionText, medText, notesText, txtCon, eText, lblDate, lblD;
-    private JTextField txtName;
-    private JFrame editMenu;
+    private JButton edit, notes, btnSave, btnCancel, btnUploadPhoto, btnNotesSave, btnNotesClear;
+    private JTextArea allergyText, conditionText, medText, notesText, lblDate, lblD, txtAllergies, txtConditions, txtMedication;
+    private JTextField txtName, txtAddress, txtContactNum, txtPatientID, txtEName, txtAge, txtERel, txtENum;
+    private JFrame editMenu, notesMenu;
     private JComboBox cmbStatus, cmbBlood;
+
     
     public PatientInfo_Doctor(){
         setLayout(null);
@@ -64,7 +69,7 @@ public class PatientInfo_Doctor extends JPanel {
         lblPat.setBounds(25, 20, 100, 100);
         profileCard.add(lblPat);
         
-        name = new JLabel("Name");
+        name = new JLabel(" ");
         name.setFont(new Font("Calibri", Font.BOLD, 22));
         name.setBounds(150, 20, 300, 30);
         profileCard.add(name);
@@ -82,7 +87,7 @@ public class PatientInfo_Doctor extends JPanel {
         status.setBounds(5, 5, 180, 20);
         statusBadge.add(status);
 
-        info = new JLabel("ID: P-   |   Age:    |   Blood: ");
+        info = new JLabel("ID: P-   |   Age:    |   Blood Type: ");
         info.setFont(new Font("Calibri", Font.BOLD, 15));
         info.setForeground(Color.DARK_GRAY);
         info.setBounds(150, 90, 400, 22);
@@ -94,6 +99,7 @@ public class PatientInfo_Doctor extends JPanel {
         edit.setBackground(darkBlue);
         edit.setForeground(Color.WHITE);
         edit.setFont(new Font("Calibri", Font.BOLD, 14));
+        edit.addActionListener(this);
         profileCard.add(edit);
 
         notes = new JButton("Notes");
@@ -101,6 +107,7 @@ public class PatientInfo_Doctor extends JPanel {
         notes.setBackground(lightBlue);
         notes.setForeground(Color.BLACK);
         notes.setFont(new Font("Calibri", Font.BOLD, 14));
+        notes.addActionListener(this);
         profileCard.add(notes);
 
         //details panel
@@ -128,7 +135,7 @@ public class PatientInfo_Doctor extends JPanel {
         lblAdd.setBounds(20, 50, 200, 30);
         details.add(lblAdd);
         
-        lblAddre = new JLabel("Location");
+        lblAddre = new JLabel(" ");
         lblAddre.setFont(new Font("Calibri", Font.PLAIN, 22));
         lblAddre.setForeground(darkBlue);
         lblAddre.setBounds(200, 50, 200, 30);
@@ -140,7 +147,7 @@ public class PatientInfo_Doctor extends JPanel {
         lblCnum.setBounds(20, 80, 200, 30);
         details.add(lblCnum);
         
-        lblNum = new JLabel("+63");
+        lblNum = new JLabel(" ");
         lblNum.setFont(new Font("Calibri", Font.PLAIN, 22));
         lblNum.setForeground(darkBlue);
         lblNum.setBounds(200, 80, 200, 30);
@@ -153,8 +160,8 @@ public class PatientInfo_Doctor extends JPanel {
         lblAllergy.setBounds(20, 150, 150, 22);
         details.add(lblAllergy);
 
-        allergyText = new JTextArea("- \n- ");
-        allergyText.setBounds(20, 170, 200, 55);
+        allergyText = new JTextArea("• \n• \n• ");
+        allergyText.setBounds(20, 185, 200, 80);
         allergyText.setEditable(false);
         allergyText.setOpaque(false);
         allergyText.setFont(new Font("Calibri", Font.PLAIN, 22));
@@ -167,8 +174,8 @@ public class PatientInfo_Doctor extends JPanel {
         lblCondition.setBounds(250, 150, 150, 22);
         details.add(lblCondition);
 
-        conditionText = new JTextArea("- \n- ");
-        conditionText.setBounds(250, 170, 200, 55);
+        conditionText = new JTextArea("• \n• \n• ");
+        conditionText.setBounds(250, 185, 200, 80);
         conditionText.setEditable(false);
         conditionText.setOpaque(false);
         conditionText.setFont(new Font("Calibri", Font.PLAIN, 22));
@@ -181,8 +188,8 @@ public class PatientInfo_Doctor extends JPanel {
         lblMed.setBounds(480, 150, 200, 22);
         details.add(lblMed);
 
-        medText = new JTextArea("- \n- ");
-        medText.setBounds(480, 170, 230, 55);
+        medText = new JTextArea("• \n• \n• ");
+        medText.setBounds(480, 185, 230, 80);
         medText.setEditable(false);
         medText.setOpaque(false);
         medText.setFont(new Font("Calibri", Font.PLAIN, 22));
@@ -235,28 +242,88 @@ public class PatientInfo_Doctor extends JPanel {
         vitalsLine.setBackground(lightBlue);
         vitals.add(vitalsLine);
 
-        String[][] vitalRows = {
-            {"Blood Pressure", ""},
-            {"Heart Rate", ""},
-            {"Temperature", ""},
-            {"SpO2", ""}
-        };
-
         int y = 50;
-        for (String[] row : vitalRows) {
-            lblVT = new JLabel(row[0] + ":");
-            lblVT.setFont(new Font("Calibri", Font.BOLD, 20));
-            lblVT.setForeground(Color.DARK_GRAY);
-            lblVT.setBounds(20, y, 200, 22);
-            vitals.add(lblVT);
+        // blood press
+        lblVT = new JLabel("Blood Pressure:");
+        lblVT.setFont(new Font("Calibri", Font.BOLD, 20));
+        lblVT.setForeground(Color.DARK_GRAY);
+        lblVT.setBounds(20, y, 200, 22);
+        vitals.add(lblVT);
 
-            lblval = new JLabel(row[1]);
-            lblval.setFont(new Font("Calibri", Font.PLAIN, 20));
-            lblval.setForeground(darkBlue);
-            lblval.setBounds(230, y, 200, 22);
-            vitals.add(lblval);
-            y += 38;
-        }
+        lblBPValue = new JLabel("");
+        lblBPValue.setFont(new Font("Calibri", Font.PLAIN, 20));
+        lblBPValue.setForeground(darkBlue);
+        lblBPValue.setBounds(230, y, 100, 22);
+        vitals.add(lblBPValue);
+
+        lblBPUnitDisplay = new JLabel("mmHg");
+        lblBPUnitDisplay.setFont(new Font("Calibri", Font.PLAIN, 18));
+        lblBPUnitDisplay.setForeground(Color.GRAY);
+        lblBPUnitDisplay.setBounds(340, y, 60, 22);
+        vitals.add(lblBPUnitDisplay);
+        y += 38;
+        
+
+        // heart rate
+        lblVT = new JLabel("Heart Rate:");
+        lblVT.setFont(new Font("Calibri", Font.BOLD, 20));
+        lblVT.setForeground(Color.DARK_GRAY);
+        lblVT.setBounds(20, y, 200, 22);
+        vitals.add(lblVT);
+
+        lblHRValue = new JLabel("");
+        lblHRValue.setFont(new Font("Calibri", Font.PLAIN, 20));
+        lblHRValue.setForeground(darkBlue);
+        lblHRValue.setBounds(230, y, 100, 22);
+        vitals.add(lblHRValue);
+
+        lblHRUnitDisplay = new JLabel("bpm");
+        lblHRUnitDisplay.setFont(new Font("Calibri", Font.PLAIN, 18));
+        lblHRUnitDisplay.setForeground(Color.GRAY);
+        lblHRUnitDisplay.setBounds(340, y, 60, 22);
+        vitals.add(lblHRUnitDisplay);
+        y += 38;
+
+        // temperature
+        lblVT = new JLabel("Temperature:");
+        lblVT.setFont(new Font("Calibri", Font.BOLD, 20));
+        lblVT.setForeground(Color.DARK_GRAY);
+        lblVT.setBounds(20, y, 200, 22);
+        vitals.add(lblVT);
+
+        lblTempValue = new JLabel("");
+        lblTempValue.setFont(new Font("Calibri", Font.PLAIN, 20));
+        lblTempValue.setForeground(darkBlue);
+        lblTempValue.setBounds(230, y, 100, 22);
+        vitals.add(lblTempValue);
+
+        lblTempUnitDisplay = new JLabel("°C");
+        lblTempUnitDisplay.setFont(new Font("Calibri", Font.PLAIN, 18));
+        lblTempUnitDisplay.setForeground(Color.GRAY);
+        lblTempUnitDisplay.setBounds(340, y, 60, 22);
+        vitals.add(lblTempUnitDisplay);
+        
+        y += 38;
+
+        // SpO2
+        lblVT = new JLabel("SpO2:");
+        lblVT.setFont(new Font("Calibri", Font.BOLD, 20));
+        lblVT.setForeground(Color.DARK_GRAY);
+        lblVT.setBounds(20, y, 200, 22);
+        vitals.add(lblVT);
+
+        lblSpO2Value = new JLabel("");
+        lblSpO2Value.setFont(new Font("Calibri", Font.PLAIN, 20));
+        lblSpO2Value.setForeground(darkBlue);
+        lblSpO2Value.setBounds(230, y, 100, 22);
+        vitals.add(lblSpO2Value);
+
+        lblO2UnitDisplay = new JLabel("%");
+        lblO2UnitDisplay.setFont(new Font("Calibri", Font.PLAIN, 18));
+        lblO2UnitDisplay.setForeground(Color.GRAY);
+        lblO2UnitDisplay.setBounds(340, y, 60, 22);
+        vitals.add(lblO2UnitDisplay);
+
 
         // emergency contact
         emergency = new JPanel();
@@ -277,19 +344,41 @@ public class PatientInfo_Doctor extends JPanel {
         emergencyLine.setBackground(lightBlue);
         emergency.add(emergencyLine);
         
-        txtCon = new JTextArea("Contact Name: \n\nRelationship: \n\nContact Number: ");
-        txtCon.setFont(new Font("Calibri", Font.BOLD, 20));
-        txtCon.setBounds(20, 50, 500, 170);
-        txtCon.setEditable(false);
-        txtCon.setOpaque(false);
-        emergency.add(txtCon);
+        //contact Name
+        lblEName = new JLabel("Contact Name:");
+        lblEName.setFont(new Font("Calibri", Font.BOLD, 20));
+        lblEName.setBounds(20, 60, 200, 30);
+        emergency.add(lblEName);
 
-        eText = new JTextArea("");
-        eText.setFont(new Font("Calibri", Font.PLAIN, 20));
-        eText.setBounds(250, 50, 500, 170);
-        eText.setEditable(false);
-        eText.setOpaque(false);
-        emergency.add(eText);
+        lblENameVal = new JLabel("");
+        lblENameVal.setFont(new Font("Calibri", Font.PLAIN, 20));
+        lblENameVal.setForeground(darkBlue);
+        lblENameVal.setBounds(255, 60, 500, 30);
+        emergency.add(lblENameVal);
+
+        //relationship
+        lblERel = new JLabel("Relationship:");
+        lblERel.setFont(new Font("Calibri", Font.BOLD, 20));
+        lblERel.setBounds(20, 120, 200, 30);
+        emergency.add(lblERel);
+
+        lblERelVal = new JLabel("");
+        lblERelVal.setFont(new Font("Calibri", Font.PLAIN, 20));
+        lblERelVal.setForeground(darkBlue);
+        lblERelVal.setBounds(255, 120, 500, 30);
+        emergency.add(lblERelVal);
+
+        //contact Number
+        lblENum = new JLabel("Contact Number:");
+        lblENum.setFont(new Font("Calibri", Font.BOLD, 20));
+        lblENum.setBounds(20, 180, 200, 30);
+        emergency.add(lblENum);
+
+        lblENumVal = new JLabel("");
+        lblENumVal.setFont(new Font("Calibri", Font.PLAIN, 20));
+        lblENumVal.setForeground(darkBlue);
+        lblENumVal.setBounds(255, 180, 500, 30);
+        emergency.add(lblENumVal);
 
         //appointment
         appointment = new JPanel();
@@ -357,67 +446,293 @@ public class PatientInfo_Doctor extends JPanel {
         lblTy.setForeground(Color.BLACK);
         lblTy.setBounds(380, 110, 300, 30);
         appointment.add(lblTy);
-
-        //edit menu
-        edit.addActionListener(e -> {
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        //edit button
+        if (e.getSource() == edit) {
             editMenu = new JFrame();
             editMenu.setTitle("Edit Patient Information");
-            editMenu.setSize(400, 500);
+            editMenu.setSize(900, 580);
             editMenu.setLocationRelativeTo(null);
             editMenu.setLayout(null);
             editMenu.setResizable(false);
+            editMenu.getContentPane().setBackground(new Color(240, 240, 240));
 
-
-            lblEditName = new JLabel("Full Name:");
-            lblEditName.setBounds(30, 30, 150, 25);
-            lblEditName.setFont(new Font("Calibri", Font.BOLD, 14));
-            editMenu.add(lblEditName);
-
-            txtName = new JTextField("Joshua Garcia");
-            txtName.setBounds(30, 55, 320, 30);
+            //get current info
+            String currentInfo = info.getText();
+            String currentID = "";
+            String currentAge = "";
+            
+            //enter info text heree
+            if (currentInfo.contains("ID:") && currentInfo.contains("Age:") && currentInfo.contains("Blood:")) {
+                String[] parts = currentInfo.split("\\|");
+                if (parts.length >= 3) {
+                    currentID = parts[0].replace("ID:", "").trim();
+                    currentAge = parts[1].replace("Age:", "").trim();
+                }
+            }
+            
+            //left side of menu
+            lblPhoto = new JLabel("Patient Photo:");
+            lblPhoto.setBounds(30, 30, 120, 25);
+            lblPhoto.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblPhoto);
+            
+            btnUploadPhoto = new JButton("Upload Photo");
+            btnUploadPhoto.setBounds(160, 30, 130, 25);
+            btnUploadPhoto.addActionListener(this);
+            editMenu.add(btnUploadPhoto);
+           
+            lblFullName = new JLabel("Full Name:");
+            lblFullName.setBounds(30, 75, 120, 25);
+            lblFullName.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblFullName);
+            
+            txtName = new JTextField(name.getText());
+            txtName.setBounds(160, 75, 280, 30);
             editMenu.add(txtName);
-
-            lblEditStatus = new JLabel("Status:");
-            lblEditStatus.setBounds(30, 100, 150, 25);
-            lblEditStatus.setFont(new Font("Calibri", Font.BOLD, 14));
-            editMenu.add(lblEditStatus);
-
-            String[] statuses = {"Observation", "Admitted", "Discharged", "Critical", "Stable"};
+            
+            lblPatientID = new JLabel("Patient ID:");
+            lblPatientID.setBounds(30, 120, 120, 25);
+            lblPatientID.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblPatientID);
+            
+            txtPatientID = new JTextField(currentID);
+            txtPatientID.setBounds(160, 120, 280, 30);
+            editMenu.add(txtPatientID);
+            
+            lblPatientAge = new JLabel("Age:");
+            lblPatientAge.setBounds(30, 165, 120, 25);
+            lblPatientAge.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblPatientAge);
+            
+            txtAge = new JTextField(currentAge);
+            txtAge.setBounds(160, 165, 280, 30);
+            editMenu.add(txtAge);
+            
+            lblStatus = new JLabel("Status:");
+            lblStatus.setBounds(30, 210, 120, 25);
+            lblStatus.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblStatus);
+            
+            String[] statuses = {"Newly Admitted","Observation", "Admitted", "Discharged", "Critical", "Stable"};
             cmbStatus = new JComboBox<>(statuses);
-            cmbStatus.setBounds(30, 125, 320, 30);
+            cmbStatus.setBounds(160, 210, 280, 30);
             editMenu.add(cmbStatus);
-
-            lblEditBlood = new JLabel("Blood Type:");
-            lblEditBlood.setBounds(30, 170, 150, 25);
-            lblEditBlood.setFont(new Font("Calibri", Font.BOLD, 14));
-            editMenu.add(lblEditBlood);
-
-            String[] bloodTypes = {"A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"};
+            
+            lblBlood = new JLabel("Blood Type:");
+            lblBlood.setBounds(30, 255, 120, 25);
+            lblBlood.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblBlood);
+            
+            String[] bloodTypes = {"Pending","A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-", "Unknown"};
             cmbBlood = new JComboBox<>(bloodTypes);
-            cmbBlood.setBounds(30, 195, 320, 30);
+            cmbBlood.setBounds(160, 255, 280, 30);
             editMenu.add(cmbBlood);
+            
+            lblAddress = new JLabel("Address:");
+            lblAddress.setBounds(30, 300, 120, 25);
+            lblAddress.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblAddress);
+            
+            txtAddress = new JTextField(lblAddre.getText());
+            txtAddress.setBounds(160, 300, 280, 30);
+            editMenu.add(txtAddress);
+            
+            lblContact = new JLabel("Contact Number:");
+            lblContact.setBounds(30, 345, 120, 25);
+            lblContact.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblContact);
+            
+            txtContactNum = new JTextField(lblNum.getText());
+            txtContactNum.setBounds(160, 345, 280, 30);
+            editMenu.add(txtContactNum);
+            
+            //right side of menu
+            lblAllergies = new JLabel("Allergies:");
+            lblAllergies.setBounds(470, 30, 180, 25);
+            lblAllergies.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblAllergies);
+            
+            txtAllergies = new JTextArea();
+            txtAllergies.setBounds(470, 55, 380, 60);
+            txtAllergies.setLineWrap(true);
+            txtAllergies.setWrapStyleWord(true);
+            txtAllergies.setText(allergyText.getText());
+            editMenu.add(txtAllergies);
+            
+            lblConditions = new JLabel("Conditions:");
+            lblConditions.setBounds(470, 125, 180, 25);
+            lblConditions.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblConditions);
+            
+            txtConditions = new JTextArea();
+            txtConditions.setBounds(470, 150, 380, 60);
+            txtConditions.setLineWrap(true);
+            txtConditions.setWrapStyleWord(true);
+            txtConditions.setText(conditionText.getText());
+            editMenu.add(txtConditions);
+            
+            lblMedication = new JLabel("Medication:");
+            lblMedication.setBounds(470, 220, 180, 25);
+            lblMedication.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblMedication);
+            
+            txtMedication = new JTextArea();
+            txtMedication.setBounds(470, 245, 380, 60);
+            txtMedication.setLineWrap(true);
+            txtMedication.setWrapStyleWord(true);
+            txtMedication.setText(medText.getText());
+            editMenu.add(txtMedication);
+            
+            //emergency contact part
+            lblEEditName = new JLabel("Contact Name:");
+            lblEEditName.setBounds(470, 315, 150, 25);
+            lblEEditName.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblEEditName);
 
+            txtEName = new JTextField(lblENameVal.getText());
+            txtEName.setBounds(630, 315, 220, 30);
+            editMenu.add(txtEName);
+
+            lblEEditRel = new JLabel("Relationship:");
+            lblEEditRel.setBounds(470, 355, 150, 25);
+            lblEEditRel.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblEEditRel);
+
+            txtERel = new JTextField(lblERelVal.getText());
+            txtERel.setBounds(630, 355, 220, 30);
+            editMenu.add(txtERel);
+
+            lblEEditNum = new JLabel("Contact Number:");
+            lblEEditNum.setBounds(470, 395, 150, 25);
+            lblEEditNum.setFont(new Font("Calibri", Font.BOLD, 14));
+            editMenu.add(lblEEditNum);
+
+            txtENum = new JTextField(lblENumVal.getText());
+            txtENum.setBounds(630, 395, 220, 30);
+            editMenu.add(txtENum);
+            
+            //buttons
             btnSave = new JButton("Save Changes");
-            btnSave.setBounds(30, 380, 150, 35);
+            btnSave.setBounds(280, 490, 130, 35);
             btnSave.setBackground(darkBlue);
             btnSave.setForeground(Color.WHITE);
+            btnSave.addActionListener(this);
             editMenu.add(btnSave);
-
+            
             btnCancel = new JButton("Cancel");
-            btnCancel.setBounds(200, 380, 150, 35);
+            btnCancel.setBounds(430, 490, 130, 35);
             btnCancel.setBackground(Color.GRAY);
             btnCancel.setForeground(Color.WHITE);
+            btnCancel.addActionListener(this);
             editMenu.add(btnCancel);
-
-            btnSave.addActionListener(save -> {
-                name.setText(txtName.getText());
-                status.setText("Status: " + cmbStatus.getSelectedItem());
-                info.setText("ID: P-10021   |   Age: 29   |   Blood: " + cmbBlood.getSelectedItem());
-                editMenu.dispose();
-            });
-
-            btnCancel.addActionListener(cancel -> editMenu.dispose());
+            
             editMenu.setVisible(true);
-        });
+        }
+        
+        
+        //save button action
+        else if (e.getSource() == btnSave) {
+
+            if (txtName.getText().trim().isEmpty() || 
+                txtPatientID.getText().trim().isEmpty() || 
+                txtAge.getText().trim().isEmpty() || 
+                txtAddress.getText().trim().isEmpty() || 
+                txtContactNum.getText().trim().isEmpty()) {
+
+                JOptionPane.showMessageDialog(editMenu, "Please fill in all required fields!\n\nRequired: Name, Patient ID, Age", "Incomplete Information", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            //savename
+            name.setText(txtName.getText());
+            status.setText("Status: " + cmbStatus.getSelectedItem());
+            
+            //save info line (ID, Age, Blood)
+            String patientID = txtPatientID.getText();
+            String patientAge = txtAge.getText();
+            String patientBlood = cmbBlood.getSelectedItem().toString();
+            info.setText("ID: " + patientID + "   |   Age: " + patientAge + "   |   Blood Type: " + patientBlood);
+            
+            //save address and contact
+            lblAddre.setText(txtAddress.getText());
+            lblNum.setText(txtContactNum.getText());
+            
+            //save medical info
+            allergyText.setText(txtAllergies.getText());
+            conditionText.setText(txtConditions.getText());
+            medText.setText(txtMedication.getText());
+            
+            //save emergency contact
+            lblENameVal.setText(txtEName.getText());
+            lblERelVal.setText(txtERel.getText());
+            lblENumVal.setText(txtENum.getText());
+            
+            editMenu.dispose();
+            JOptionPane.showMessageDialog(null, "Patient information updated successfully!");
+        }
+        
+        //cancel button action
+        else if (e.getSource() == btnCancel) {
+            editMenu.dispose();
+        }
+        
+        //notes button
+        else if (e.getSource() == notes) {
+            notesMenu = new JFrame();
+            notesMenu.setTitle("Doctor's Notes");
+            notesMenu.setSize(500, 400);
+            notesMenu.setLocationRelativeTo(null);
+            notesMenu.setLayout(null);
+            notesMenu.setResizable(false);
+            
+            JLabel lblNotesTitle = new JLabel("Enter Doctor's Notes:");
+            lblNotesTitle.setFont(new Font("Calibri", Font.BOLD, 16));
+            lblNotesTitle.setBounds(20, 20, 200, 30);
+            notesMenu.add(lblNotesTitle);
+            
+            JTextArea txtNotesEditor = new JTextArea();
+            txtNotesEditor.setFont(new Font("Calibri", Font.PLAIN, 14));
+            txtNotesEditor.setLineWrap(true);
+            txtNotesEditor.setWrapStyleWord(true);
+            txtNotesEditor.setText(notesText.getText());
+            
+            JScrollPane scrollNotes = new JScrollPane(txtNotesEditor);
+            scrollNotes.setBounds(20, 60, 440, 250);
+            notesMenu.add(scrollNotes);
+            
+            btnNotesSave = new JButton("Save");
+            btnNotesSave.setBounds(120, 317, 100, 35);
+            btnNotesSave.setBackground(darkBlue);
+            btnNotesSave.setForeground(Color.WHITE);
+            btnNotesSave.addActionListener(this);
+            notesMenu.add(btnNotesSave);
+            
+            btnNotesClear = new JButton("Clear");
+            btnNotesClear.setBounds(260, 317, 100, 35);
+            btnNotesClear.setBackground(LightRed);
+            btnNotesClear.setForeground(Color.WHITE);
+            btnNotesClear.addActionListener(this);
+            notesMenu.add(btnNotesClear);
+            
+            notesMenu.setVisible(true);
+        }
+        
+        //save notes button
+        else if (e.getSource() == btnNotesSave) {
+            JTextArea txtNotesEditor = (JTextArea) ((JScrollPane) notesMenu.getContentPane().getComponent(2)).getViewport().getView();
+            notesText.setText(txtNotesEditor.getText());
+            notesMenu.dispose();
+            JOptionPane.showMessageDialog(this, "Notes saved successfully!");
+        }
+        
+        //clear notes button
+        else if (e.getSource() == btnNotesClear) {
+            JTextArea txtNotesEditor = (JTextArea) ((JScrollPane) notesMenu.getContentPane().getComponent(2)).getViewport().getView();
+            txtNotesEditor.setText("");
+        }
     }
 }

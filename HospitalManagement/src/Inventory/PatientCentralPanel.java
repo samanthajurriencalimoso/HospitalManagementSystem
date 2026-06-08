@@ -63,7 +63,7 @@ public class PatientCentralPanel extends JPanel {
         pnlSelection.setLayout(null);
         pnlSelection.setBackground(Color.WHITE);
         pnlSelection.setBorder(BorderFactory.createLineBorder(borderLBLUE));
-        pnlSelection.setBounds(30, 210, 1350, 120);
+        pnlSelection.setBounds(30, 210, 1200, 120);
         pnlMain.add(pnlSelection);
         
         lblName = new JLabel("Name:");

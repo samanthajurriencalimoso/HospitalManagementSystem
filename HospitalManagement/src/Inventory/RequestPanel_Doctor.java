@@ -2,19 +2,31 @@ package Inventory;
 
 import static Color_Palette.ColorPalette.*;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.*;
 import java.awt.*;
 
 public class RequestPanel_Doctor extends JPanel {
     
     private JPanel pnlMain,tabItem,tabLows,tabValue,pnlSelection,pnlBot,tabUpdate;
     private DefaultTableModel tblModel;
-    private JTextField txtItem, txtQty, txtPrice;
+    private JTextField txtQty;
     private JLabel lblTItem, lblLStock, lblTValue,lbltitle,lblDT,lblCate,lblItem,lblQty,lblPrice,lblTitle,lblValue;
     private JTable tblInve;
     private JButton btnAdd, btnQty, btnRemove;
-    private JComboBox<String> cmbCate;
+    private JComboBox<String> cmbCate, cmbItem;
     private JScrollPane srcInve;
+    
+    private static final String[][] CATEGORY_ITEMS = {
+        // List of Medication
+        {"Paracetamol", "Ibuprofen", "Amoxicillin", "Metformin", "Amlodipine",
+         "Omeprazole", "Cetirizine", "Azithromycin", "Losartan", "Aspirin"},
+        // List of Equipment
+        {"Stethoscope", "Blood Pressure Monitor", "Thermometer", "Pulse Oximeter",
+         "Otoscope", "Syringe", "IV Drip Stand", "Defibrillator", "Glucometer", "Nebulizer"},
+        // List ofSupplies
+        {"Surgical Gloves", "Face Mask", "Gauze Pad", "Bandage Roll", "Alcohol Wipes",
+         "Cotton Balls", "Adhesive Plaster", "Tongue Depressor", "Specimen Cup", "Sterile Drape"}
+    };
     
     public RequestPanel_Doctor() {
         setLayout(null);
@@ -38,17 +50,17 @@ public class RequestPanel_Doctor extends JPanel {
         lblDT.setBounds(1390, 20, 400, 40);
         pnlMain.add(lblDT);
    
-        tabItem = createTab("Total Items Requested", "0", darkBlue);
+        tabItem = createTab("Total Requested Items", "0", darkBlue);
         tabItem.setBounds(30, 80, 500, 100);
         pnlMain.add(tabItem);
         lblTItem = (JLabel) tabItem.getComponent(1);
         
-        tabLows = createTab("Low Stock", "0", Yellow);
+        tabLows = createTab("Total Received Items", "0", Yellow);
         tabLows.setBounds(550, 80, 500, 100);
         pnlMain.add(tabLows);
         lblLStock = (JLabel) tabLows.getComponent(1);
         
-        tabValue = createTab("Total Value", "₱0", mediumBlue);
+        tabValue = createTab("Total Pending Items", "0", mediumBlue);
         tabValue.setBounds(1070, 80, 500, 100);
         pnlMain.add(tabValue);
         lblTValue = (JLabel) tabValue.getComponent(1);
@@ -57,55 +69,47 @@ public class RequestPanel_Doctor extends JPanel {
         pnlSelection.setLayout(null);
         pnlSelection.setBackground(Color.WHITE);
         pnlSelection.setBorder(BorderFactory.createLineBorder(borderLBLUE));
-        pnlSelection.setBounds(30, 210, 1180, 80);
+        pnlSelection.setBounds(30, 210, 900, 80);
         pnlMain.add(pnlSelection);
         
         lblCate = new JLabel("Category:");
-        lblCate.setBounds(15, 28, 80, 25);
+        lblCate.setBounds(15, 28, 85, 25);
         lblCate.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblCate);
         
         cmbCate = new JComboBox<>(new String[]{"Medication", "Equipment", "Supplies"});
-        cmbCate.setBounds(95, 26, 150, 28);
+        cmbCate.setBounds(100, 26, 180, 28);
+        cmbCate.addActionListener(ae -> refreshItemComboBox());
         pnlSelection.add(cmbCate);
         
         lblItem = new JLabel("Item:");
-        lblItem.setBounds(260, 28, 60, 25);
+        lblItem.setBounds(300, 28, 50, 25);
         lblItem.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblItem);
         
-        txtItem = new JTextField();
-        txtItem.setBounds(310, 26, 180, 28);
-        pnlSelection.add(txtItem);
+        cmbItem = new JComboBox<>(CATEGORY_ITEMS[0]);
+        cmbItem.setBounds(355, 26, 220, 28);
+        pnlSelection.add(cmbItem);
         
         lblQty = new JLabel("Qty:");
-        lblQty.setBounds(500, 28, 80, 25);
+        lblQty.setBounds(595, 28, 50, 25);
         lblQty.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblQty);
         
         txtQty = new JTextField();
-        txtQty.setBounds(540, 26, 180, 28);
+        txtQty.setBounds(645, 26, 120, 28);
         pnlSelection.add(txtQty);
-        
-        lblPrice = new JLabel("Price:");
-        lblPrice.setBounds(740, 28, 100, 25);
-        lblPrice.setFont(new Font("Calibri", Font.BOLD, 16));
-        pnlSelection.add(lblPrice);
-        
-        txtPrice = new JTextField();
-        txtPrice.setBounds(790, 26, 180, 28);
-        pnlSelection.add(txtPrice);
         
         btnAdd = new JButton("Add Item");
         btnAdd.setBackground(Green);
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFont(new Font("Calibri", Font.BOLD, 16));
         btnAdd.setFocusPainted(false);
-        btnAdd.setBounds(1000, 22, 150, 35);
+        btnAdd.setBounds(785, 22, 100, 35);
         btnAdd.addActionListener(e -> addItem());
         pnlSelection.add(btnAdd);
 
-        String[] clm = {"Category", "Item", "Quantity", "Unit Price", "Total Cost", "Status"};
+        String[] clm = {"Category", "Item", "Quantity", "Status"};
         tblModel = new DefaultTableModel(clm, 0);
         tblInve = new JTable(tblModel);
         tblInve.setRowHeight(35);
@@ -129,7 +133,7 @@ public class RequestPanel_Doctor extends JPanel {
         btnQty.setForeground(Color.WHITE);
         btnQty.setFont(new Font("Calibri", Font.BOLD, 14));
         btnQty.setFocusPainted(false);
-        btnQty.setBounds(20, 10, 120, 30);
+        btnQty.setBounds(20, 10, 130, 30);
         btnQty.addActionListener(e -> requestedItem());
         pnlBot.add(btnQty);
         
@@ -138,11 +142,18 @@ public class RequestPanel_Doctor extends JPanel {
         btnRemove.setForeground(Color.WHITE);
         btnRemove.setFont(new Font("Calibri", Font.BOLD, 14));
         btnRemove.setFocusPainted(false);
-        btnRemove.setBounds(160, 10, 120, 30);
+        btnRemove.setBounds(170, 10, 120, 30);
         btnRemove.addActionListener(e -> removeItem());
         pnlBot.add(btnRemove);
         
-        addSampData();
+    }
+    
+    private void refreshItemComboBox() {
+        int index = cmbCate.getSelectedIndex();
+        cmbItem.removeAllItems();
+        for (String item : CATEGORY_ITEMS[index]) {
+            cmbItem.addItem(item);
+        }
     }
     
     private JPanel createTab(String title, String value, Color color) {
@@ -166,30 +177,49 @@ public class RequestPanel_Doctor extends JPanel {
     }
     
     private void addItem() {
-        if (txtItem.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Enter item name!");
+        String category = cmbCate.getSelectedItem().toString();
+        String item     = cmbItem.getSelectedItem().toString();
+        String qtyText  = txtQty.getText().trim();
+        
+        if (qtyText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a quantity!",
+                "Missing Quantity", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int qty = 0;
-        try { 
-        qty = Integer.parseInt(txtQty.getText()); 
-        } catch (Exception e) {}
-        double price = 0;
-        try { 
-            price = Double.parseDouble(txtPrice.getText()); 
-        } catch (Exception e) {}
         
-        String category = cmbCate.getSelectedItem().toString();
-        String status = "Requested";
-        double tCost = qty * price;
-        tblModel.addRow(new Object[]{category, txtItem.getText(), qty, "₱" + price, "₱" + tCost, status});
-        
-        txtItem.setText("");
-        txtQty.setText("");
-        txtPrice.setText("");
-        updateSummary();
-        JOptionPane.showMessageDialog(this, "Item requested!");
-    }
+        int qty;
+            try {
+                qty = Integer.parseInt(qtyText);
+                if (qty <= 0) {
+                    JOptionPane.showMessageDialog(this, "Quantity must be greater than zero!",
+                        "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Quantity must be a valid number!",
+                    "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            for (int i = 0; i < tblModel.getRowCount(); i++) {
+                if (tblModel.getValueAt(i, 0).toString().equals(category) &&
+                    tblModel.getValueAt(i, 1).toString().equals(item)) {
+                    JOptionPane.showMessageDialog(this,
+                        item + " already exists under " + category + ".\nUse 'Add Quantity' to update it instead.",
+                        "Duplicate Item", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            }
+
+            String status = qty < 50 ? "Pending" : "Requested";
+            tblModel.addRow(new Object[]{category, item, qty, status});
+
+            txtQty.setText("");
+            cmbCate.setSelectedIndex(0);
+            refreshItemComboBox();
+            updateSummary();
+            JOptionPane.showMessageDialog(this, "Item requested successfully!");
+        }
     
     private void requestedItem() {
         int row = tblInve.getSelectedRow();
@@ -220,40 +250,77 @@ public class RequestPanel_Doctor extends JPanel {
         }
     }
     
+    private void addQuantity() {
+        int row = tblInve.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Select an item first!", "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int current = Integer.parseInt(tblModel.getValueAt(row, 2).toString());
+        String addStr = JOptionPane.showInputDialog(this, "Item: " + tblModel.getValueAt(row, 1) + "\nCurrent Qty: " + current + "\nAdd Qty:");
+
+        if (addStr == null) return; 
+
+        addStr = addStr.trim();
+        if (addStr.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a quantity to add!", "Missing Quantity", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int add;
+        try {
+            add = Integer.parseInt(addStr);
+            if (add <= 0) {
+                JOptionPane.showMessageDialog(this, "Quantity to add must be greater than zero!", "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid number!", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int newQty = current + add;
+        tblModel.setValueAt(newQty, row, 2);
+        tblModel.setValueAt(newQty < 50 ? "Pending" : "Received", row, 3);
+
+        updateSummary();
+        JOptionPane.showMessageDialog(this, "Quantity updated! New Qty: " + newQty);
+    }
+    
     private void removeItem() {
         int row = tblInve.getSelectedRow();
-        if (row >= 0) {
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Select an item first!",
+                "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String itemName = tblModel.getValueAt(row, 1).toString();
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Remove \"" + itemName + "\" from the request list?",
+            "Confirm Removal", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
             tblModel.removeRow(row);
             updateSummary();
-            JOptionPane.showMessageDialog(this, "Item removed!");
-        } else {
-            JOptionPane.showMessageDialog(this, "Select an item first!");
+            JOptionPane.showMessageDialog(this, itemName + " removed successfully!");
         }
     }
     
     private void updateSummary() {
-        int total = tblModel.getRowCount();
-        int low = 0;
-        double value = 0;
+        int total    = tblModel.getRowCount();
+        int received = 0;
+        int pending  = 0;
+
         for (int i = 0; i < total; i++) {
-            if (tblModel.getValueAt(i, 5).toString().contains("Low")) low++;
-            
-            try { 
-                String TCosts = tblModel.getValueAt(i, 4).toString().replace("₱", "");
-                double totalCost = Double.parseDouble(TCosts);
-                value += totalCost; 
-            } catch (Exception e) {}
+            String status = tblModel.getValueAt(i, 3).toString();
+            if (status.equals("Received")) received++;
+            if (status.equals("Pending"))  pending++;
         }
+
         lblTItem.setText(String.valueOf(total));
-        lblLStock.setText(String.valueOf(low));
-        lblTValue.setText("₱" + value);
-    }
-    
-    private void addSampData() {
-        tblModel.addRow(new Object[]{"Medication", "Paracetamol", 500, "₱5", "₱2500", "Good"});
-        tblModel.addRow(new Object[]{"Equipment", "Stethoscope", 20, "₱1000", "₱20000", "Good"});
-        tblModel.addRow(new Object[]{"Supplies", "Ibuprofen", 45, "₱50", "₱2250", "Low Stock"});
-        
-        updateSummary();
+        lblLStock.setText(String.valueOf(received));
+        lblTValue.setText(String.valueOf(pending));
     }
 }

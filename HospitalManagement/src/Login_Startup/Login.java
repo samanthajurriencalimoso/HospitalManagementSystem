@@ -37,9 +37,9 @@ public class Login extends JFrame implements ActionListener{
         setLocationRelativeTo(null);
         
         imgBg = new ImageIcon(getClass().getResource("/resources/Login_BG.png"));
-        BgImage = imgBg.getImage().getScaledInstance(1920, 1080, Image.SCALE_SMOOTH);
+        BgImage = imgBg.getImage().getScaledInstance(1020, 1080 ,Image.SCALE_SMOOTH);
         lblbackground = new JLabel(new ImageIcon(BgImage));
-        lblbackground.setBounds(0, 0, 1920, 1080);
+        lblbackground.setBounds(900, 0, 1020, 1080);
         add(lblbackground);
         
         pnlLogin = new JPanel();
@@ -56,7 +56,8 @@ public class Login extends JFrame implements ActionListener{
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
 
-        lblbackground.add(pnlLogin);
+        add(pnlLogin);
+        add(lblbackground);
         
         imgDlogo = new ImageIcon(getClass().getResource("/resources/eTriage.Logo.png"));
         imgbg = imgDlogo.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);

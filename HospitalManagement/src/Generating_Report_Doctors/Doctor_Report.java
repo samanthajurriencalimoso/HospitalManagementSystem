@@ -2,6 +2,7 @@ package Generating_Report_Doctors;
 
 import static Color_Palette.ColorPalette.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -14,6 +15,7 @@ public class Doctor_Report extends JPanel implements ActionListener {
     private JPanel pnlMain, pnlPrev, pnlRType, pnlB;
     private String currentReportType = "";
     private JScrollPane scroll;
+    private JButton btnSaveReport, btnCopyReport;
 
     public Doctor_Report() {
         setLayout(null);
@@ -157,6 +159,47 @@ public class Doctor_Report extends JPanel implements ActionListener {
         btnPrint.setForeground(Color.BLACK);
         btnPrint.addActionListener(e -> printReport());
         pnlB.add(btnPrint);
+        
+        btnSaveReport = new JButton("Save Report");
+        btnSaveReport.setBounds(500, 730, 150, 35);
+        btnSaveReport.setBackground(Green);
+        btnSaveReport.setForeground(Color.WHITE);
+        btnSaveReport.addActionListener(e -> saveCurrentReport());
+        pnlB.add(btnSaveReport);
+        
+        
+        btnCopyReport = new JButton("Copy Report");
+        btnCopyReport.setBounds(660, 730, 150, 35);
+        btnCopyReport.setBackground(mediumBlue);
+        btnCopyReport.setForeground(Color.WHITE);
+        btnCopyReport.addActionListener(e -> copyCurrentReport());
+        pnlB.add(btnCopyReport);
+        
+        
+    }
+    
+    private void saveCurrentReport() {
+            if (currentReportType.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please select a report first!");
+                return;
+            }
+            setStatus("Saved");
+            JOptionPane.showMessageDialog(this, currentReportType + " saved successfully!");
+        }
+    
+    private void copyCurrentReport() {
+        if (currentReportType.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please select a report first!");
+            return;
+        }
+        String data = "=== ETRIAGE HOSPITAL " + currentReportType.toUpperCase() + " ===\n";
+        data += "Date: " + java.time.LocalDate.now() + "\n";
+        data += "Status: " + lblStatus.getText() + "\n";
+        data += "This document is an official report from eTriage Hospital System.";
+
+        StringSelection ss = new StringSelection(data);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
+        JOptionPane.showMessageDialog(this, currentReportType + " copied to clipboard!");
     }
 
     private void setStatus(String status) {

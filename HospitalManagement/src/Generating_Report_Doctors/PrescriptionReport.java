@@ -221,5 +221,41 @@ public class PrescriptionReport extends JPanel {
         lineDA.setBounds(30, 545, 960, 2);
         lineDA.setBackground(neutralGray);
         pnlMain.add(lineDA);
+    
+        lineFooter = new JPanel();
+        lineFooter.setBounds(30, 620, 960, 2);
+        lineFooter.setBackground(neutralGray);
+        pnlMain.add(lineFooter);
+
+        lblPrescriberName = new JLabel("DR. ISABELLA RAMOS, MD");
+        lblPrescriberName.setFont(new Font("Calibri", Font.BOLD, 12));
+        lblPrescriberName.setBounds(60, 640, 300, 25);
+        pnlMain.add(lblPrescriberName);
+
+        lblPrescriberLicense = new JLabel("License No.: 123456");
+        lblPrescriberLicense.setFont(new Font("Calibri", Font.PLAIN, 10));
+        lblPrescriberLicense.setBounds(60, 665, 150, 20);
+        pnlMain.add(lblPrescriberLicense);
+
+        lblPrescriberPTR = new JLabel("PTR No.: 789012");
+        lblPrescriberPTR.setFont(new Font("Calibri", Font.PLAIN, 10));
+        lblPrescriberPTR.setBounds(60, 685, 150, 20);
+        pnlMain.add(lblPrescriberPTR);
+
+        lineSignature = new JPanel();
+        lineSignature.setBounds(60, 715, 250, 2);
+        lineSignature.setBackground(Color.BLACK);
+        pnlMain.add(lineSignature);
+
+        lblSignature = new JLabel("Signature over Printed Name");
+        lblSignature.setFont(new Font("Calibri", Font.PLAIN, 9));
+        lblSignature.setBounds(85, 720, 200, 15);
+        pnlMain.add(lblSignature);
+
+        lblValidity = new JLabel("This prescription is valid for 30 days from date of issue");
+        lblValidity.setFont(new Font("Calibri", Font.ITALIC, 9));
+        lblValidity.setForeground(Color.GRAY);
+        lblValidity.setBounds(330, 730, 400, 20);
+        pnlMain.add(lblValidity);
     }
 }
