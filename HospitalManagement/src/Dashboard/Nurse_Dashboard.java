@@ -2,6 +2,7 @@ package Dashboard;
 
 import Appointments.Nurse_SchedAppointment;
 import static Color_Palette.ColorPalette.*;
+import Inventory.RequestPanel_Nurse;
 import Patient_Information.PatientInfo_Nurse;
 import Prescriptions.Prescription_Nurse;
 import java.awt.*;
@@ -259,6 +260,23 @@ public class Nurse_Dashboard extends JPanel{
         lblTasks.setBounds(20, 15, 300, 30);
         lblTasks.setFont(new Font("Calibri", Font.BOLD, 24));
         pnlSelection.add(lblTasks);
+        
+        lblView = new JLabel("View All");
+        lblView.setFont(new Font("Calibri", Font.PLAIN, 18));
+        lblView.setForeground(Color.BLUE);
+        lblView.setBounds(540, 15, 80, 30);
+        lblView.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        lblView.addMouseListener(new java.awt.event.MouseAdapter() {
+        
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlMain.removeAll();
+                pnlMain.add(new RequestPanel_Nurse());
+                pnlMain.revalidate();
+                pnlMain.repaint();
+            }
+        });
+        pnlSelection.add(lblView);
 
         String[] clmItems = {"Item", "Quantity", "Status"};
 
