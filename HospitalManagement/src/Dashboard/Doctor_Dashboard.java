@@ -54,7 +54,7 @@ public class Doctor_Dashboard extends JPanel{
         pnlMain.add(tabLows);
         lblLStock = (JLabel) tabLows.getComponent(1);
         
-        tabMed = createTab("Active Prescriptions", "0", Blue);
+        tabMed = createTab("Total Prescriptions", "0", Blue);
         tabMed.setBounds(810, 80, 370, 120);
         pnlMain.add(tabMed);
         lblMed = (JLabel) tabMed.getComponent(1);
