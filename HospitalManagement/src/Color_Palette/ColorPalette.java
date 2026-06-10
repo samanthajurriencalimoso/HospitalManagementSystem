@@ -29,6 +29,7 @@ public class ColorPalette {
     public static final Color Blue = new Color(0x6FA8DC);
     public static final Color TealGreen = new Color(0x5DAA9C);
     public static final Color orange = new Color(0xE69138);
+    public static final Color SeaGreen = new Color(0x2E8B57);
 
     //SelectionBlue
     public static final Color SBlue = new Color(0x5A, 0x8F, 0xC9);

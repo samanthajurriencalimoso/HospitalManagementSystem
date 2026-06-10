@@ -1,18 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Left_Sidebar;
 
 import static Color_Palette.ColorPalette.*;
 import Dashboard.Admin_Dashboard;
+import Models.Employee;
 import java.awt.*;
 import javax.swing.*;
 
-/**
- *
- * @author Jm's Laptop
- */
 public class Admin_SideBarFrame extends JFrame{
      
     private JPanel window;
@@ -40,10 +33,29 @@ public class Admin_SideBarFrame extends JFrame{
         hdr.setBackground(lightBlue);
         add(hdr);
         
-        lblAdminName = new JLabel("Admin | John Smith");
+        Employee activeUser = Database.UserManagementSQL.currentEmployee;
+
+        String adminName = (activeUser != null) ? activeUser.getName() : "No Admin Logged In";
+        String adminRole = (activeUser != null) ? activeUser.getRole() : "Admin";
+        String imgPath = (activeUser != null) ? activeUser.getProfileImage() : null;
+
+        lblAdminName = new JLabel(adminRole + " | " + adminName);
         lblAdminName.setFont(new Font("Calibri", Font.BOLD, 20));
         lblAdminName.setBounds(1320, 20, 300, 35);
         hdr.add(lblAdminName);
+
+        try {
+            java.net.URL imgUrl = null;
+            if (imgPath != null && !imgPath.isEmpty()) {
+                imgUrl = getClass().getResource(imgPath);
+            }
+            if (imgUrl == null) {
+                imgUrl = getClass().getResource("/resources/ADMIN.PHOTO.png");
+            }
+            imgAdmin = new ImageIcon(imgUrl);
+        } catch (Exception e) {
+            imgAdmin = new ImageIcon(getClass().getResource("/resources/ADMIN.PHOTO.png"));
+        }
         
         imgAdmin = new ImageIcon(getClass().getResource("/resources/ADMIN.PHOTO.png"));
         imdAd = imgAdmin.getImage();

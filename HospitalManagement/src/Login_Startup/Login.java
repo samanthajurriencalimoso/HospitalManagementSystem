@@ -4,6 +4,8 @@ import static Color_Palette.ColorPalette.*;
 import Left_Sidebar.Admin_SideBarFrame;
 import Left_Sidebar.Doctor_SideBarFrame;
 import Left_Sidebar.Nurse_SideBarFrame;
+import Database.UserManagementSQL; 
+import Models.Employee;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,24 +15,26 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.border.*;
 
-public class Login extends JFrame implements ActionListener{
+public class Login extends JFrame implements ActionListener {
     
     private JPanel pnlLogin;
     private JTextField txtUsername;
     private JPasswordField txtPassword;
-    private JButton btnLogin;
-    private JLabel lblbackground, lblLogo, lblTitle, lblUser, lblPass, lblForgot, lblFooter;
+    private JButton btnLogin, btnForgot;
+    private JLabel lblbackground, lblLogo, lblTitle, lblUser, lblPass, lblFooter;
     private ImageIcon imgBg, imgDlogo;
     private Image BgImage, imgbg;
+    
+    private static final String URL = "jdbc:mysql://localhost:3306/hospitalmanagement";
+    private static final String USER = "root";
+    private static final String PASS = "";
     
     public Login() {
         setTitle("Hospital Login");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         
-        // For screen size
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setMinimumSize(new Dimension(1000, 1000));
         setLayout(null);
@@ -50,7 +54,7 @@ public class Login extends JFrame implements ActionListener{
             BorderFactory.createLineBorder(borderLBLUE, 1, true),
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
-        
+
         pnlLogin.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(borderLBLUE, 1, true),
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
@@ -105,12 +109,15 @@ public class Login extends JFrame implements ActionListener{
         txtPassword.setBorder(createInputBorder());
         pnlLogin.add(txtPassword);
 
-        lblForgot = new JLabel("Forgot Password?");
-        lblForgot.setFont(new Font("Calibri", Font.PLAIN, 18));
-        lblForgot.setForeground(Color.BLUE);
-        lblForgot.setBounds(370, 580, 200, 30);
-        lblForgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        pnlLogin.add(lblForgot);
+        btnForgot = new JButton("Forgot Password?");
+        btnForgot.setFont(new Font("Calibri", Font.PLAIN, 16));
+        btnForgot.setForeground(Color.BLUE);
+        btnForgot.setBounds(350, 580, 200, 30);
+        btnForgot.setContentAreaFilled(false);
+        btnForgot.setBorderPainted(false);
+        btnForgot.setFocusPainted(false);
+        btnForgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        pnlLogin.add(btnForgot);
 
         btnLogin = new JButton("LOGIN");
         btnLogin.setBounds(80, 630, 700, 50);
@@ -139,6 +146,22 @@ public class Login extends JFrame implements ActionListener{
             }
         });
         
+        btnForgot.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnForgot.setForeground(mediumBlue); 
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnForgot.setForeground(Color.BLUE);
+            }
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ForgotPasswordFrame recoverFrame = new ForgotPasswordFrame();
+                recoverFrame.setVisible(true);
+            }
+        });
+        
         setVisible(true);
     }
     
@@ -151,69 +174,66 @@ public class Login extends JFrame implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-        String user = txtUsername.getText();
-        String pass = new String(txtPassword.getPassword());
-
         if (ae.getSource() == btnLogin) {
-            try {
-                    Connection conn = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/HospitalManagement",
-                    "root",
-                    ""
-                    );
-                    
-                String sql = "SELECT ID, role FROM users WHERE username=? AND password=?";
-                
-                PreparedStatement pst = conn.prepareStatement(sql);
+            String user = txtUsername.getText().trim();
+            String pass = new String(txtPassword.getPassword()).trim();
 
+            if (user.isEmpty() || pass.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter both username and password fields!", "Input Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String sql = "SELECT * FROM employees WHERE username = ? AND password = ?";
+            
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                 PreparedStatement pst = conn.prepareStatement(sql)) {
+                
                 pst.setString(1, user);
                 pst.setString(2, pass);
 
-                ResultSet rs = pst.executeQuery();
+                try (ResultSet rs = pst.executeQuery()) {
+                    if (rs.next()) {
+                        
+                        UserManagementSQL.currentEmployee = new Employee(
+                            rs.getString("name"),
+                            rs.getString("id"),
+                            rs.getInt("age"),
+                            rs.getString("role"),
+                            rs.getString("status"),
+                            rs.getString("department"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("profile_image")
+                        );
 
-                if (rs.next()) {
-                    String ID = rs.getString("ID");
+                        String role = UserManagementSQL.currentEmployee.getRole();
 
-                    String role = rs.getString("role");
-
-                    if (role.equalsIgnoreCase("admin")) {
-
-                        Admin_SideBarFrame sf = new Admin_SideBarFrame();
-                        sf.setVisible(true);
-                        dispose();
-
-                    } else if (role.equalsIgnoreCase("doctor")) {
-
-                        Doctor_SideBarFrame sf = new Doctor_SideBarFrame();
-                        sf.setVisible(true);
-                        dispose();
+                        if (role.equalsIgnoreCase("Admin")) {
+                            Admin_SideBarFrame sf = new Admin_SideBarFrame();
+                            sf.setVisible(true);
+                            dispose();
+                        } else if (role.equalsIgnoreCase("Doctor")) {
+                            Doctor_SideBarFrame sf = new Doctor_SideBarFrame();
+                            sf.setVisible(true);
+                            dispose();
+                        } else if (role.equalsIgnoreCase("Nurse")) {
+                            Nurse_SideBarFrame sf = new Nurse_SideBarFrame();
+                            sf.setVisible(true);
+                            dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Unrecognized employee role type configured.", "Access Denied", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        txtPassword.setText("");
+                        JOptionPane.showMessageDialog(this, "Incorrect Credentials. Try Again.", "Login Failed", JOptionPane.ERROR_MESSAGE);
                     }
-                    
-                    else if (role.equalsIgnoreCase("nurse")) {
-
-                        Nurse_SideBarFrame sf = new Nurse_SideBarFrame();
-                        sf.setVisible(true);
-                        dispose();
-                    }
-
-                } else {
-                    txtPassword.setText("");
-
-                    JOptionPane.showMessageDialog(null,"Incorrect Credentials. Try Again.","Login Failed", JOptionPane.ERROR_MESSAGE);
                 }
-
-                rs.close();
-                pst.close();
-                conn.close();
-
             } catch (SQLException ex) {
-
                 ex.printStackTrace();
-
-                JOptionPane.showMessageDialog(null,"Database Connection Failed!");
+                JOptionPane.showMessageDialog(this, "Database Connection Failed!\n" + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     } 
 }
-    
-     

@@ -1,21 +1,29 @@
 package Inventory;
 
 import static Color_Palette.ColorPalette.*;
+import Database.PatientManagementSQL;
+import Database.UserManagementSQL; 
+import Models.Patient;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class PatientCentralPanel extends JPanel {
     
-    private JPanel pnlMain,tabPatient,tabAdmission, pnlSelection,pnlBot,tabUpdate, tabDis, tabCri;
+    private JPanel pnlMain, tabPatient, tabAdmission, pnlSelection, pnlBot, tabUpdate, tabDis, tabCri;
     private DefaultTableModel tblModel;
     private JTextField txtName, txtRoom;
-    private JLabel lblTPatient, lblAct,lbltitle,lblDT,lblName,lblRoom, lblTitle, lblValue, lblDoc, lblNur, lblStatus, lblCri, lblDis;
+    private JLabel lblTPatient, lblAct, lbltitle, lblDT, lblName, lblRoom, lblTitle, lblValue, lblDoc, lblNur, lblStatus, lblCri, lblDis;
     private JTable tblPC;
-    private JButton btnAdd, btnAdmit, btnDischarge, btnRemove, btnCStatus;
+    private JButton btnAdd, btnAdmit, btnDischarge, btnRemove, btnCStatus, btnEdit;
     private JScrollPane srcRoom;
     private JComboBox<String> cmbDoc, cmbNur, cmbStatus;
-    private int PNum = 10000;
+    private boolean isEditMode = false;
+    private String activeEditingPatientId = "";
     
     public PatientCentralPanel() {
         setLayout(null);
@@ -33,11 +41,13 @@ public class PatientCentralPanel extends JPanel {
         lbltitle.setBounds(30, 20, 400, 40);
         pnlMain.add(lbltitle);
         
-        lblDT = new JLabel("May 21, 2026 | 10:00 AM");
+        lblDT = new JLabel();
         lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
         lblDT.setForeground(Color.darkGray);
-        lblDT.setBounds(1390, 20, 400, 40);
+        lblDT.setBounds(1320, 20, 400, 40);
         pnlMain.add(lblDT);
+        
+        startClockTimer();
         
         tabPatient = createTab("Total Patients", "0", darkBlue);
         tabPatient.setBounds(30, 80, 300, 100);
@@ -63,7 +73,7 @@ public class PatientCentralPanel extends JPanel {
         pnlSelection.setLayout(null);
         pnlSelection.setBackground(Color.WHITE);
         pnlSelection.setBorder(BorderFactory.createLineBorder(borderLBLUE));
-        pnlSelection.setBounds(30, 210, 1200, 120);
+        pnlSelection.setBounds(30, 210, 1350, 120);
         pnlMain.add(pnlSelection);
         
         lblName = new JLabel("Name:");
@@ -89,7 +99,7 @@ public class PatientCentralPanel extends JPanel {
         lblDoc.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblDoc);
         
-        cmbDoc = new JComboBox<>(new String[]{"Dr. Lee", "Dr. Cruz", "Dr. Santos"});
+        cmbDoc = new JComboBox<>();
         cmbDoc.setBounds(770, 26, 200, 28);
         pnlSelection.add(cmbDoc);
         
@@ -98,7 +108,7 @@ public class PatientCentralPanel extends JPanel {
         lblNur.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblNur);
         
-        cmbNur = new JComboBox<>(new String[]{"Nurse Watson", "Nurse Reyes", "Nurse Tan"});
+        cmbNur = new JComboBox<>();
         cmbNur.setBounds(445, 70, 200, 28);
         pnlSelection.add(cmbNur);
         
@@ -111,7 +121,7 @@ public class PatientCentralPanel extends JPanel {
         cmbStatus.setBounds(120, 68, 200, 28);
         pnlSelection.add(cmbStatus);
         
-        btnAdd = new JButton("Add Patient");
+        btnAdd = new JButton("Save Patient");
         btnAdd.setBackground(Green);
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFont(new Font("Calibri", Font.BOLD, 16));
@@ -119,8 +129,8 @@ public class PatientCentralPanel extends JPanel {
         btnAdd.setBounds(1010, 25, 150, 35);
         btnAdd.addActionListener(e -> addPatient());
         pnlSelection.add(btnAdd);
-       
-        String[] clm = {"Patient ID", "Name", "Room", "Doctor", "Nurse", "Status"};
+        
+        String[] clm = {"Patient ID", "Name", "Room", "Doctor", "Nurse", "Status", "Date"};
         tblModel = new DefaultTableModel(clm, 0);
         tblPC = new JTable(tblModel);
         tblPC.setRowHeight(35);
@@ -171,23 +181,54 @@ public class PatientCentralPanel extends JPanel {
         btnViewProfile.setForeground(Color.WHITE);
         btnViewProfile.setFont(new Font("Calibri", Font.BOLD, 14));
         btnViewProfile.setFocusPainted(false);
-        btnViewProfile.setBounds(510, 10, 150, 30);
+        btnViewProfile.setBounds(510, 10, 130, 30);
         btnViewProfile.addActionListener(e -> viewProfile());
         pnlBot.add(btnViewProfile);
         
+        btnEdit = new JButton("Edit Patient");
+        btnEdit.setBackground(darkBlue);
+        btnEdit.setForeground(Color.WHITE);
+        btnEdit.setFont(new Font("Calibri", Font.BOLD, 14));
+        btnEdit.setFocusPainted(false);
+        btnEdit.setBounds(660, 10, 130, 30);
+        btnEdit.addActionListener(e -> setupEditFormWorkflow());
+        pnlBot.add(btnEdit);
+
         btnCStatus = new JButton("Change Status");
         btnCStatus.setBackground(orange);
         btnCStatus.setForeground(Color.WHITE);
         btnCStatus.setFont(new Font("Calibri", Font.BOLD, 14));
         btnCStatus.setFocusPainted(false);
-        btnCStatus.setBounds(680, 10, 150, 30);
+        btnCStatus.setBounds(810, 10, 150, 30);
         btnCStatus.addActionListener(e -> changeStatus());
         pnlBot.add(btnCStatus);
 
-        
-        addSampData();
+        populateActiveStaff();
+        loadDataFromDatabase();
     }
     
+    private void populateActiveStaff() {
+        cmbDoc.removeAllItems();
+        cmbNur.removeAllItems();
+
+        List<String> activeDoctors = UserManagementSQL.getActiveEmployeeNamesByRole("Doctor");
+        for (String docName : activeDoctors) {
+            cmbDoc.addItem("Dr. " + docName);
+        }
+
+        List<String> activeNurses = UserManagementSQL.getActiveEmployeeNamesByRole("Nurse");
+        for (String nurseName : activeNurses) {
+            cmbNur.addItem(nurseName + " (Nurse)");
+        }
+
+        if (cmbDoc.getItemCount() == 0) {
+            cmbDoc.addItem("No Active Doctors");
+        }
+        if (cmbNur.getItemCount() == 0) {
+            cmbNur.addItem("No Active Nurses");
+        }
+    }
+
     private JPanel createTab(String title, String value, Color color) {
         tabUpdate = new JPanel();
         tabUpdate.setLayout(null);
@@ -207,102 +248,200 @@ public class PatientCentralPanel extends JPanel {
         
         return tabUpdate;
     }
+
+    private void loadDataFromDatabase() {
+        tblModel.setRowCount(0);
+        List<Patient> patients = PatientManagementSQL.getAllPatients();
+        for (Patient p : patients) {
+            tblModel.addRow(new Object[]{
+                p.getId(), 
+                p.getName(), 
+                p.getRoom(), 
+                p.getDoctor(), 
+                p.getNurse(), 
+                p.getStatus(),
+                p.getAdmissionDate()
+            });
+        }
+        updateSummary();
+    }
     
     private void addPatient() {
         String name = txtName.getText().trim();
         String room = txtRoom.getText().trim();
+        
+        if (cmbDoc.getSelectedItem() == null || cmbNur.getSelectedItem() == null ||
+            cmbDoc.getSelectedItem().toString().startsWith("No Active") ||
+            cmbNur.getSelectedItem().toString().startsWith("No Active")) {
+            JOptionPane.showMessageDialog(this, "Please ensure you have valid active staff members assigned!", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (name.isEmpty() || room.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "All fields are required. Please populate both Name and Room number fields!", "Validation Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (!Pattern.matches("^[a-zA-Z\\s.\\-]+$", name)) {
+            JOptionPane.showMessageDialog(this, "Invalid Name structure! Characters must consist of alphabetic text characters only.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (!Pattern.matches("^[a-zA-Z0-9\\s\\-]+$", room)) {
+            JOptionPane.showMessageDialog(this, "Invalid Room structure! Use alphanumeric indicators only (e.g., 'ICU-02' or '304').", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         String doc = cmbDoc.getSelectedItem().toString();
         String nur = cmbNur.getSelectedItem().toString();
         String status = cmbStatus.getSelectedItem().toString();
         
-        if (name.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter patient name!");
-            return;
-        }
+        boolean transactionResult;
         
-        String PatID = "P+" + (++PNum);
-        tblModel.addRow(new Object[]{PatID, name, room, doc, nur, status});
+        if (isEditMode) {
+            Patient updatedPatient = new Patient(activeEditingPatientId, name, room, doc, nur, status, "");
+            transactionResult = PatientManagementSQL.updatePatient(updatedPatient);
+        } else {
+            String generatedId = PatientManagementSQL.getNextPatientId();
+            String currentTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            Patient newPatient = new Patient(generatedId, name, room, doc, nur, status, currentTimestamp);
+            transactionResult = PatientManagementSQL.insertPatient(newPatient);
+        }
+
+        if (transactionResult) {
+            clearFormInputFields();
+            loadDataFromDatabase();
+            JOptionPane.showMessageDialog(this, isEditMode ? "Patient record updated successfully!" : "Patient added successfully!");
+            
+            isEditMode = false;
+            activeEditingPatientId = "";
+            btnAdd.setText("Save Patient");
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to persist transaction structural updates into the database log layer.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void setupEditFormWorkflow() {
+        int selectedRow = tblPC.getSelectedRow();
+        if (selectedRow >= 0) {
+            isEditMode = true;
+            activeEditingPatientId = tblModel.getValueAt(selectedRow, 0).toString();
+            
+            txtName.setText(tblModel.getValueAt(selectedRow, 1).toString());
+            txtRoom.setText(tblModel.getValueAt(selectedRow, 2).toString());
+            
+            cmbDoc.setSelectedItem(tblModel.getValueAt(selectedRow, 3).toString());
+            cmbNur.setSelectedItem(tblModel.getValueAt(selectedRow, 4).toString());
+            cmbStatus.setSelectedItem(tblModel.getValueAt(selectedRow, 5).toString());
+            
+            btnAdd.setText("Update Patient");
+            JOptionPane.showMessageDialog(this, "Modify elements inside text areas and press UPDATE PATIENT to save structural alterations.");
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select an applicable patient entry from table mappings first!", "Selection Required", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void clearFormInputFields() {
         txtName.setText("");
         txtRoom.setText("");
-        cmbDoc.setSelectedIndex(0);
-        cmbNur.setSelectedIndex(0);
+        if (cmbDoc.getItemCount() > 0) cmbDoc.setSelectedIndex(0);
+        if (cmbNur.getItemCount() > 0) cmbNur.setSelectedIndex(0);
         cmbStatus.setSelectedIndex(0);
-        
-        updateSummary();
-        JOptionPane.showMessageDialog(this, "Patient added!");
     }
     
     private void admitPatient() {
         int row = tblPC.getSelectedRow();
         if (row >= 0) {
-            tblModel.setValueAt("Admitted", row, 2);
-            updateSummary();
-            JOptionPane.showMessageDialog(this, "Patient admitted!");
+            String patId = tblModel.getValueAt(row, 0).toString();
+            String currentRoom = tblModel.getValueAt(row, 2).toString();
+
+            if (currentRoom.isEmpty()) {
+                currentRoom = JOptionPane.showInputDialog(this, "Assign Room Number for Admission:", "Room Assignment", JOptionPane.PLAIN_MESSAGE);
+                if (currentRoom == null || currentRoom.trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Admission cancelled. Room is required.");
+                    return;
+                }
+            }
+
+            if (PatientManagementSQL.updatePatientRoomAndStatus(patId, currentRoom, "Admitted")) {
+                loadDataFromDatabase();
+                JOptionPane.showMessageDialog(this, "Patient admitted successfully!");
+            }
         } else {
-            JOptionPane.showMessageDialog(this, "Select a patient!");
+            JOptionPane.showMessageDialog(this, "Please select a patient row from the table!", "Selection Error", JOptionPane.WARNING_MESSAGE);
         }
     }
     
-    private void viewProfile() {
+    private void dischargePatient() {
         int row = tblPC.getSelectedRow();
         if (row >= 0) {
-            String profile =
-                "Patient Profile:\n\n" +
-                "Patient ID: " + tblModel.getValueAt(row, 0) + "\n" +
-                "Name: " + tblModel.getValueAt(row, 1) + "\n" +
-                "Room: " + tblModel.getValueAt(row, 2) + "\n" +
-                "Doctor: " + tblModel.getValueAt(row, 3) + "\n" +
-                "Nurse: " + tblModel.getValueAt(row, 4) + "\n" +
-                "Status: " + tblModel.getValueAt(row, 5);
-
-            JOptionPane.showMessageDialog(this, profile, "Patient Details", JOptionPane.INFORMATION_MESSAGE);
+            String patId = tblModel.getValueAt(row, 0).toString();
+            if (PatientManagementSQL.updatePatientRoomAndStatus(patId, "", "Discharged")) {
+                loadDataFromDatabase();
+                JOptionPane.showMessageDialog(this, "Patient discharged successfully!");
+            }
         } else {
-            JOptionPane.showMessageDialog(this, "Select a patient to view profile!");
+            JOptionPane.showMessageDialog(this, "Please select a patient row from the table!", "Selection Error", JOptionPane.WARNING_MESSAGE);
         }
     }
     
     private void changeStatus() {
         int row = tblPC.getSelectedRow();
-            if (row >= 0) {
-                String currentStatus = tblModel.getValueAt(row, 5).toString();
-                String[] options = {"Active", "Admitted", "Discharged", "Under Observation"};
-                String newStatus = (String) JOptionPane.showInputDialog(this,"Change status:","Update Patient Status",JOptionPane.PLAIN_MESSAGE,null,options,currentStatus);
-                
-        if (newStatus != null) {
-            tblModel.setValueAt(newStatus, row, 5);
-            updateSummary();
-            JOptionPane.showMessageDialog(this, "Status updated to " + newStatus);
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Select an patient to change status!");
-    }
-}
-
-    
-    private void dischargePatient() {
-        int row = tblPC.getSelectedRow();
         if (row >= 0) {
-            tblModel.setValueAt("Discharged", row, 2);
-            updateSummary();
-            JOptionPane.showMessageDialog(this, "Patient discharged!");
+            String patId = tblModel.getValueAt(row, 0).toString();
+            String currentStatus = tblModel.getValueAt(row, 5).toString();
+            String[] options = {"Active", "Admitted", "Discharged", "Under Observation", "Critical"};
+            
+            String newStatus = (String) JOptionPane.showInputDialog(this, "Change status:", "Update Patient Status", 
+                    JOptionPane.PLAIN_MESSAGE, null, options, currentStatus);
+            
+            if (newStatus != null) {
+                if (PatientManagementSQL.updatePatientStatus(patId, newStatus)) {
+                    loadDataFromDatabase();
+                    JOptionPane.showMessageDialog(this, "Status updated to " + newStatus);
+                }
+            }
         } else {
-            JOptionPane.showMessageDialog(this, "Select a patient!");
+            JOptionPane.showMessageDialog(this, "Please select a patient row from the table!", "Selection Error", JOptionPane.WARNING_MESSAGE);
         }
     }
     
     private void removePatient() {
         int row = tblPC.getSelectedRow();
         if (row >= 0) {
-            String name = tblModel.getValueAt(row, 0).toString();
-            int confirm = JOptionPane.showConfirmDialog(this, "Remove " + name + "?", "Confirm", JOptionPane.YES_NO_OPTION);
+            String patId = tblModel.getValueAt(row, 0).toString();
+            String name = tblModel.getValueAt(row, 1).toString();
+            
+            int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to completely remove " + name + " (" + patId + ")?", 
+                    "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            
             if (confirm == JOptionPane.YES_OPTION) {
-                tblModel.removeRow(row);
-                updateSummary();
-                
-                JOptionPane.showMessageDialog(this, "Patient removed!");
+                if (PatientManagementSQL.deletePatient(patId)) {
+                    loadDataFromDatabase();
+                    JOptionPane.showMessageDialog(this, "Patient record removed!");
+                }
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Select a patient!");
+            JOptionPane.showMessageDialog(this, "Please select a patient row from the table!", "Selection Error", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void viewProfile() {
+        int row = tblPC.getSelectedRow();
+        if (row >= 0) {
+            String profile =
+                "Patient Profile Details:\n\n" +
+                "Patient ID: " + tblModel.getValueAt(row, 0) + "\n" +
+                "Name: " + tblModel.getValueAt(row, 1) + "\n" +
+                "Room: " + tblModel.getValueAt(row, 2) + "\n" +
+                "Doctor: " + tblModel.getValueAt(row, 3) + "\n" +
+                "Nurse: " + tblModel.getValueAt(row, 4) + "\n" +
+                "Status: " + tblModel.getValueAt(row, 5) + "\n" +
+                "Date: " + tblModel.getValueAt(row, 6);
+
+            JOptionPane.showMessageDialog(this, profile, "Patient Information", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Select a patient row to view their profile details!", "Selection Error", JOptionPane.WARNING_MESSAGE);
         }
     }
     
@@ -312,9 +451,9 @@ public class PatientCentralPanel extends JPanel {
         
         for (int i = 0; i < total; i++) {
             String status = tblModel.getValueAt(i, 5).toString();
-            if (status.equals("Admitted")) admitted++;
-            if (status.equals("Discharged")) discharged++;
-            if (status.equals("Critical")) critical++;
+            if (status.equalsIgnoreCase("Admitted")) admitted++;
+            if (status.equalsIgnoreCase("Discharged")) discharged++;
+            if (status.equalsIgnoreCase("Critical")) critical++;
         }
         lblTPatient.setText(String.valueOf(total));
         lblAct.setText(String.valueOf(admitted));
@@ -322,12 +461,10 @@ public class PatientCentralPanel extends JPanel {
         lblCri.setText(String.valueOf(critical));
     }
     
-    private void addSampData() {
-        tblModel.addRow(new Object[]{"P-10001", "Jane Smith", "102", "Dr. Lee", "Nurse Watson", "Admitted"});
-        tblModel.addRow(new Object[]{"P-10002", "Bob Johnson", "103", "Dr. Cruz", "Nurse Reyes", "Discharged"});
-        tblModel.addRow(new Object[]{"P-10003", "Alice Brown", "104", "Dr. Santos", "Nurse Tan", "Under Observation"});
-        tblModel.addRow(new Object[]{"P-10004", "Mark Davis", "105", "Dr. Lee", "Nurse Watson", "Critical"});
-
-        updateSummary();
+    private void startClockTimer() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mm:ss a");
+        lblDT.setText(LocalDateTime.now().format(formatter));
+        Timer timer = new Timer(1000, e -> lblDT.setText(LocalDateTime.now().format(formatter)));
+        timer.start();
     }
 }

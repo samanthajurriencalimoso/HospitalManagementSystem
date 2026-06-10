@@ -1,23 +1,28 @@
 package Inventory;
 
 import static Color_Palette.ColorPalette.*;
+import Database.InventorySQL;
+import Models.InventoryItem;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.time.LocalDate;
+import java.util.List;
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class InventoryPanel extends JPanel {
     
     private JPanel pnlMain, tabItem, tabLows, tabValue, pnlSelection, pnlBot, tabUpdate;
     private DefaultTableModel tblModel;
     private JTextField txtItem, txtQty, txtPrice, txtExpiry;
-    private JLabel lbltitle, lblDT, lblTItem, lblLStock, lblTValue, lblItem, lblQty, lblPrice, lblTitle, lblValue, lblCat,
-                   lblExpiry;
+    private JLabel lbltitle, lblDT, lblTItem, lblLStock, lblTValue, lblItem, lblQty, lblPrice, lblTitle, lblValue, lblCat, lblExpiry;
     private JTable tblInve;
     private JButton btnAdd, btnEdit, btnRestock, btnRemove;
     private JScrollPane srcInve;
     private JComboBox<String> cmbCategory;
-    private LocalDate expDate;
+    
+    private Integer selectedItemId = null;
     
     public InventoryPanel() {
         setLayout(null);
@@ -35,11 +40,13 @@ public class InventoryPanel extends JPanel {
         lbltitle.setBounds(30, 20, 400, 40);
         pnlMain.add(lbltitle);
         
-        lblDT = new JLabel("May 21, 2026 | 10:00 AM");
+        lblDT = new JLabel();
         lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
         lblDT.setForeground(Color.darkGray);
         lblDT.setBounds(1390, 20, 400, 40);
         pnlMain.add(lblDT);
+        
+        startClockTimer();
    
         tabItem = createTab("Total Items", "0", darkBlue);
         tabItem.setBounds(30, 80, 500, 100);
@@ -86,7 +93,7 @@ public class InventoryPanel extends JPanel {
         pnlSelection.add(lblExpiry);
 
         txtExpiry = new JTextField();
-        txtExpiry.setBounds(840, 26,200, 28);
+        txtExpiry.setBounds(840, 26, 200, 28);
         pnlSelection.add(txtExpiry);
         
         lblPrice = new JLabel("Price:");
@@ -107,13 +114,13 @@ public class InventoryPanel extends JPanel {
         txtQty.setBounds(445, 70, 200, 28);
         pnlSelection.add(txtQty);
         
-        btnAdd = new JButton("Add Item");
+        btnAdd = new JButton("Save Item");
         btnAdd.setBackground(Green);
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFont(new Font("Calibri", Font.BOLD, 16));
         btnAdd.setFocusPainted(false);
         btnAdd.setBounds(1080, 25, 150, 35);
-        btnAdd.addActionListener(e -> addItem());
+        btnAdd.addActionListener(e -> saveItem());
         pnlSelection.add(btnAdd);
         
         btnEdit = new JButton("Edit Item");
@@ -125,14 +132,19 @@ public class InventoryPanel extends JPanel {
         btnEdit.addActionListener(e -> editItem());
         pnlSelection.add(btnEdit);
 
-        String[] clm = {"Category", "Item", "Quantity", "Price", "Status", "Expiry"};
-        tblModel = new DefaultTableModel(clm, 0);
+        String[] clm = {"ID", "Category", "Item", "Quantity", "Price", "Status", "Expiry"};
+        tblModel = new DefaultTableModel(clm, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
         tblInve = new JTable(tblModel);
         tblInve.setRowHeight(35);
         tblInve.setAutoCreateRowSorter(true);
         tblInve.setFont(new Font("Calibri", Font.PLAIN, 16));
         tblInve.getTableHeader().setFont(new Font("Calibri", Font.BOLD, 18));
         tblInve.getTableHeader().setBackground(lightBlue);
+        
+        tblInve.removeColumn(tblInve.getColumnModel().getColumn(0));
         
         srcInve = new JScrollPane(tblInve);
         srcInve.setBounds(30, 350, 1560, 500);
@@ -163,7 +175,7 @@ public class InventoryPanel extends JPanel {
         btnRemove.addActionListener(e -> removeItem());
         pnlBot.add(btnRemove);
         
-        addSampData();
+        refreshTableData();
     }
     
     private JPanel createTab(String title, String value, Color color) {
@@ -186,7 +198,42 @@ public class InventoryPanel extends JPanel {
         return tabUpdate;
     }
     
-    private void addItem() {
+    private void refreshTableData() {
+        tblModel.setRowCount(0);
+        List<InventoryItem> items = InventorySQL.getAllItems();
+        
+        int totalItems = 0;
+        int lowStockCount = 0;
+        double totalValue = 0;
+        
+        for (InventoryItem item : items) {
+            tblModel.addRow(new Object[]{
+                item.getId(),
+                item.getCategory(),
+                item.getItem(),
+                item.getQuantity(),
+                "₱" + String.format("%.2f", item.getPrice()), 
+                item.getStatus(),
+                item.getExpiry()
+            });
+            
+            totalItems++;
+            if (item.getStatus().contains("Low")) {
+                lowStockCount++;
+            }
+            totalValue += (item.getPrice() * item.getQuantity());
+        }
+        
+        lblTItem.setText(String.valueOf(totalItems));
+        lblLStock.setText(String.valueOf(lowStockCount));
+        java.text.NumberFormat phFormat = java.text.NumberFormat.getInstance(java.util.Locale.US);
+        phFormat.setMinimumFractionDigits(2);
+        phFormat.setMaximumFractionDigits(2);
+
+        lblTValue.setText("₱ " + phFormat.format(totalValue));
+    }
+    
+    private void saveItem() {
         String category = cmbCategory.getSelectedItem().toString();
         String item = txtItem.getText().trim();
         String qtyStr = txtQty.getText().trim();
@@ -194,170 +241,129 @@ public class InventoryPanel extends JPanel {
         String expiry = txtExpiry.getText().trim();
 
         if (item.isEmpty() || qtyStr.isEmpty() || priceStr.isEmpty() || expiry.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "All fields are required.");
-            return;
-        }
-        
-        if (!item.matches("[a-zA-Z ]+")) {
-            JOptionPane.showMessageDialog(this, "Item name must contain letters only.");
+            JOptionPane.showMessageDialog(this, "All fields are required!");
             return;
         }
 
         int qty;
-        try {
-            qty = Integer.parseInt(qtyStr);
-            if (qty < 0) {
-                JOptionPane.showMessageDialog(this, "Quantity cannot be negative.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Quantity must be a whole number.");
-            return;
-        }
-        
         double price;
         try {
-            price = Double.parseDouble(priceStr);
-            if (price < 0) {
-                JOptionPane.showMessageDialog(this, "Price cannot be negative.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Price must be a valid number.");
+            qty = Integer.parseInt(qtyStr);
+            price = Double.parseDouble(priceStr.replace("₱", "").replace(",", "").trim());
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(this, "Quantity and Price must be valid numeric expressions.");
             return;
         }
-        
-        try {
-            expDate = LocalDate.parse(expiry);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Invalid expiry date format. Use YYYY-MM-DD.");
-            return;
-        }
-        if (expDate.isBefore(LocalDate.now())) {
-            JOptionPane.showMessageDialog(this, "Expiry date cannot be in the past.");
-            return;
-        }
-        
-        int selectedRow = tblInve.getSelectedRow();
-        if (selectedRow < 0) {
-            for (int i = 0; i < tblModel.getRowCount(); i++) {
-                String existing = tblModel.getValueAt(i, 1).toString().toLowerCase();
-                if (existing.equals(item.toLowerCase())) {
-                    JOptionPane.showMessageDialog(this, "An item with this name already exists.");
-                    return;
-                }
-            }
-        }
-        
+
         String status = qty < 50 ? "Low Stock" : "Good";
-        if (expDate.isBefore(LocalDate.now().plusDays(30))) {
-            status = "Expiring Soon";
+        try {
+            LocalDate expDate = LocalDate.parse(expiry);
+            if (expDate.isBefore(LocalDate.now().plusDays(30))) {
+                status = "Expiring Soon";
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Invalid expiry date format (use YYYY-MM-DD).");
+            return;
         }
-
-        if (selectedRow >= 0) {
-            tblModel.setValueAt(category,selectedRow, 0);
-            tblModel.setValueAt(item, selectedRow, 1);
-            tblModel.setValueAt(qty, selectedRow, 2);
-            tblModel.setValueAt("₱" + price,selectedRow, 3);
-            tblModel.setValueAt(status, selectedRow, 4);
-            tblModel.setValueAt(expiry, selectedRow, 5);
-            tblInve.clearSelection();
-            JOptionPane.showMessageDialog(this, "Item updated successfully.");
+        
+        if (selectedItemId != null) {
+            InventoryItem itemUpdate = new InventoryItem(selectedItemId, category, item, qty, price, status, expiry);
+            if (InventorySQL.updateItem(itemUpdate)) {
+                JOptionPane.showMessageDialog(this, "Item updated successfully!");
+                selectedItemId = null;
+            } else {
+                JOptionPane.showMessageDialog(this, "Error processing updating row modifications structural layout.");
+            }
         } else {
-            tblModel.addRow(new Object[]{category, item, qty, "₱" + price, status, expiry});
-            JOptionPane.showMessageDialog(this, "Item added successfully.");
+            InventoryItem newItem = new InventoryItem(category, item, qty, price, status, expiry);
+            if (InventorySQL.insertItem(newItem)) {
+                JOptionPane.showMessageDialog(this, "Item added successfully!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Error inserting tracking parameters database pipeline.");
+            }
         }
 
-        txtItem.setText("");
-        txtQty.setText("");
-        txtPrice.setText("");
-        txtExpiry.setText("");
-        updateSummary();
+        clearFields();
+        refreshTableData();
     }
     
     private void editItem() {
         int row = tblInve.getSelectedRow();
-            if (row >= 0) {
-                cmbCategory.setSelectedItem(tblModel.getValueAt(row, 0).toString());
-                txtItem.setText(tblModel.getValueAt(row, 1).toString());
-                txtQty.setText(tblModel.getValueAt(row, 2).toString());
-                txtPrice.setText(tblModel.getValueAt(row, 3).toString().replace("₱", ""));
-                txtExpiry.setText(tblModel.getValueAt(row, 5).toString());
+        if (row >= 0) {
+            int modelRow = tblInve.convertRowIndexToModel(row);
+            
+            selectedItemId = (Integer) tblModel.getValueAt(modelRow, 0);
+            cmbCategory.setSelectedItem(tblModel.getValueAt(modelRow, 1).toString());
+            txtItem.setText(tblModel.getValueAt(modelRow, 2).toString());
+            txtQty.setText(tblModel.getValueAt(modelRow, 3).toString());
+            txtPrice.setText(tblModel.getValueAt(modelRow, 4).toString().replace("₱", ""));
+            txtExpiry.setText(tblModel.getValueAt(modelRow, 6).toString());
 
-                JOptionPane.showMessageDialog(this, "Edit fields and click Add Item to save changes.");
-            } else {
-                JOptionPane.showMessageDialog(this, "Select an item to edit!");
-            }
+            JOptionPane.showMessageDialog(this, "Edit field details, then click Save Item to sync to database structural arrays.");
+        } else {
+            JOptionPane.showMessageDialog(this, "Select an item to edit first!");
         }
+    }
     
     private void restockItem() {
         int row = tblInve.getSelectedRow();
         if (row >= 0) {
-            JOptionPane.showMessageDialog(this, "Select an item first.");
-            return;  
-        } 
-        
-        int current = Integer.parseInt(tblModel.getValueAt(row, 2).toString());
-        String addStr = JOptionPane.showInputDialog(this, "Current quantity: " + current + "\nEnter amount to add:");
-
-        if (addStr == null) return;
-
-        addStr = addStr.trim();
-        if (addStr.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a quantity.");
-            return;
+            int modelRow = tblInve.convertRowIndexToModel(row);
+            int id = (Integer) tblModel.getValueAt(modelRow, 0);
+            int current = (int) tblModel.getValueAt(modelRow, 3);
+            
+            String addStr = JOptionPane.showInputDialog(this, "Current Stock level: " + current + "\nEnter quantity additions string values:");
+            if (addStr != null && !addStr.trim().isEmpty()) {
+                try {
+                    int add = Integer.parseInt(addStr.trim());
+                    int newQty = current + add;
+                    String newStatus = newQty < 50 ? "Low Stock" : "Good";
+                    
+                    if (InventorySQL.updateQuantityAndStatus(id, newQty, newStatus)) {
+                        JOptionPane.showMessageDialog(this, "Restocked! New Quantity level: " + newQty);
+                        refreshTableData();
+                    }
+                } catch (NumberFormatException nfe) {
+                    JOptionPane.showMessageDialog(this, "Invalid number entered!");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Select an item from the table layout first!");
         }
-        
-        int add;
-        try {
-            add = Integer.parseInt(addStr);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Quantity must be a whole number.");
-            return;
-        }
-
-        if (add <= 0) {
-            JOptionPane.showMessageDialog(this, "Restock amount must be greater than zero.");
-            return;
-        }
-        
-        int newQty = current + add;
-        tblModel.setValueAt(newQty, row, 2);
-        tblModel.setValueAt(newQty < 50 ? "Low Stock" : "Good", row, 4);
-        updateSummary();
-        JOptionPane.showMessageDialog(this, "Restocked successfully. New quantity: " + newQty);
     }
     
     private void removeItem() {
         int row = tblInve.getSelectedRow();
         if (row >= 0) {
-            tblModel.removeRow(row);
-            updateSummary();
-            JOptionPane.showMessageDialog(this, "Item removed!");
+            int modelRow = tblInve.convertRowIndexToModel(row);
+            int id = (Integer) tblModel.getValueAt(modelRow, 0);
+            String itemName = tblModel.getValueAt(modelRow, 2).toString();
+            
+            int option = JOptionPane.showConfirmDialog(this, "Are you sure you want to completely remove " + itemName + "?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                if (InventorySQL.deleteItem(id)) {
+                    JOptionPane.showMessageDialog(this, "Item successfully purged from tracking parameters!");
+                    clearFields();
+                    refreshTableData();
+                }
+            }
         } else {
-            JOptionPane.showMessageDialog(this, "Select an item first!");
+            JOptionPane.showMessageDialog(this, "Select an item from the tracking grid layout first!");
         }
     }
     
-    private void updateSummary() {
-        int total = tblModel.getRowCount();
-        int low = 0;
-        double value = 0;
-        for (int i = 0; i < total; i++) {
-            if (tblModel.getValueAt(i, 4).toString().contains("Low")) low++;
-                
-            String price = tblModel.getValueAt(i, 3).toString().replace("₱", "");
-            try { value += Double.parseDouble(price); } catch (Exception e) {}
-        }
-        lblTItem.setText(String.valueOf(total));
-        lblLStock.setText(String.valueOf(low));
-        lblTValue.setText("₱" + value);
+    private void clearFields() {
+        txtItem.setText("");
+        txtQty.setText("");
+        txtPrice.setText("");
+        txtExpiry.setText("");
+        selectedItemId = null;
     }
     
-    private void addSampData() {
-        tblModel.addRow(new Object[]{"Medicine", "Paracetamol", 500, "₱2500", "Good", "2026-12-31"});
-        tblModel.addRow(new Object[]{"Medicine", "Amoxicillin", 300, "₱4500", "Good", "2026-11-15"});
-        tblModel.addRow(new Object[]{"Medicine", "Ibuprofen", 45, "₱1500", "Low Stock", "2026-07-01"});
-        updateSummary();
+    private void startClockTimer() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mm:ss a");
+        lblDT.setText(LocalDateTime.now().format(formatter));
+        Timer timer = new Timer(1000, e -> lblDT.setText(LocalDateTime.now().format(formatter)));
+        timer.start();
     }
 }

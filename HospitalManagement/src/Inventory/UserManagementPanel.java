@@ -1,22 +1,36 @@
 package Inventory;
 
 import static Color_Palette.ColorPalette.*;
+import Database.UserManagementSQL;
+import Models.Employee;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class UserManagementPanel extends JPanel {
     
-    private JPanel pnlMain,tabAdmin,tabDoc,tabNur,pnlSelection,pnlBot,tabUpdate;
+    private JPanel pnlMain, tabAdmin, tabDoc, tabNur, pnlSelection, pnlBot;
     private DefaultTableModel tblModel;
     private JTextField txtName, txtID, txtAge, txtEmail, txtPhone;
-    private String currentRole = "Doctor";
+    private String currentRole = "None"; 
     private JTable tblUM;
-    private JLabel lblAd, lblDoc, lblNur,lbltitle,lblDT,lblName,lblID,lblAge,lblTitle,lblValue, lblDept,
-                   lblEmail, lblPhone, lblStatus;
+    private JLabel lblAd, lblDoc, lblNur, lbltitle, lblDT, lblName, lblID, lblAge, lblDept, lblEmail, lblPhone, lblStatus;
+    private JLabel lblCurrentRole; 
     private JButton btnDoctor, btnNurse, btnAdmin, btnSave, btnEdit, btnDelete, btnRefresh, btnVProfile, btnSCreds, btnCStatus;
+    private JButton btnChooseImage; 
     private JScrollPane srcUM;
     private JComboBox<String> cmbStatus, cmbDept;
+    
+    private String selectedImagePath = "src/profile_images/default.png";
+    private File selectedFileReference = null;
     
     public UserManagementPanel() {
         setLayout(null);
@@ -34,18 +48,26 @@ public class UserManagementPanel extends JPanel {
         lbltitle.setBounds(30, 20, 400, 40);
         pnlMain.add(lbltitle);
         
-        lblDT = new JLabel("May 21, 2026 | 10:00 AM");
+        lblDT = new JLabel();
         lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
         lblDT.setForeground(Color.darkGray);
-        lblDT.setBounds(1390, 20, 400, 40);
+        lblDT.setBounds(1320, 20, 400, 40); 
         pnlMain.add(lblDT);
+
+        startClockTimer();
+
+        lblCurrentRole = new JLabel("Current Role Selected: None");
+        lblCurrentRole.setFont(new Font("Calibri", Font.BOLD | Font.ITALIC, 16));
+        lblCurrentRole.setForeground(darkBlue);
+        lblCurrentRole.setBounds(30, 55, 400, 25);
+        pnlMain.add(lblCurrentRole);
        
         btnAdmin = new JButton("ADMIN");
         btnAdmin.setBackground(darkBlue);
         btnAdmin.setForeground(Color.WHITE);
         btnAdmin.setFont(new Font("Calibri", Font.BOLD, 18));
         btnAdmin.setFocusPainted(false);
-        btnAdmin.setBounds(30, 80, 120, 35);
+        btnAdmin.setBounds(30, 85, 120, 35);
         btnAdmin.addActionListener(e -> switchRole("Admin"));
         pnlMain.add(btnAdmin);
         
@@ -54,7 +76,7 @@ public class UserManagementPanel extends JPanel {
         btnDoctor.setForeground(Color.WHITE);
         btnDoctor.setFont(new Font("Calibri", Font.BOLD, 18));
         btnDoctor.setFocusPainted(false);
-        btnDoctor.setBounds(160, 80, 120, 35);
+        btnDoctor.setBounds(160, 85, 120, 35);
         btnDoctor.addActionListener(e -> switchRole("Doctor"));
         pnlMain.add(btnDoctor);
         
@@ -63,106 +85,116 @@ public class UserManagementPanel extends JPanel {
         btnNurse.setForeground(Color.WHITE);
         btnNurse.setFont(new Font("Calibri", Font.BOLD, 18));
         btnNurse.setFocusPainted(false);
-        btnNurse.setBounds(290, 80, 120, 35);
+        btnNurse.setBounds(290, 85, 120, 35);
         btnNurse.addActionListener(e -> switchRole("Nurse"));
         pnlMain.add(btnNurse);
         
-        tabAdmin = createTab("Admin", "0", darkBlue);
-        tabAdmin.setBounds(30, 130, 250, 60);
+        lblAd = new JLabel("0");
+        tabAdmin = createTab("Admin", lblAd, darkBlue);
+        tabAdmin.setBounds(30, 135, 250, 60);
         pnlMain.add(tabAdmin);
-        lblAd = (JLabel) tabAdmin.getComponent(1);
 
-        tabDoc = createTab("Doctor", "0", mediumBlue);
-        tabDoc.setBounds(300, 130, 250, 60);
+        lblDoc = new JLabel("0");
+        tabDoc = createTab("Doctor", lblDoc, mediumBlue);
+        tabDoc.setBounds(300, 135, 250, 60);
         pnlMain.add(tabDoc);
-        lblDoc = (JLabel) tabDoc.getComponent(1);
 
-        tabNur = createTab("Nurse", "0", lightBlue);
-        tabNur.setBounds(570, 130, 250, 60);
+        lblNur = new JLabel("0");
+        tabNur = createTab("Nurse", lblNur, lightBlue);
+        tabNur.setBounds(570, 135, 250, 60);
         pnlMain.add(tabNur);
-        lblNur = (JLabel) tabNur.getComponent(1);
         
         pnlSelection = new JPanel();
         pnlSelection.setLayout(null);
         pnlSelection.setBackground(Color.WHITE);
         pnlSelection.setBorder(BorderFactory.createLineBorder(borderLBLUE));
-        pnlSelection.setBounds(30, 210, 1350, 120);
+        pnlSelection.setBounds(30, 215, 1350, 120);
         pnlMain.add(pnlSelection);
 
         lblName = new JLabel("Name:");
-        lblName.setBounds(15, 28, 100, 25);
+        lblName.setBounds(15, 25, 100, 25);
         lblName.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblName);
 
         txtName = new JTextField();
-        txtName.setBounds(120, 26, 200, 28);
+        txtName.setBounds(110, 23, 200, 28);
         pnlSelection.add(txtName);
-
-        lblID = new JLabel("ID:");
-        lblID.setBounds(340, 28, 100, 25);
-        lblID.setFont(new Font("Calibri", Font.BOLD, 16));
-        pnlSelection.add(lblID);
-
-        txtID = new JTextField();
-        txtID.setBounds(445, 26, 200, 28);
-        pnlSelection.add(txtID);
-
-        lblAge = new JLabel("Age:");
-        lblAge.setBounds(665, 28, 100, 25);
-        lblAge.setFont(new Font("Calibri", Font.BOLD, 16));
-        pnlSelection.add(lblAge);
-
-        txtAge = new JTextField();
-        txtAge.setBounds(770, 26, 200, 28);
-        pnlSelection.add(txtAge);
         
         lblDept = new JLabel("Department:");
-        lblDept.setBounds(15, 70, 100, 25);
+        lblDept.setBounds(15, 67, 100, 25);
         lblDept.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblDept);
 
         cmbDept = new JComboBox<>(new String[]{"ER","Pediatrics","Surgery","Pharmacy","Radiology","General"});
-        cmbDept.setBounds(120, 68, 200, 28);
+        cmbDept.setBounds(110, 65, 200, 28);
         pnlSelection.add(cmbDept);
+
+        lblID = new JLabel("ID:");
+        lblID.setBounds(340, 25, 100, 25);
+        lblID.setFont(new Font("Calibri", Font.BOLD, 16));
+        pnlSelection.add(lblID);
+
+        txtID = new JTextField();
+        txtID.setBounds(410, 23, 200, 28);
+        txtID.setEditable(false);
+        pnlSelection.add(txtID);
         
         lblStatus = new JLabel("Status:");
-        lblStatus.setBounds(340, 70, 100, 25);
+        lblStatus.setBounds(340, 67, 100, 25);
         lblStatus.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblStatus);
 
         cmbStatus = new JComboBox<>(new String[]{"Active","Inactive","On Leave"});
-        cmbStatus.setBounds(445, 68, 200, 28);
+        cmbStatus.setBounds(410, 65, 200, 28);
         pnlSelection.add(cmbStatus);
 
+        lblAge = new JLabel("Age:");
+        lblAge.setBounds(640, 25, 100, 25);
+        lblAge.setFont(new Font("Calibri", Font.BOLD, 16));
+        pnlSelection.add(lblAge);
+
+        txtAge = new JTextField();
+        txtAge.setBounds(700, 23, 200, 28);
+        pnlSelection.add(txtAge);
+
         lblEmail = new JLabel("Email:");
-        lblEmail.setBounds(665, 70, 100, 25);
+        lblEmail.setBounds(640, 67, 100, 25);
         lblEmail.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblEmail);
 
         txtEmail = new JTextField();
-        txtEmail.setBounds(770, 68, 200, 28);
+        txtEmail.setBounds(700, 65, 200, 28);
         pnlSelection.add(txtEmail);
 
         lblPhone = new JLabel("Phone:");
-        lblPhone.setBounds(990, 28, 100, 25);
+        lblPhone.setBounds(930, 25, 100, 25);
         lblPhone.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblPhone);
 
         txtPhone = new JTextField();
-        txtPhone.setBounds(1095, 26, 200, 28);
+        txtPhone.setBounds(1000, 23, 200, 28);
         pnlSelection.add(txtPhone);
 
+        btnChooseImage = new JButton("Choose Profile Image");
+        btnChooseImage.setBounds(1000, 63, 200, 28);
+        btnChooseImage.setBackground(mediumBlue);
+        btnChooseImage.setForeground(Color.WHITE);
+        btnChooseImage.setFont(new Font("Calibri", Font.BOLD, 13));
+        btnChooseImage.setFocusPainted(false);
+        btnChooseImage.addActionListener(e -> selectProfileImage());
+        pnlSelection.add(btnChooseImage);
+
         btnSave = new JButton("Save");
-        btnSave.setBounds(990, 65, 150, 35);
+        btnSave.setBounds(1215, 23, 115, 32);
         btnSave.setBackground(Green);
         btnSave.setForeground(Color.WHITE);
         btnSave.setFont(new Font("Calibri", Font.BOLD, 14));
         btnSave.setFocusPainted(false);
-        btnSave.addActionListener(e -> addUser(cmbDept, txtEmail, txtPhone));
+        btnSave.addActionListener(e -> addUser());
         pnlSelection.add(btnSave);
 
         btnEdit = new JButton("Edit");
-        btnEdit.setBounds(1150, 65, 150, 35);
+        btnEdit.setBounds(1215, 63, 115, 32);
         btnEdit.setBackground(darkBlue);
         btnEdit.setForeground(Color.WHITE);
         btnEdit.setFont(new Font("Calibri", Font.BOLD, 14));
@@ -234,8 +266,15 @@ public class UserManagementPanel extends JPanel {
         btnCStatus.addActionListener(e -> changeStatus());
         pnlBot.add(btnCStatus);
 
-        disableInputs();
-        addSampData();
+        loadDataFromDatabase(); 
+        switchRole(null);
+    }
+    
+    private void startClockTimer() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mm:ss a");
+        lblDT.setText(LocalDateTime.now().format(formatter));
+        Timer timer = new Timer(1000, e -> lblDT.setText(LocalDateTime.now().format(formatter)));
+        timer.start();
     }
     
     private void disableInputs() {
@@ -246,7 +285,7 @@ public class UserManagementPanel extends JPanel {
         txtPhone.setEnabled(false);
         cmbDept.setEnabled(false);
         cmbStatus.setEnabled(false);
-        btnSave.setEnabled(false);
+        btnChooseImage.setEnabled(false);
     }
 
     private void enableInputs() {
@@ -257,125 +296,269 @@ public class UserManagementPanel extends JPanel {
         txtPhone.setEnabled(true);
         cmbDept.setEnabled(true);
         cmbStatus.setEnabled(true);
-        btnSave.setEnabled(true);
+        btnChooseImage.setEnabled(true);
     }
 
     private void switchRole(String role) {
-        currentRole = role;
-        enableInputs();
-
-        if (role.equals("Admin")) {
-            txtID.setText("ADM");
-        } else if (role.equals("Doctor")) {
-            txtID.setText("DCT");
-        } else if (role.equals("Nurse")) {
-            txtID.setText("NRS");
-        }
-        
-        JOptionPane.showMessageDialog(this, "Current Role: " + role);
-    }
-    
-    private JPanel createTab(String title, String value, Color color) {
-        tabUpdate = new JPanel();
-        tabUpdate.setLayout(null);
-        tabUpdate.setBackground(color);
-
-        JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(new Font("Calibri", Font.BOLD, 20));
-        lblTitle.setForeground(Color.WHITE);
-        lblTitle.setBounds(20, 20, 200, 25);
-        tabUpdate.add(lblTitle);
-
-        JLabel lblValue = new JLabel(value);
-        lblValue.setFont(new Font("Calibri", Font.BOLD, 28));
-        lblValue.setForeground(Color.WHITE);
-        lblValue.setBounds(200, 20, 100, 25);
-        tabUpdate.add(lblValue);
-
-        return tabUpdate;
-    }
-    
-    private void addUser(JComboBox<String> cmbDept, JTextField txtEmail, JTextField txtPhone) {
-        String name = txtName.getText().trim();
-        String id = txtID.getText().trim();
-        String age = txtAge.getText().trim();
-        String dept = cmbDept.getSelectedItem().toString();
-        String email = txtEmail.getText().trim();
-        String phone = txtPhone.getText().trim();
-        String status = cmbStatus.getSelectedItem().toString();
-        
-        if (name.isEmpty() || id.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter NAME and ID!");
+        if (role == null || role.equalsIgnoreCase("None")) {
+            currentRole = "None";
+            lblCurrentRole.setText("Current Role Selected: None");
+            txtID.setText("");
+            disableInputs();
             return;
         }
         
-        if (currentRole.equals("Admin") && !id.startsWith("ADM")) {
-            id = "ADM" + id;
-        } else if (currentRole.equals("Doctor") && !id.startsWith("DCT")) {
-            id = "DCT" + id;
-        } else if (currentRole.equals("Nurse") && !id.startsWith("NRS")) {
-            id = "NRS" + id;
-        }
+        currentRole = role;
+        lblCurrentRole.setText("Current Role Selected: " + role);
+        enableInputs();
+        txtID.setEditable(false); 
 
-        for (int i = 0; i < tblModel.getRowCount(); i++) {
-            String existingId = tblModel.getValueAt(i, 1).toString();
-                if (existingId.equalsIgnoreCase(id)) {
-                    JOptionPane.showMessageDialog(this, "Duplicate ID not allowed!");
-                    return;
+        String prefix = "";
+        if (role.equals("Admin")) prefix = "ADM";
+        else if (role.equals("Doctor")) prefix = "DCT";
+        else if (role.equals("Nurse")) prefix = "NRS";
+
+        String nextCalculatedId = UserManagementSQL.getNextIdByRole(prefix);
+        txtID.setText(nextCalculatedId);
+    }
+
+    private void selectProfileImage() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select Profile Image");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Image Files", "png", "jpg", "jpeg", "gif"));
+        
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            selectedFileReference = fileChooser.getSelectedFile();
+            btnChooseImage.setText(selectedFileReference.getName()); 
         }
     }
+
+    private String saveImageToProjectFolder(String employeeId) {
+        if (selectedFileReference == null) {
+            return selectedImagePath; 
+        }
+        try {
+            File directory = new File("src/profile_images");
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            
+            String extension = ".png";
+            String name = selectedFileReference.getName();
+            int dotIndex = name.lastIndexOf('.');
+            if (dotIndex > 0) {
+                extension = name.substring(dotIndex);
+            }
+            
+            String relativePath = "src/profile_images/" + employeeId + extension;
+            File targetLocation = new File(relativePath);
+            
+            Files.copy(selectedFileReference.toPath(), targetLocation.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return relativePath;
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to save the image locally.", "File Error", JOptionPane.ERROR_MESSAGE);
+            return "src/profile_images/default.png";
+        }
+    }
+    
+    private JPanel createTab(String title, JLabel valueLabel, Color color) {
+        JPanel containerTab = new JPanel();
+        containerTab.setLayout(null);
+        containerTab.setBackground(color);
+
+        JLabel lblTabTitle = new JLabel(title);
+        lblTabTitle.setFont(new Font("Calibri", Font.BOLD, 20));
+        lblTabTitle.setForeground(Color.WHITE);
+        lblTabTitle.setBounds(20, 15, 150, 25);
+        containerTab.add(lblTabTitle);
+
+        valueLabel.setFont(new Font("Calibri", Font.BOLD, 28));
+        valueLabel.setForeground(Color.WHITE);
+        valueLabel.setBounds(180, 12, 60, 30);
+        containerTab.add(valueLabel);
+
+        return containerTab;
+    }
+    
+    private void loadDataFromDatabase() {
+        tblModel.setRowCount(0); 
+        List<Employee> employeeList = UserManagementSQL.getAllEmployees();
         
-        tblModel.addRow(new Object[]{name, id, age, currentRole, status, dept, email, phone});
-        
-        txtName.setText("");
-        txtID.setText("");
-        txtAge.setText("");
-        cmbDept.setSelectedIndex(0);
-        txtEmail.setText("");
-        txtPhone.setText("");
-        cmbStatus.setSelectedIndex(0);
+        for (Employee emp : employeeList) {
+            tblModel.addRow(new Object[]{
+                emp.getName(),
+                emp.getId(),
+                emp.getAge(),
+                emp.getRole(),
+                emp.getStatus(),
+                emp.getDepartment(),
+                emp.getEmail(),
+                emp.getPhone()
+            });
+        }
         updateSummary();
+    }
+    
+    private void addUser() {
+        if (currentRole.equals("None")) {
+            JOptionPane.showMessageDialog(this, "Please select an operational role (ADMIN, DOCTOR, or NURSE) first!", "Action Blocked", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String name = txtName.getText().trim();
+        String id = txtID.getText().trim();
+        String ageStr = txtAge.getText().trim();
+        String email = txtEmail.getText().trim();
+        String phone = txtPhone.getText().trim();
         
-        JOptionPane.showMessageDialog(this, currentRole + " added successfully!");
+        Object selectedDept = cmbDept.getSelectedItem();
+        Object selectedStatus = cmbStatus.getSelectedItem();
+        String dept = (selectedDept != null) ? selectedDept.toString() : "General";
+        String status = (selectedStatus != null) ? selectedStatus.toString() : "Active";
+
+        if (name.isEmpty() || id.isEmpty() || ageStr.isEmpty() || email.isEmpty() || phone.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "All form text fields are mandatory. Please complete the form!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (!Pattern.matches("^[a-zA-Z\\s.\\-]+$", name)) {
+            JOptionPane.showMessageDialog(this, "Invalid Name format! Names must contain letters and standard spaces only.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int age = 0;
+        try {
+            age = Integer.parseInt(ageStr);
+            if (age < 18 || age > 100) {
+                JOptionPane.showMessageDialog(this, "Age boundary rule violation! Employees must be between 18 and 100 years old.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(this, "Please clear non-numeric characters out of the Age field!", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+        if (!Pattern.matches(emailRegex, email)) {
+            JOptionPane.showMessageDialog(this, "Invalid Email structure! Please use a standard address layout (e.g., user@domain.com).", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (!Pattern.matches("^\\+?[0-9\\s\\-]{7,15}$", phone)) {
+            JOptionPane.showMessageDialog(this, "Invalid Phone format! Use numbers, spaces, or dashes (7-15 digits long).", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        boolean isEdit = false;
+        int selectedRow = tblUM.getSelectedRow();
+        if (selectedRow >= 0 && tblModel.getValueAt(selectedRow, 1).toString().equalsIgnoreCase(id)) {
+            isEdit = true;
+        }
+
+        String defaultUsername;
+        String[] nameParts = name.split("\\s+");
+        if (nameParts.length > 0) {
+            String lastName = nameParts[nameParts.length - 1].toLowerCase();
+            defaultUsername = lastName + "." + dept.toLowerCase();
+        } else {
+            defaultUsername = name.toLowerCase() + "." + dept.toLowerCase();
+        }
+        
+        String defaultPassword = id;
+        String finalImagePath = saveImageToProjectFolder(id);
+
+        Employee newEmployee = new Employee(name, id, age, currentRole, status, dept, email, phone, defaultUsername, defaultPassword, finalImagePath);
+        boolean dbSuccess;
+        
+        if (isEdit) {
+            dbSuccess = UserManagementSQL.updateEmployee(newEmployee);
+        } else {
+            dbSuccess = UserManagementSQL.insertEmployee(newEmployee);
+        }
+        
+        if (dbSuccess) {
+            loadDataFromDatabase(); 
+            
+            txtName.setText("");
+            txtID.setText("");
+            txtAge.setText("");
+            cmbDept.setSelectedIndex(0);
+            txtEmail.setText("");
+            txtPhone.setText("");
+            cmbStatus.setSelectedIndex(0);
+            btnChooseImage.setText("Choose Profile Image");
+            
+            selectedImagePath = "src/profile_images/default.png";
+            selectedFileReference = null;
+            
+            switchRole(currentRole); 
+            
+            JOptionPane.showMessageDialog(this, currentRole + " records processed and written successfully!");
+        } else {
+            JOptionPane.showMessageDialog(this, "SQL transaction was aborted by database connector layers.");
+        }
     }
     
     private void changeStatus() {
         int row = tblUM.getSelectedRow();
-            if (row >= 0) {
-                String currentStatus = tblModel.getValueAt(row, 4).toString();
-                String[] options = {"Active", "Inactive", "On Leave"};
-                String newStatus = (String) JOptionPane.showInputDialog(
-                                this,
-                                "Change status:",
-                                "Update Employee Status",
-                                JOptionPane.PLAIN_MESSAGE,
-                                null,
-                                options,
-                                currentStatus);
-                
-        if (newStatus != null) {
-            tblModel.setValueAt(newStatus, row, 4);
-            JOptionPane.showMessageDialog(this, "Status updated to " + newStatus);
+        if (row >= 0) {
+            String targetId = tblModel.getValueAt(row, 1).toString();
+            String currentStatus = tblModel.getValueAt(row, 4).toString();
+            String[] options = {"Active", "Inactive", "On Leave"};
+            String newStatus = (String) JOptionPane.showInputDialog(
+                            this, "Change status:", "Update Employee Status",
+                            JOptionPane.PLAIN_MESSAGE, null, options, currentStatus);
+            
+            if (newStatus != null) {
+                if (UserManagementSQL.updateStatus(targetId, newStatus)) {
+                    tblModel.setValueAt(newStatus, row, 4);
+                    updateSummary();
+                    JOptionPane.showMessageDialog(this, "Status updated to " + newStatus);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to update status.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Select an employee to change status!");
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Select an employee to change status!");
     }
-}
     
     private void editUser() {
+        if (currentRole.equals("None")) {
+            JOptionPane.showMessageDialog(this, "Please select an operational role (ADMIN, DOCTOR, or NURSE) first!", "Action Blocked", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         int row = tblUM.getSelectedRow();
         if (row >= 0) {
+            String empId = tblModel.getValueAt(row, 1).toString();
             txtName.setText(tblModel.getValueAt(row, 0).toString());
-            txtID.setText(tblModel.getValueAt(row, 1).toString());
+            txtID.setText(empId);
             txtAge.setText(tblModel.getValueAt(row, 2).toString());
             
-            String role = tblModel.getValueAt(row, 3).toString();
-            currentRole = role;
+            currentRole = tblModel.getValueAt(row, 3).toString();
+            lblCurrentRole.setText("Current Role Selected: " + currentRole);
             
             cmbStatus.setSelectedItem(tblModel.getValueAt(row, 4).toString());
             cmbDept.setSelectedItem(tblModel.getValueAt(row, 5).toString());
             txtEmail.setText(tblModel.getValueAt(row, 6).toString());
             txtPhone.setText(tblModel.getValueAt(row, 7).toString());
+            
+            List<Employee> list = UserManagementSQL.getAllEmployees();
+            for (Employee e : list) {
+                if (e.getId().equalsIgnoreCase(empId)) {
+                    selectedImagePath = e.getProfileImage();
+                    File imgFile = new File(selectedImagePath);
+                    btnChooseImage.setText(imgFile.exists() ? imgFile.getName() : "Choose Profile Image");
+                    break;
+                }
+            }
+            
+            enableInputs();
+            txtID.setEditable(false); 
             
             JOptionPane.showMessageDialog(this, "Edit the details and click SAVE");
         } else {
@@ -387,11 +570,18 @@ public class UserManagementPanel extends JPanel {
         int row = tblUM.getSelectedRow();
         if (row >= 0) {
             String name = tblModel.getValueAt(row, 0).toString();
+            String idToDelete = tblModel.getValueAt(row, 1).toString();
+            
             int confirm = JOptionPane.showConfirmDialog(this, "Delete " + name + "?", "Confirm", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                tblModel.removeRow(row);
-                updateSummary();
-                JOptionPane.showMessageDialog(this, "User deleted!");
+                if (UserManagementSQL.deleteEmployee(idToDelete)) {
+                    tblModel.removeRow(row);
+                    updateSummary();
+                    switchRole(currentRole);
+                    JOptionPane.showMessageDialog(this, "User deleted!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to delete user record.");
+                }
             }
         } else {
             JOptionPane.showMessageDialog(this, "Select a user to delete!");
@@ -403,9 +593,9 @@ public class UserManagementPanel extends JPanel {
         int admin = 0, doctor = 0, nurse = 0;
         for (int i = 0; i < total; i++) {
             String role = tblModel.getValueAt(i, 3).toString();
-                if (role.equals("Admin")) admin++;
-                if (role.equals("Doctor")) doctor++;
-                if (role.equals("Nurse")) nurse++;
+            if (role.equalsIgnoreCase("Admin")) admin++;
+            if (role.equalsIgnoreCase("Doctor")) doctor++;
+            if (role.equalsIgnoreCase("Nurse")) nurse++;
         }
         lblAd.setText(String.valueOf(admin));
         lblDoc.setText(String.valueOf(doctor));
@@ -413,14 +603,32 @@ public class UserManagementPanel extends JPanel {
     }
     
     private void refreshTable() {
-        tblModel.setRowCount(0);
-        addSampData();
-        JOptionPane.showMessageDialog(this, "Table refreshed!");
+        loadDataFromDatabase();
+        txtName.setText("");
+        txtAge.setText("");
+        txtEmail.setText("");
+        txtPhone.setText("");
+        btnChooseImage.setText("Choose Profile Image");
+        selectedImagePath = "src/profile_images/default.png";
+        selectedFileReference = null;
+        switchRole("None");
+        JOptionPane.showMessageDialog(this, "Table synchronized with Database values!");
     }
     
     private void viewProfile() {
         int row = tblUM.getSelectedRow();
         if (row >= 0) {
+            String empId = tblModel.getValueAt(row, 1).toString();
+            String imgPath = "src/profile_images/default.png";
+            
+            List<Employee> list = UserManagementSQL.getAllEmployees();
+            for (Employee e : list) {
+                if (e.getId().equalsIgnoreCase(empId)) {
+                    imgPath = e.getProfileImage();
+                    break;
+                }
+            }
+
             String profile = 
                 "Employee Profile:\n\n" +
                 "Name: " + tblModel.getValueAt(row, 0) + "\n" +
@@ -430,9 +638,10 @@ public class UserManagementPanel extends JPanel {
                 "Status: " + tblModel.getValueAt(row, 4) + "\n" +
                 "Department: " + tblModel.getValueAt(row, 5) + "\n" +
                 "Email: " + tblModel.getValueAt(row, 6) + "\n" +
-                "Phone: " + tblModel.getValueAt(row, 7);
+                "Phone: " + tblModel.getValueAt(row, 7) + "\n" +
+                "Image Path: " + imgPath; 
 
-            JOptionPane.showMessageDialog(this, profile,"Profile Details",JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, profile, "Profile Details", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this, "Select an employee to view profile!");
         }
@@ -453,16 +662,5 @@ public class UserManagementPanel extends JPanel {
         } else {
             JOptionPane.showMessageDialog(this, "Select an employee to send credentials!");
         }
-    }
-    
-    private void addSampData() {
-        tblModel.addRow(new Object[]{"Admin John Smith", "ADM001", "45", "Admin", "Active", "General", "john.smith@hospital.com", "09171234567"});
-        tblModel.addRow(new Object[]{"Dr. Sarah Lee", "DCT001", "38", "Doctor", "Active", "Surgery", "sarah.lee@hospital.com", "09181234567"});
-        tblModel.addRow(new Object[]{"Nurse Emma Watson", "NRS001", "29", "Nurse", "Active", "Pediatrics", "emma.watson@hospital.com", "09191234567"});
-        tblModel.addRow(new Object[]{"Nurse Olivia Brown", "NRS002", "32", "Nurse", "Active", "ER", "olivia.brown@hospital.com", "09201234567"});
-        tblModel.addRow(new Object[]{"Admin Mike Ross", "ADM002", "41", "Admin", "Active", "Pharmacy", "mike.ross@hospital.com", "09211234567"});
-        tblModel.addRow(new Object[]{"Admin Rachel Green", "ADM003", "35", "Admin", "Active", "Radiology", "rachel.green@hospital.com", "09221234567"});
-
-        updateSummary();
     }
 }
