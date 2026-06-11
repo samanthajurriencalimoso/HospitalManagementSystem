@@ -186,4 +186,19 @@ public class UserManagementSQL {
             return false;
         }
     }
+    
+    public static List<String> getAllActiveDoctors() {
+        List<String> doctors = new ArrayList<>();
+        String sql = "SELECT name FROM employees WHERE UPPER(role) = 'DOCTOR' AND UPPER(status) = 'ACTIVE' ORDER BY name ASC";
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                doctors.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return doctors;
+    }
 }

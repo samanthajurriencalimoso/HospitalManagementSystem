@@ -1,4 +1,4 @@
-package Generating_Reports_Admin;
+package Generating_Report_Nurses;
 
 import static Color_Palette.ColorPalette.*;
 import java.awt.*;
@@ -8,15 +8,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javax.swing.*;
 
-public class Admin_Reports extends JPanel implements ActionListener{
+public class AppointmentNurse extends JPanel implements ActionListener{
     
-    private JButton btnPrescriptionReport, btnEdit, btnSend, btnEx, btnMComplete, btnMIncomplete, btnMMissing;
-    private JLabel lblType, lblAdmin, lblDT, lbltext, lblRType, lblPrev, lblStatus;
-    private JPanel pnlMain, pnlRType, pnlB, pnlPrev;
-    private String currentReportType = "";
+    private JButton btnMedication, btnVitals, btnCareTask, btnSend, btnEdit, btnPrint,btnMComplete, btnMIncomplete, btnMMissing;
+    private JLabel lblType, lblStatus, lblDT,lblNurse,lbltext,lblRType,lblPrev;
+    private JPanel pnlMain, pnlPrev,pnlRType, pnlB;
     private JScrollPane scroll;
+    private String currentReportType = "";
     
-    public Admin_Reports() {
+    public AppointmentNurse() {
         setLayout(null);
         setBounds(0, 0, 1620, 930);
         
@@ -26,11 +26,11 @@ public class Admin_Reports extends JPanel implements ActionListener{
         pnlMain.setBounds(0, 0, 1620, 930);
         add(pnlMain);
         
-        lblAdmin = new JLabel("Admin Reports");
-        lblAdmin.setBounds(30, 20, 300, 50);
-        lblAdmin.setFont(new Font("Calibri", Font.BOLD, 28));
-        lblAdmin.setForeground(Color.BLACK);
-        pnlMain.add(lblAdmin);
+        lblNurse = new JLabel("Nurse Reports");
+        lblNurse.setBounds(30, 20, 300, 50);
+        lblNurse.setFont(new Font("Calibri", Font.BOLD, 28));
+        lblNurse.setForeground(Color.BLACK);
+        pnlMain.add(lblNurse);
         
         lblDT = new JLabel();
         lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
@@ -45,15 +45,15 @@ public class Admin_Reports extends JPanel implements ActionListener{
         lblType.setForeground(Color.BLACK);
         pnlMain.add(lblType);
         
-        lbltext = new JLabel("Manage financial, operational, and compliance documents.");
-        lbltext.setBounds(30, 60, 500, 50);
-        lbltext.setFont(new Font("Calibri", Font.PLAIN, 20));
+        lbltext = new JLabel("Manage medication, appointment history, and care task documents.");
+        lbltext.setBounds(30, 60, 500, 30);
+        lbltext.setFont(new Font("Calibri", Font.PLAIN, 18));
         lbltext.setForeground(Color.BLACK);
         pnlMain.add(lbltext);
         
         pnlRType = new JPanel();
         pnlRType.setLayout(null);
-        pnlRType.setBounds(30, 110, 450, 750);
+        pnlRType.setBounds(30, 110, 450, 800);
         pnlRType.setBackground(Color.WHITE);
         pnlMain.add(pnlRType);
         
@@ -62,25 +62,40 @@ public class Admin_Reports extends JPanel implements ActionListener{
         lblRType.setFont(new Font("Calibri", Font.BOLD, 24));
         pnlRType.add(lblRType);
         
-        btnPrescriptionReport = new JButton("Appointment History");
-        btnPrescriptionReport.setBounds(20, 70, 400, 70);
-        btnPrescriptionReport.setFont(new Font("Calibri", Font.BOLD, 18));
-        btnPrescriptionReport.setBackground(Color.WHITE);
-        btnPrescriptionReport.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
-        pnlRType.add(btnPrescriptionReport);
+        btnMedication = new JButton("Medication Administration Log");
+        btnMedication.setBounds(20, 70, 400, 80);
+        btnMedication.setFont(new Font("Calibri", Font.BOLD, 18));
+        btnMedication.setBackground(Color.WHITE);
+        btnMedication.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
+        pnlRType.add(btnMedication);
         
-        btnPrescriptionReport.addActionListener(this);
+        btnVitals = new JButton("Appointment History");
+        btnVitals.setBounds(20, 170, 400, 80);
+        btnVitals.setFont(new Font("Calibri", Font.BOLD, 20));
+        btnVitals.setBackground(Color.WHITE);
+        btnVitals.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
+        pnlRType.add(btnVitals);
+        
+        btnCareTask = new JButton("Care Task Summary");
+        btnCareTask.setBounds(20, 270, 400, 80);
+        btnCareTask.setFont(new Font("Calibri", Font.BOLD, 20));
+        btnCareTask.setBackground(Color.WHITE);
+        btnCareTask.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
+        pnlRType.add(btnCareTask);
+        
+        btnMedication.addActionListener(this);
+        btnVitals.addActionListener(this);
+        btnCareTask.addActionListener(this);
         
         pnlB = new JPanel();
         pnlB.setLayout(null);
-        pnlB.setBounds(500, 110, 1100, 1000);
+        pnlB.setBounds(500, 110, 1100, 800);
         pnlB.setBackground(Color.WHITE);
         pnlMain.add(pnlB);
-        
+
         lblPrev = new JLabel("Report Preview");
-        lblPrev.setBounds(30, 20, 250, 40);
+        lblPrev.setBounds(30, 20, 200, 40);
         lblPrev.setFont(new Font("Calibri", Font.BOLD, 24));
-        lblPrev.setForeground(Color.BLACK);
         pnlB.add(lblPrev);
         
         btnMComplete = new JButton("Complete");
@@ -91,14 +106,14 @@ public class Admin_Reports extends JPanel implements ActionListener{
         pnlB.add(btnMComplete);
         
         btnMIncomplete = new JButton("Incomplete");
-        btnMIncomplete.setBounds(470, 25, 100, 30);
+        btnMIncomplete.setBounds(470, 25, 100, 28);
         btnMIncomplete.setBackground(Yellow);
         btnMIncomplete.setForeground(Color.BLACK);
         btnMIncomplete.addActionListener(e -> setStatus("Incomplete"));
         pnlB.add(btnMIncomplete);
         
         btnMMissing = new JButton("Missing");
-        btnMMissing.setBounds(590, 25, 100, 30);
+        btnMMissing.setBounds(590, 25, 100, 28);
         btnMMissing.setBackground(LightRed);
         btnMMissing.setForeground(Color.WHITE);
         btnMMissing.addActionListener(e -> setStatus("Missing"));
@@ -114,6 +129,7 @@ public class Admin_Reports extends JPanel implements ActionListener{
         pnlPrev.setLayout(null);
         pnlPrev.setBackground(Color.WHITE);
         pnlPrev.setPreferredSize(new Dimension(1020, 920));
+        pnlMain.add(pnlPrev);
         
         scroll = new JScrollPane(pnlPrev);
         scroll.setBounds(30, 70, 1050, 650);
@@ -125,29 +141,26 @@ public class Admin_Reports extends JPanel implements ActionListener{
         
         btnEdit = new JButton("Edit Report");
         btnEdit.setBounds(500, 730, 150, 35);
-        btnEdit.setFont(new Font("Calibri", Font.BOLD, 16));
         btnEdit.setBackground(darkBlue);
         btnEdit.setForeground(Color.WHITE);
         btnEdit.addActionListener(e -> editReport());
         pnlB.add(btnEdit);
         
-        btnSend = new JButton("Send to Patient");
+        btnSend = new JButton("Send to Doctor");
         btnSend.setBounds(660, 730, 170, 35);
-        btnSend.setFont(new Font("Calibri", Font.BOLD, 16));
         btnSend.setBackground(Green);
         btnSend.setForeground(Color.BLACK);
         btnSend.addActionListener(e -> sendReport());
         pnlB.add(btnSend);
         
-        btnEx = new JButton("Export (CSV)");
-        btnEx.setBounds(840, 730, 180, 35);
-        btnEx.setFont(new Font("Calibri", Font.BOLD, 16));
-        btnEx.setBackground(LightGray);
-        btnEx.setForeground(Color.BLACK);
-        btnEx.addActionListener(e -> exportReport());
-        pnlB.add(btnEx);
+        btnPrint = new JButton("Print Report");
+        btnPrint.setBounds(840, 730, 180, 35);
+        btnPrint.setBackground(LightGray);
+        btnPrint.setForeground(Color.BLACK);
+        btnPrint.addActionListener(e -> printReport());
+        pnlB.add(btnPrint);
     }
-
+    
     private void setStatus(String status) {
         if (currentReportType.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please select a report first!");
@@ -156,7 +169,7 @@ public class Admin_Reports extends JPanel implements ActionListener{
         lblStatus.setText("Status: " + status);
         
         switch (status) {
-            case "Complete": lblStatus.setForeground(Green); break;
+            case "Complete": lblStatus.setForeground(new Color(0, 150, 0)); break;
             case "Incomplete": lblStatus.setForeground(new Color(255, 140, 0)); break;
             case "Missing": lblStatus.setForeground(Color.RED); break;
             default: lblStatus.setForeground(Color.BLACK);
@@ -175,30 +188,27 @@ public class Admin_Reports extends JPanel implements ActionListener{
         if (currentReportType.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please select a report first!");
             return;
-        } else if (currentReportType.equals("Staff Attendance")) {
-            JOptionPane.showMessageDialog(this, "Staff Attendance Report cannot be sent to patients.");
-            return;
         }
-        setStatus("Sent to Patient");
-        JOptionPane.showMessageDialog(this, "Sending " + currentReportType + " to Patient for approval...");
+        setStatus("Sent to Doctor");
+        JOptionPane.showMessageDialog(this, "Sending " + currentReportType + " to Doctor for review...");
     }
     
-    private void exportReport() {
+    private void printReport() {
         if (currentReportType.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please select a report first!");
             return;
         }
-        JOptionPane.showMessageDialog(this, "Exporting " + currentReportType + "...");
+        JOptionPane.showMessageDialog(this, "Printing " + currentReportType + "...");
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if (ae.getSource() == btnPrescriptionReport) {
+         if (ae.getSource() == btnVitals) {
             pnlPrev.removeAll();
-            AppointmentAdmin pr = new AppointmentAdmin();
-            pr.setBounds(0, 0, 1020, 820);
-            pnlPrev.setPreferredSize(new Dimension(1020, 820));
-            pnlPrev.add(pr);
+            AppointmentNurse vs = new AppointmentNurse();
+            vs.setBounds(0, 0, 1020, 620);
+            pnlPrev.setPreferredSize(new Dimension(1020, 620));
+            pnlPrev.add(vs);
             pnlPrev.revalidate();
             pnlPrev.repaint();
             scroll.getVerticalScrollBar().setValue(0);
@@ -206,8 +216,7 @@ public class Admin_Reports extends JPanel implements ActionListener{
             lblStatus.setText("Status: Incomplete");
             lblStatus.setForeground(new Color(255, 140, 0));
             lblType.setText(" > Appointment History");
-            btnSend.setVisible(true);
-        }
+        } 
     }
     
     private void startClockTimer() {
@@ -217,3 +226,4 @@ public class Admin_Reports extends JPanel implements ActionListener{
         timer.start();
     }
 }
+

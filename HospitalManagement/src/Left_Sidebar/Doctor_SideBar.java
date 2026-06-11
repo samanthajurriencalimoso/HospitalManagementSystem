@@ -4,7 +4,9 @@ import Prescriptions.Prescription_Doctor;
 import Appointments.Doctor_SchedAppointment;
 import static Color_Palette.ColorPalette.*;
 import Dashboard.Doctor_Dashboard;
+import Database.PatientManagementSQL;
 import Generating_Report_Doctors.Doctor_Report;
+import Inventory.LogisticsPanel;
 import Inventory.RequestPanel_Doctor;
 import Login_Startup.Login;
 import MedicalHistory.MedicalHistory_Doctor;
@@ -22,6 +24,11 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
     private ImageIcon imgDlogo;
     private Image imgbg;
     private Doctor_SideBarFrame navPage;
+    private LogisticsPanel logisticsPanel = new LogisticsPanel();
+    
+    public LogisticsPanel getLogisticsPanel() {
+        return this.logisticsPanel;
+    }
     
     public Doctor_SideBar(Doctor_SideBarFrame navPage) {
         this.navPage = navPage;
@@ -128,11 +135,23 @@ public class Doctor_SideBar extends JPanel implements ActionListener{
             }
         } else if (ae.getSource() == btnDashboard) {
             navPage.turnPage(new Doctor_Dashboard());
-        } else if (ae.getSource() == btnProfile) {
-            navPage.turnPage(new PatientInfo_Doctor());
-        } else if (ae.getSource() == btnMHis) {
-            navPage.turnPage(new MedicalHistory_Doctor());
-        } else if (ae.getSource() == btnPres) {
+       } else if (ae.getSource() == btnProfile) {
+    String patientName = PatientManagementSQL.getCurrentPatientName();
+    if (patientName == null || patientName.isEmpty()) {
+        JOptionPane.showMessageDialog(navPage, "No patient selected. Please select a patient from the dashboard or appointments first.");
+        navPage.turnPage(new PatientInfo_Doctor());   // empty panel (or could show an error)
+    } else {
+        navPage.turnPage(new PatientInfo_Doctor(patientName));
+    }
+} else if (ae.getSource() == btnMHis) {
+    String patientName = PatientManagementSQL.getCurrentPatientName();
+    if (patientName == null || patientName.isEmpty()) {
+        JOptionPane.showMessageDialog(navPage, "No patient selected. Please select a patient from the dashboard or appointments first.");
+        navPage.turnPage(new MedicalHistory_Doctor());
+    } else {
+        navPage.turnPage(new MedicalHistory_Doctor(patientName));
+    }
+} else if (ae.getSource() == btnPres) {
             navPage.turnPage(new  Prescription_Doctor());
         } else if (ae.getSource() == btnAppointment) {
             navPage.turnPage(new  Doctor_SchedAppointment());

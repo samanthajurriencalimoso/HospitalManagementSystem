@@ -21,7 +21,6 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
     private JButton btnDashboard, btnUManagement, btnPInfo, btnAppointment, btnInventory, btnPOptions, btnIManagement, btnLogistics, btnReport, btnLogout, btnDesign, btnLout;
     private ImageIcon imgDlogo;
     private Image imgbg;
-    private JRadioButton rbtnDarkMode;
     private Admin_SideBarFrame navPage;
     
     public Admin_Sidebar(Admin_SideBarFrame navPage) {

@@ -4,6 +4,7 @@ import Prescriptions.Prescription_Nurse;
 import Appointments.Nurse_SchedAppointment;
 import static Color_Palette.ColorPalette.*;
 import Dashboard.Nurse_Dashboard;
+import Database.PatientManagementSQL;
 import Generating_Report_Nurses.Nurses_Report;
 import Inventory.RequestPanel_Nurse;
 import Login_Startup.Login;
@@ -129,10 +130,22 @@ public class Nurse_SideBar extends JPanel implements ActionListener{
         } else if (ae.getSource() == btnDashboard) {
             navPage.turnPage(new Nurse_Dashboard());
         } else if (ae.getSource() == btnProfile) {
-            navPage.turnPage(new PatientInfo_Nurse());
-        } else if (ae.getSource() == btnMHis) {
-            navPage.turnPage(new MedicalHistory_Nurse());
-        } else if (ae.getSource() == btnPres) {
+    String patientName = PatientManagementSQL.getCurrentPatientName();
+    if (patientName == null || patientName.isEmpty()) {
+        JOptionPane.showMessageDialog(navPage, "No patient selected. Please select a patient from the dashboard or appointments first.");
+        navPage.turnPage(new PatientInfo_Nurse());
+    } else {
+        navPage.turnPage(new PatientInfo_Nurse(patientName));
+    }
+} else if (ae.getSource() == btnMHis) {
+    String patientName = PatientManagementSQL.getCurrentPatientName();
+    if (patientName == null || patientName.isEmpty()) {
+        JOptionPane.showMessageDialog(navPage, "No patient selected. Please select a patient from the dashboard or appointments first.");
+        navPage.turnPage(new MedicalHistory_Nurse());
+    } else {
+        navPage.turnPage(new MedicalHistory_Nurse(patientName));
+    }
+} else if (ae.getSource() == btnPres) {
             navPage.turnPage(new Prescription_Nurse());
         } else if (ae.getSource() == btnAppointment) {
             navPage.turnPage(new  Nurse_SchedAppointment());

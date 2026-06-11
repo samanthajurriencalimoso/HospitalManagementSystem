@@ -9,6 +9,7 @@ import Models.Patient;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -19,10 +20,11 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
 
     private JPanel pnlMain, tabPatients, tabAdmitted, tabCompleted, tabPending, tabUr, pnlSelection, pnlBot, tabUpdate;
     private DefaultTableModel tblModel;
-    private JTextField txtTreatment, txtDate;
-    private JComboBox<String> cmbPatient, cmbDoc;
+    private JTextField txtTreatment, txtDate; 
+    private JSpinner spnTime;
+    private JComboBox<String> cmbPatient, cmbDoc; 
     private JTable tblAppoint;
-    private JLabel lblTitle, lblDT, lblPatient, lblDoc, lblTreatment, lblDate, lblTPatient, lblUCases, lblPAppointments, 
+    private JLabel lblTitle, lblDT, lblPatient, lblDoc, lblTreatment, lblDate, lblTime, lblTPatient, lblUCases, lblPAppointments, 
                     lblTitle2, lblValue, lblAdmitted, lblCompleted;
     private JButton btnAdd, btnEdit, btnRev, btnChangeStatus;
     private JScrollPane srcApp;
@@ -48,7 +50,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
         lblDT = new JLabel();
         lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
         lblDT.setForeground(Color.darkGray);
-        lblDT.setBounds(1320, 20, 400, 40);
+        lblDT.setBounds(1390, 20, 400, 40);
         pnlMain.add(lblDT);
         
         startClockTimer();
@@ -120,8 +122,20 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
         txtDate = new JTextField();
         txtDate.setBounds(165, 53, 120, 28);
         pnlSelection.add(txtDate);
-        
         txtDate.setText(java.time.LocalDate.now().toString());
+        
+        lblTime = new JLabel("Time (HH:mm):");
+        lblTime.setBounds(300, 55, 120, 25);
+        lblTime.setFont(new Font("Calibri", Font.BOLD, 16));
+        pnlSelection.add(lblTime);
+
+        SpinnerDateModel timeModel = new SpinnerDateModel();
+        timeModel.setValue(new java.util.Date());
+        spnTime = new JSpinner(timeModel);
+        JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(spnTime, "HH:mm");
+        spnTime.setEditor(timeEditor);
+        spnTime.setBounds(420, 53, 80, 28);
+        pnlSelection.add(spnTime);
 
         btnAdd = new JButton("Save Appointment");
         btnAdd.setBounds(920, 10, 160, 35);
@@ -193,7 +207,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
         for (Patient p : activePatients) {
             cmbPatient.addItem(p.getName());
         }
- 
+
         List<String> activeDoctors = UserManagementSQL.getActiveEmployeeNamesByRole("Doctor");
         for (String docName : activeDoctors) {
             cmbDoc.addItem("Dr. " + docName);
@@ -227,8 +241,9 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
         tblModel.setRowCount(0);
         List<Appointment> list = AppointmentSQL.getAllAppointments();
         
-        int total = list.size();
+        int todayAppointmentsCount = 0;
         int pending = 0, admitted = 0, urgent = 0, completed = 0;
+        String todayString = LocalDate.now().toString();
 
         for (Appointment app : list) {
             tblModel.addRow(new Object[]{
@@ -240,6 +255,10 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
                 app.getAppointmentDate()
             });
             
+            if (app.getAppointmentDate() != null && app.getAppointmentDate().startsWith(todayString)) {
+                todayAppointmentsCount++;
+            }
+            
             switch (app.getStatus()) {
                 case "Pending": pending++; break;
                 case "Admitted": admitted++; break;
@@ -248,7 +267,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
             }
         }
 
-        lblTPatient.setText(String.valueOf(total));
+        lblTPatient.setText(String.valueOf(todayAppointmentsCount));
         lblPAppointments.setText(String.valueOf(pending));
         lblAdmitted.setText(String.valueOf(admitted));
         lblUCases.setText(String.valueOf(urgent));
@@ -267,6 +286,10 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
         String doctor = cmbDoc.getSelectedItem().toString();
         String treatment = txtTreatment.getText().trim();
         String appDate = txtDate.getText().trim();
+        
+        java.util.Date timeVal = (java.util.Date) spnTime.getValue();
+        String timePart = new java.text.SimpleDateFormat("HH:mm").format(timeVal);
+        String dateTime = appDate + " " + timePart + " AM";
 
         if (treatment.isEmpty() || appDate.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Treatment and Target Appointment Date entry boxes must not be left empty!");
@@ -274,19 +297,19 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
         }
 
         if (selectedAppointmentId != null) {
-            Appointment updatedApp = new Appointment(selectedAppointmentId, patient, doctor, treatment, "Pending", appDate);
+            Appointment updatedApp = new Appointment(selectedAppointmentId, patient, doctor, treatment, "Pending", dateTime);
             if (AppointmentSQL.updateAppointment(updatedApp)) {
                 JOptionPane.showMessageDialog(this, "Appointment data updated successfully!");
                 selectedAppointmentId = null;
                 btnAdd.setText("Save Appointment");
             } else {
-                JOptionPane.showMessageDialog(this, "SQL Database layer update transactional error.");
+                JOptionPane.showMessageDialog(this, "Update failed.");
             }
         } else {
             int nextSeq = AppointmentSQL.getLastSequenceNum() + 1;
             String generatedID = "AP-" + nextSeq;
             
-            Appointment newApp = new Appointment(generatedID, patient, doctor, treatment, "Pending", appDate);
+            Appointment newApp = new Appointment(generatedID, patient, doctor, treatment, "Pending", dateTime);
             if (AppointmentSQL.insertAppointment(newApp)) {
                 JOptionPane.showMessageDialog(this, "Appointment scheduled! Tracking ID: " + generatedID);
             } else {
@@ -295,7 +318,7 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
         }
 
         txtTreatment.setText("");
-        txtDate.setText(java.time.LocalDate.now().toString());
+        txtDate.setText(java.time.LocalDate.now().toString()); 
         refreshTableData();
     }
     
@@ -308,8 +331,22 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
             cmbPatient.setSelectedItem(tblModel.getValueAt(modelRow, 1).toString());
             cmbDoc.setSelectedItem(tblModel.getValueAt(modelRow, 2).toString());
             txtTreatment.setText(tblModel.getValueAt(modelRow, 3).toString());
-            txtDate.setText(tblModel.getValueAt(modelRow, 5).toString());
-
+            String dateTimeStr = tblModel.getValueAt(modelRow, 5).toString();
+            if (dateTimeStr != null && dateTimeStr.length() >= 10) {
+                String datePart = dateTimeStr.substring(0, 10);
+                String timePart = dateTimeStr.length() > 11 ? dateTimeStr.substring(11, 16) : "00:00";
+                txtDate.setText(datePart);
+                try {
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm");
+                    java.util.Date time = sdf.parse(timePart);
+                    spnTime.setValue(time);
+                } catch (java.text.ParseException ex) {
+                    spnTime.setValue(new java.util.Date());
+                }
+            } else {
+                txtDate.setText(LocalDate.now().toString());
+                spnTime.setValue(new java.util.Date());
+            }
             btnAdd.setText("Update Appointment");
             JOptionPane.showMessageDialog(this, "Modify dropdown configurations or structural texts, then press Update to apply modifications.");
         } else {
@@ -323,7 +360,9 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
             int modelRow = tblAppoint.convertRowIndexToModel(row);
             String id = tblModel.getValueAt(modelRow, 0).toString();
             
-            int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to permanently delete appointment " + id + "?", "Confirm Removal", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                "Are you sure you want to permanently delete appointment " + id + "?", 
+                "Confirm Removal", JOptionPane.YES_NO_OPTION);
                 
             if (confirm == JOptionPane.YES_OPTION) {
                 if (AppointmentSQL.deleteAppointment(id)) {
@@ -348,7 +387,8 @@ public class Admin_SchedAppointment extends JPanel implements ActionListener {
             String currentStatus = tblModel.getValueAt(modelRow, 4).toString();
             
             String[] options = {"Pending", "Admitted", "Complete", "Urgent"};
-            String newStatus = (String) JOptionPane.showInputDialog(this, "Change appointment status selection:", "Update Status Context",
+            String newStatus = (String) JOptionPane.showInputDialog(this, 
+                "Change appointment status selection:", "Update Status Context",
                 JOptionPane.PLAIN_MESSAGE, null, options, currentStatus);
 
             if (newStatus != null) {

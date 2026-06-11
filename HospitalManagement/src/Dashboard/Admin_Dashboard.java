@@ -52,10 +52,11 @@ public class Admin_Dashboard extends JPanel {
         lblDT = new JLabel();
         lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
         lblDT.setForeground(Color.darkGray);
-        lblDT.setBounds(1320, 20, 400, 40);
+        lblDT.setBounds(1390, 20, 400, 40);
         pnlMain.add(lblDT);
         startClockTimer();
         
+        // Metrics Badges
         tabItem = createTab("Total Patients", "0", darkBlue);
         tabItem.setBounds(30, 80, 350, 120);
         pnlMain.add(tabItem);
@@ -221,7 +222,7 @@ public class Admin_Dashboard extends JPanel {
                 if (value != null) {
                     String state = value.toString();
                     if (state.equalsIgnoreCase("Delivered")) {
-                        lbl.setForeground(new Color(0x2E8B57));
+                        lbl.setForeground(SeaGreen);
                     } else if (state.equalsIgnoreCase("Pending")) {
                         lbl.setForeground(Color.ORANGE);
                     } else {
@@ -252,6 +253,7 @@ public class Admin_Dashboard extends JPanel {
         });
         pnlActivity.add(lblViewInventory);
         
+        // Staff Section
         pnlSummary = new JPanel();
         pnlSummary.setLayout(null);
         pnlSummary.setBounds(1140, 450, 450, 460);

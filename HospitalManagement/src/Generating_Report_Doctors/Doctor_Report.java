@@ -5,11 +5,13 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.swing.*;
 
 public class Doctor_Report extends JPanel implements ActionListener {
 
-    private JButton btnPrescription, btnDiagnosis, btnAppointment, btnSend, btnEdit, btnPrint;
+    private JButton btnPrescription, btnSend, btnEdit, btnPrint;
     private JButton btnMComplete, btnMIncomplete, btnMMissing;
     private JLabel lblType, lblStatus, lblDoctor, lblDT, lbltext, lblRType, lblPrev;
     private JPanel pnlMain, pnlPrev, pnlRType, pnlB;
@@ -33,11 +35,12 @@ public class Doctor_Report extends JPanel implements ActionListener {
         lblDoctor.setForeground(Color.BLACK);
         pnlMain.add(lblDoctor);
 
-        lblDT = new JLabel("May 21, 2026 | 10:00 AM");
+        lblDT = new JLabel();
         lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
         lblDT.setForeground(Color.darkGray);
         lblDT.setBounds(1390, 20, 400, 40);
         pnlMain.add(lblDT);
+        startClockTimer();
 
         lblType = new JLabel();
         lblType.setBounds(210, 20, 400, 50);
@@ -62,30 +65,14 @@ public class Doctor_Report extends JPanel implements ActionListener {
         lblRType.setFont(new Font("Calibri", Font.BOLD, 24));
         pnlRType.add(lblRType);
 
-        btnPrescription = new JButton("Prescription Report");
+        btnPrescription = new JButton("Appointment History");
         btnPrescription.setBounds(20, 70, 400, 80);
         btnPrescription.setFont(new Font("Calibri", Font.BOLD, 18));
         btnPrescription.setBackground(Color.WHITE);
         btnPrescription.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
         pnlRType.add(btnPrescription);
 
-        btnDiagnosis = new JButton("Patient Diagnosis Summary");
-        btnDiagnosis.setBounds(20, 170, 400, 80);
-        btnDiagnosis.setFont(new Font("Calibri", Font.BOLD, 18));
-        btnDiagnosis.setBackground(Color.WHITE);
-        btnDiagnosis.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
-        pnlRType.add(btnDiagnosis);
-
-        btnAppointment = new JButton("Appointment History Report");
-        btnAppointment.setBounds(20, 270, 400, 80);
-        btnAppointment.setFont(new Font("Calibri", Font.BOLD, 18));
-        btnAppointment.setBackground(Color.WHITE);
-        btnAppointment.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
-        pnlRType.add(btnAppointment);
-
         btnPrescription.addActionListener(this);
-        btnDiagnosis.addActionListener(this);
-        btnAppointment.addActionListener(this);
 
         pnlB = new JPanel();
         pnlB.setLayout(null);
@@ -241,43 +228,24 @@ public class Doctor_Report extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() == btnPrescription) {
             pnlPrev.removeAll();
-            PrescriptionReport pr = new PrescriptionReport();
+            AppointmentDoctor pr = new AppointmentDoctor();
             pr.setBounds(0, 0, 1020, 820);
             pnlPrev.setPreferredSize(new Dimension(1020, 820));
             pnlPrev.add(pr);
             pnlPrev.revalidate();
             pnlPrev.repaint();
             scroll.getVerticalScrollBar().setValue(0);
-            currentReportType = "Prescription Report";
-            lblStatus.setText("Status: Incomplete");
-            lblStatus.setForeground(new Color(255, 140, 0));
-            lblType.setText(" > Prescription Report");
-        }  else if (ae.getSource() == btnDiagnosis) {
-            pnlPrev.removeAll();
-            DiagnosisSummary ds = new DiagnosisSummary();
-            ds.setBounds(0, 0, 1020, 820);  
-            pnlPrev.setPreferredSize(new Dimension(1020, 820));  
-            pnlPrev.add(ds);
-            pnlPrev.revalidate();
-            pnlPrev.repaint();
-            scroll.getVerticalScrollBar().setValue(0);
-            currentReportType = "Diagnosis Summary";
-            lblStatus.setText("Status: Incomplete");
-            lblStatus.setForeground(new Color(255, 140, 0));
-            lblType.setText(" > Patient Diagnosis Summary");
-        }else if (ae.getSource() == btnAppointment) {
-            pnlPrev.removeAll();
-            AppointmentHistory ah = new AppointmentHistory();
-            ah.setBounds(0, 0, 1020, 680);
-            pnlPrev.setPreferredSize(new Dimension(1020, 680));
-            pnlPrev.add(ah);
-            pnlPrev.revalidate();
-            pnlPrev.repaint();
-            scroll.getVerticalScrollBar().setValue(0);
             currentReportType = "Appointment History";
             lblStatus.setText("Status: Incomplete");
             lblStatus.setForeground(new Color(255, 140, 0));
-            lblType.setText(" > Appointment History Report");
-        }
+            lblType.setText(" > Prescription Report");
+        }  
+    }
+    
+    private void startClockTimer() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mm:ss a");
+        lblDT.setText(LocalDateTime.now().format(formatter));
+        Timer timer = new Timer(1000, e -> lblDT.setText(LocalDateTime.now().format(formatter)));
+        timer.start();
     }
 }

@@ -226,6 +226,7 @@ public class InventoryPanel extends JPanel {
         
         lblTItem.setText(String.valueOf(totalItems));
         lblLStock.setText(String.valueOf(lowStockCount));
+        
         java.text.NumberFormat phFormat = java.text.NumberFormat.getInstance(java.util.Locale.US);
         phFormat.setMinimumFractionDigits(2);
         phFormat.setMaximumFractionDigits(2);
@@ -267,10 +268,11 @@ public class InventoryPanel extends JPanel {
         }
         
         if (selectedItemId != null) {
+
             InventoryItem itemUpdate = new InventoryItem(selectedItemId, category, item, qty, price, status, expiry);
             if (InventorySQL.updateItem(itemUpdate)) {
                 JOptionPane.showMessageDialog(this, "Item updated successfully!");
-                selectedItemId = null;
+                selectedItemId = null; 
             } else {
                 JOptionPane.showMessageDialog(this, "Error processing updating row modifications structural layout.");
             }

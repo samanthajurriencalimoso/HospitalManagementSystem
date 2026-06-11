@@ -1,11 +1,18 @@
 package Appointments;
 
 import static Color_Palette.ColorPalette.*;
+import Database.AppointmentSQL;
+import Database.PatientManagementSQL;
+import Database.UserManagementSQL;
+import MedicalHistory.MedicalHistory_Nurse;
+import Models.Appointment;
+import Models.Patient;
 import Patient_Information.PatientInfo_Nurse;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -15,33 +22,34 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.*;
 
-public class Nurse_SchedAppointment extends JPanel implements ActionListener{
+public class Nurse_SchedAppointment extends JPanel implements ActionListener {
     
     private JPanel pnlMain, tabUpdate, tabItem, tabLows, tabMed, tabSup, pnlRecent, dvdType, dvdStatus, pnlNote,
-                   pnlSched, dvdCal, dvdTable, pnlEdit2, pnlNew;
+                    pnlSched, dvdCal, dvdTable, pnlEdit2, pnlNew;
     private JLabel lbltitle, lblDT, lblTitle, lblPatientIcon, lblPatient, lblPatID, lblTItem, lblLStock, lblMed, lblSup,
                    lblComp, lblType, lblTime, lblRoom, lblStatus, lblStaff, lblDoctor, lblNurse, lblNotes, lblCalendar,
-                   lblMonth, lblTDAp, lblValue, lblDay, lblMore, lblEv, lblTime2, lblPID, lblPName;
+                   lblMonth, lblTDAp, lblValue, lblDay, lblMore, lblEv, lblTime2, lblPID, lblPName, lblDocSelect;
     private ImageIcon imgPatient;
     private Image imgPat;
-    private JButton btnRecord, btnNote, btnEdit, btnPrev, btnNext, btnNew, btnEdit2, btnCancel;
+    private JButton btnRecord, btnNote, btnMedHistory, btnEdit, btnPrev, btnNext, btnNew, btnEdit2, btnCancel;
     private JTextArea txtNote;
-    private JTextField PID, PName, txtStatus;
+    private JTextField PID, txtStatus;
+    private JComboBox PName;
     private JScrollPane scrNote, scrCalendar, srcAppointments;
     private JTable tblCalendar, tblApp;
     private JTableHeader tblCHdr;
     private javax.swing.table.DefaultTableModel CModel;
     private YearMonth CMonth = YearMonth.now();
-    private Map<LocalDate, java.util.List<Object[]>> appointmentsMap = new HashMap<>();
-    private Map<LocalDate, java.util.List<CalendarEvent>> calendarEvents = new HashMap<>();
-    private JComboBox<String> cmbTime, cmbType;
+    
+    private Map<String, java.util.List<Appointment>> appointmentsMap = new HashMap<>();
+    
+    private JComboBox<String> cmbTime, cmbType, cmbDoctor;
     private DefaultTableModel appModel;
     private LocalDate currentSelectedDate = null;
     private DateTimeFormatter formatter;
     private LocalDate FMonth, date, SDate, today, selectedDate;
     private Container par;
     private EventType et;
-    private CalendarEvent ev;
     
     public Nurse_SchedAppointment() {
         setLayout(null);
@@ -60,11 +68,12 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
         lbltitle.setBounds(30, 20, 400, 40);
         pnlMain.add(lbltitle);
         
-        lblDT = new JLabel("May 21, 2026 | 10:00 AM");
+        lblDT = new JLabel();
         lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
         lblDT.setForeground(Color.darkGray);
         lblDT.setBounds(1390, 20, 400, 40);
         pnlMain.add(lblDT);
+        startClockTimer();
         
         tabItem = createTab("Today's Patients: ", "0", darkBlue);
         tabItem.setBounds(270, 20, 250, 50);
@@ -168,6 +177,11 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
         btnNote.setBounds(210, 370, 200, 35);
         pnlRecent.add(btnNote);
         
+        btnMedHistory = new JButton("Medical History");
+        btnMedHistory.setFont(new Font("Calibri", Font.BOLD, 14));
+        btnMedHistory.setBounds(40, 415, 370, 35);
+        pnlRecent.add(btnMedHistory);
+        
         pnlNote = new JPanel();
         pnlNote.setLayout(null);
         pnlNote.setBounds(30, 570, 450, 330);
@@ -236,9 +250,7 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
 
         CModel = new DefaultTableModel(days, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
+            public boolean isCellEditable(int row, int column) { return false; }
         };
         tblCalendar = new JTable(CModel);
         tblCalendar.setRowHeight(120);
@@ -251,6 +263,8 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
         tblCalendar.setSelectionBackground(lightBlue);
         tblCalendar.setSelectionForeground(Color.BLACK);
         tblCalendar.setDefaultRenderer(Object.class, new CalendarCellRenderer());
+        
+        loadAppointmentsFromDatabase();
         renderMonthCalendar();
         
         tblCHdr = tblCalendar.getTableHeader();
@@ -273,9 +287,16 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
                         lblTDAp.setText("Appointments for " + selectedDate);
 
                         appModel.setRowCount(0);
-                        if (appointmentsMap.containsKey(selectedDate)) {
-                            for (Object[] appt : appointmentsMap.get(selectedDate)) {
-                                appModel.addRow(appt);
+                        String keyDate = selectedDate.toString();
+                        if (appointmentsMap.containsKey(keyDate)) {
+                            for (Appointment appt : appointmentsMap.get(keyDate)) {
+                                String displayTime = "08:00 AM";
+                                if (appt.getAppointmentDate().contains(" ")) {
+                                    displayTime = appptTimeExtractor(appt.getAppointmentDate());
+                                }
+                                appModel.addRow(new Object[]{
+                                    displayTime, appt.getDoctorName(), appt.getPatientName(), appt.getTreatment(), appt.getStatus()
+                                });
                             }
                         }
                     }
@@ -298,13 +319,11 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
         lblTDAp.setForeground(Color.BLACK);
         pnlSched.add(lblTDAp);
         
-        String[] clmAppointments = {"Time","Patient ID","Patient Name","Type","Status"};
+        String[] clmAppointments = {"Time","Doctor","Patient Name","Type","Status"};
 
         appModel = new DefaultTableModel(clmAppointments, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
+            public boolean isCellEditable(int row, int column) { return false; }
         };
         tblApp = new JTable(appModel);
         tblApp.setRowHeight(40);
@@ -318,6 +337,75 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
         srcAppointments = new JScrollPane(tblApp);
         srcAppointments.setBounds(20, 610, 1020, 120);
         pnlSched.add(srcAppointments);
+        
+        tblApp.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int row = tblApp.getSelectedRow();
+
+                if (row != -1) {
+                    String selectedTime   = (String) appModel.getValueAt(row, 0);
+                    String selectedDoctor = (String) appModel.getValueAt(row, 1);
+                    String selectedPName  = (String) appModel.getValueAt(row, 2);
+                    String selectedType   = (String) appModel.getValueAt(row, 3);
+                    String selectedStatus = (String) appModel.getValueAt(row, 4);
+
+                    String patientId = "N/A";
+                    String room      = "N/A";
+                    String doctor    = selectedDoctor;
+                    String nurse     = "N/A";
+                    String notes     = "";
+                    String condition = "N/A";
+
+                    java.util.List<Patient> patients = PatientManagementSQL.getAllPatients();
+
+                    for (Patient p : patients) {
+                        if (p.getName().equalsIgnoreCase(selectedPName)) {
+
+                            patientId = p.getId();
+
+                            if (p.getRoom() != null && !p.getRoom().isEmpty()) {
+                                room = p.getRoom();
+                            }
+
+                            if (p.getDoctor() != null && !p.getDoctor().isEmpty()) {
+                                doctor = p.getDoctor();
+                            }
+
+                            if (p.getNurse() != null && !p.getNurse().isEmpty()) {
+                                nurse = p.getNurse();
+                            }
+
+                            if (p.getNotes() != null) {
+                                notes = p.getNotes();
+                            }
+
+                            if (p.getConditions() != null && !p.getConditions().isEmpty()) {
+                                condition = p.getConditions();
+                            }
+
+                            break;
+                        }
+                    }
+
+                    lblPatient.setText("Patient Name: " + selectedPName);
+                    lblPatID.setText("Patient ID: " + patientId);
+                    lblComp.setText("Care Need: " + condition);
+                    lblType.setText("Task: " + selectedType);
+
+                    lblTime.setText("Time: " + selectedTime);
+                    lblRoom.setText("Room: " + room);
+                    lblStatus.setText("Status: " + selectedStatus);
+
+                    lblDoctor.setText("Doctor: " + doctor);
+                    lblNurse.setText("Nurse: " + nurse);
+
+                    txtNote.setText(notes);
+
+                    pnlRecent.revalidate();
+                    pnlRecent.repaint();
+                }
+            }
+        });
         
         btnNew = new JButton("+ New Appointment");
         btnNew.setBounds(20, 745, 170, 35);
@@ -345,12 +433,30 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
         
         btnRecord.addActionListener(this);
         btnNote.addActionListener(this);
+        btnMedHistory.addActionListener(this);
         btnEdit.addActionListener(this);
         btnPrev.addActionListener(this);
         btnNext.addActionListener(this);
         btnNew.addActionListener(this);
         btnEdit2.addActionListener(this);
         btnCancel.addActionListener(this);
+    }
+    
+    private void loadAppointmentsFromDatabase() {
+        appointmentsMap.clear();
+        java.util.List<Appointment> list = AppointmentSQL.getAllAppointments();
+        for (Appointment app : list) {
+            String fullDate = app.getAppointmentDate();
+            String datePart = fullDate.split(" ")[0]; 
+            appointmentsMap.computeIfAbsent(datePart, k -> new ArrayList<>()).add(app);
+        }
+    }
+
+    private String appptTimeExtractor(String dateValue) {
+        if (dateValue != null && dateValue.contains(" ")) {
+            return dateValue.substring(dateValue.indexOf(" ") + 1);
+        }
+        return "08:00 AM";
     }
     
     private JPanel createTab(String title, String value, Color color) {
@@ -376,7 +482,7 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
     public enum EventType {
         APPOINTMENT("Appointment", Blue),
         FOLLOWUP   ("Follow-up",   Green),
-        SURGERY    ("Surgery",     orange),
+        SURGERY    ("Surgery",      orange),
         EMERGENCY  ("Emergency",   LightRed);
 
         public final String label;
@@ -388,19 +494,6 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
             for (EventType t : values())
                 if (t.label.equals(label)) return t;
             return APPOINTMENT;
-        }
-    }
-
-    class CalendarEvent {
-        String time, patientName, patientId, status;
-        EventType type;
-
-        CalendarEvent(String time, String patientId, String patientName, EventType type, String status) {
-            this.time = time;
-            this.patientId = patientId;
-            this.patientName = patientName;
-            this.type = type;
-            this.status = status;
         }
     }
 
@@ -423,7 +516,6 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
                 } else if (CurrentD > daysInMonth) {
                     rowData[c] = " ";
                 } else {
-                    date = CMonth.atDay(CurrentD);
                     rowData[c] = String.valueOf(CurrentD);
                     CurrentD++;
                 }
@@ -448,21 +540,30 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
                 JOptionPane.showMessageDialog(this, "Please select an appointment first.");
                 return;
             }
-
-            String pid   = (String) tblApp.getValueAt(row, 1);
-            String pname = (String) tblApp.getValueAt(row, 2);
-
-            if (pid == null || pid.trim().isEmpty() || pname == null || pname.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Selected appointment has incomplete patient data.");
-                return;
-            }
             
             par = this.getParent();
             par.removeAll();
-            par.add(new PatientInfo_Nurse());
+            String patientName = (String) tblApp.getValueAt(row, 2);
+            par.add(new PatientInfo_Nurse(patientName));
             par.revalidate();
             par.repaint();
             
+        } else if (ae.getSource() == btnMedHistory) {
+            int row = tblApp.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(this, "Please select an appointment first.");
+                return;
+            }
+            String pname = (String) appModel.getValueAt(row, 2);
+            if (pname == null || pname.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Selected appointment has incomplete data.");
+                return;
+            }
+            par = this.getParent();
+            par.removeAll();
+            par.add(new MedicalHistory_Nurse(pname));
+            par.revalidate();
+            par.repaint();
         } else if (ae.getSource() == btnPrev) {
             CMonth = CMonth.minusMonths(1);
             renderMonthCalendar();
@@ -474,13 +575,7 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
             refreshAppointmentsTable();
             
         } else if (ae.getSource() == btnNote) {
-            boolean hasPrescription = false;
-            if (hasPrescription) {
-                String prescriptionDetails = "Type: ...\nDrug: ...\nDuration: ...\nDosage: ...";
-                JOptionPane.showMessageDialog(this, prescriptionDetails,"Patient Prescription", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "No prescription found for this patient.");
-            }
+            JOptionPane.showMessageDialog(this, "No prescription details found for editing options here.");
         } else if (ae.getSource() == btnEdit) {
             txtNote.setEditable(true);
             JOptionPane.showMessageDialog(this, "You can now edit the notes.");
@@ -499,11 +594,6 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
             }
 
             String dayText = CValue.trim();
-            if (!dayText.matches("\\d+")) {
-                JOptionPane.showMessageDialog(this, "Please select a valid date.");
-                return;
-            }
-
             SDate = CMonth.atDay(Integer.parseInt(dayText));
             today = LocalDate.now();
             if (SDate.isBefore(today)) {
@@ -514,15 +604,33 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
             String[] workingHours = {"08:00 AM","09:00 AM","10:00 AM","11:00 AM",
                                      "01:00 PM","02:00 PM","03:00 PM","04:00 PM","05:00 PM"};
             cmbTime  = new JComboBox<>(workingHours);
-            PID = new JTextField("P-");
-            PName = new JTextField();
+            PName = new JComboBox<>();
+            
+            String loggedInNurse = UserManagementSQL.currentEmployee.getName() + " (Nurse)";
+            java.util.List<Patient> patientList = PatientManagementSQL.getAllPatients();
+            for (Patient p : patientList) {
+                if (p.getNurse()!= null && p.getNurse().equalsIgnoreCase(loggedInNurse)) {
+                    PName.addItem(p.getName());
+                }
+            }
+            if (PName.getItemCount() == 0) PName.addItem("No patients found");
             cmbType = new JComboBox<>(new String[]{"Appointment", "Follow-up", "Surgery", "Emergency"});
             txtStatus = new JTextField("Needs Admin Approval");
             txtStatus.setEditable(false);
 
+            java.util.List<String> docList = UserManagementSQL.getAllActiveDoctors();
+
+            for (int i = 0; i < docList.size(); i++) {
+                if (!docList.get(i).startsWith("Dr. ")) {
+                    docList.set(i, "Dr. " + docList.get(i));
+                }
+            }
+
+            cmbDoctor = new JComboBox<>(docList.toArray(new String[0]));
+
             pnlNew = new JPanel();
             pnlNew.setLayout(null);
-            pnlNew.setPreferredSize(new Dimension(360, 220));
+            pnlNew.setPreferredSize(new Dimension(360, 258));
 
             lblTime2 = new JLabel("Time:");
             lblTime2.setBounds(10, 10, 110, 28);
@@ -530,108 +638,93 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
             pnlNew.add(lblTime2);
             pnlNew.add(cmbTime);
 
-            lblPID = new JLabel("Patient ID:");
-            lblPID.setBounds(10, 48, 110, 28);
-            PID.setBounds(130, 48, 210, 28);
-            pnlNew.add(lblPID);
-            pnlNew.add(PID);
-
             lblPName = new JLabel("Patient Name:");
-            lblPName.setBounds(10, 86, 110, 28);
-            PName.setBounds(130, 86, 210, 28);
+            lblPName.setBounds(10, 48, 110, 28);
+            PName.setBounds(130, 48, 210, 28);
             pnlNew.add(lblPName);
             pnlNew.add(PName);
 
             lblType = new JLabel("Type:");
-            lblType.setBounds(10, 124, 110, 28);
-            cmbType.setBounds(130, 124, 210, 28);
+            lblType.setBounds(10, 86, 110, 28);
+            cmbType.setBounds(130, 86, 210, 28);
             pnlNew.add(lblType);
             pnlNew.add(cmbType);
 
             JLabel lStatus = new JLabel("Status:");
-            lStatus.setBounds(10, 162, 110, 28);
-            txtStatus.setBounds(130, 162, 210, 28);
+            lStatus.setBounds(10, 124, 110, 28);
+            txtStatus.setBounds(130, 124, 210, 28);
             pnlNew.add(lStatus);
             pnlNew.add(txtStatus);
+
+            lblDocSelect = new JLabel("Doctor:");
+            lblDocSelect.setBounds(10, 162, 110, 28);
+            cmbDoctor.setBounds(130, 162, 210, 28);
+            pnlNew.add(lblDocSelect);
+            pnlNew.add(cmbDoctor);
             
-            int option = JOptionPane.showConfirmDialog(this, pnlNew, "New Appointment for " + SDate,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            int option = JOptionPane.showConfirmDialog(this, pnlNew, "New Appointment for " + SDate, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
             if (option == JOptionPane.OK_OPTION) {
-                String patientID   = PID.getText().trim();
-                String patientName = PName.getText().trim();
+                String patientName = PName.getSelectedItem() != null ? PName.getSelectedItem().toString() : "";
                 String time        = (String) cmbTime.getSelectedItem();
-                String status      = "Needs Admin Approval";
-
-            if (patientID.isEmpty() || patientID.equals("P-") || patientName.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "All fields must be filled up!", "Incomplete Fields", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+                String selectedDoc = (String) cmbDoctor.getSelectedItem();
+                String typeStr     = (String) cmbType.getSelectedItem();
                 
-            if (SDate.equals(today)) {
-                java.time.LocalTime now = java.time.LocalTime.now();
-                String selectedTimeStr = (String) cmbTime.getSelectedItem();
-
-                java.time.format.DateTimeFormatter timeFmt = java.time.format.DateTimeFormatter.ofPattern("hh:mm a");
-                java.time.LocalTime selectedTime = java.time.LocalTime.parse(selectedTimeStr, timeFmt);
-
-                if (selectedTime.isBefore(now)) {
-                    JOptionPane.showMessageDialog(this, "Cannot book " + selectedTimeStr + " — that time has already passed today.");
+                if (patientName.isEmpty() || selectedDoc == null) {
+                    JOptionPane.showMessageDialog(this, "All fields must be filled up!", "Incomplete Fields", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-            }
-                   
-            if (patientID.length() != 7 || !patientID.matches("P-\\d{5}")) {
-                JOptionPane.showMessageDialog(this, "Patient ID must be P- followed by exactly 5 numbers.");
-                return;
-            }
-            if (patientName.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Patient Name cannot be empty.");
-                return;
-            }
-            if (!patientName.matches("[a-zA-Z ]+")) {
-                JOptionPane.showMessageDialog(this, "Patient Name must contain letters only.");
-                return;
-            }    
+               
+                if (!selectedDoc.startsWith("Dr. ")) {
+                    selectedDoc = "Dr. " + selectedDoc;
+                }
+                
+                int nextId = AppointmentSQL.getLastSequenceNum() + 1;
+                String generatedId = "AP-" + String.format("%03d", nextId);
+                String fullDbDateTime = SDate.toString() + " " + time;
 
-                et = EventType.fromLabel((String) cmbType.getSelectedItem());
-                ev = new CalendarEvent(time, patientID, patientName, et, status);
-                calendarEvents.computeIfAbsent(SDate, k -> new ArrayList<>()).add(ev);
-
-                Object[] newAppt = { time, patientID, patientName, et.label, status };
-                appointmentsMap.computeIfAbsent(SDate, k -> new ArrayList<>()).add(newAppt);
-                appModel.addRow(newAppt);
-                renderMonthCalendar();
+                Appointment newAppt = new Appointment(generatedId, patientName, selectedDoc, typeStr, "Pending", fullDbDateTime);
+                
+                if (AppointmentSQL.insertAppointment(newAppt)) {
+                    loadAppointmentsFromDatabase();
+                    renderMonthCalendar();
+                    JOptionPane.showMessageDialog(this, "Appointment saved successfully!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Database update error occurred.");
+                }
             }
         } else if (ae.getSource() == btnEdit2) {
             int row = tblApp.getSelectedRow();
             if (row != -1) {
-
-                String pid   = (String) tblApp.getValueAt(row, 1);
+                String oldTime = (String) tblApp.getValueAt(row, 0);
+                String docName = (String) tblApp.getValueAt(row, 1);
                 String pname = (String) tblApp.getValueAt(row, 2);
+                String typeStr = (String) tblApp.getValueAt(row, 3);
+                String statusStr = (String) tblApp.getValueAt(row, 4);
 
                 String[] workingHours = {"08:00 AM","09:00 AM","10:00 AM","11:00 AM",
                                          "01:00 PM","02:00 PM","03:00 PM","04:00 PM","05:00 PM"};
                 cmbTime = new JComboBox<>(workingHours);
-                cmbTime.setSelectedItem(tblApp.getValueAt(row, 0));
+                cmbTime.setSelectedItem(oldTime);
 
-                PID = new JTextField(pid);
-                PID.setEditable(false);
-                PID.setBackground(Color.LIGHT_GRAY);
-
-                PName = new JTextField(pname);
-                PName.setEditable(false);
-                PName.setBackground(Color.LIGHT_GRAY);
+                JTextField PNameDisplay = new JTextField(pname);
+                PNameDisplay.setEditable(false);
+                PNameDisplay.setBackground(Color.LIGHT_GRAY);
 
                 cmbType = new JComboBox<>(new String[]{"Appointment", "Follow-up", "Surgery", "Emergency"});
-                cmbType.setSelectedItem(tblApp.getValueAt(row, 3));
+                cmbType.setSelectedItem(typeStr);
 
-                txtStatus = new JTextField((String) tblApp.getValueAt(row, 4));
+                txtStatus = new JTextField(statusStr);
                 txtStatus.setEditable(false);
                 txtStatus.setBackground(LightGray);
 
+                java.util.List<String> docList = UserManagementSQL.getAllActiveDoctors();
+                cmbDoctor = new JComboBox<>(docList.toArray(new String[0]));
+                cmbDoctor.setSelectedItem(docName);
+
                 pnlEdit2 = new JPanel();
                 pnlEdit2.setLayout(null);
-                pnlEdit2.setPreferredSize(new Dimension(360, 220));
+                pnlEdit2.setPreferredSize(new Dimension(360, 258));
 
                 lblTime2 = new JLabel("Time:");
                 lblTime2.setBounds(10, 10, 110, 28);
@@ -639,66 +732,63 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
                 pnlEdit2.add(lblTime2);
                 pnlEdit2.add(cmbTime);
 
-                lblPID = new JLabel("Patient ID:");
-                lblPID.setBounds(10, 48, 110, 28);
-                PID.setBounds(130, 48, 210, 28);
-                pnlEdit2.add(lblPID);
-                pnlEdit2.add(PID);
-
                 lblPName = new JLabel("Patient Name:");
-                lblPName.setBounds(10, 86, 110, 28);
-                PName.setBounds(130, 86, 210, 28);
+                lblPName.setBounds(10, 48, 110, 28);
+                PName.setBounds(130, 48, 210, 28);
                 pnlEdit2.add(lblPName);
                 pnlEdit2.add(PName);
 
                 lblType = new JLabel("Type:");
-                lblType.setBounds(10, 124, 110, 28);
-                cmbType.setBounds(130, 124, 210, 28);
+                lblType.setBounds(10, 86, 110, 28);
+                cmbType.setBounds(130, 86, 210, 28);
                 pnlEdit2.add(lblType);
                 pnlEdit2.add(cmbType);
 
                 lblStatus = new JLabel("Status:");
-                lblStatus.setBounds(10, 162, 110, 28);
-                txtStatus.setBounds(130, 162, 210, 28);
+                lblStatus.setBounds(10, 124, 110, 28);
+                txtStatus.setBounds(130, 124, 210, 28);
                 pnlEdit2.add(lblStatus);
                 pnlEdit2.add(txtStatus);
 
-                int option = JOptionPane.showConfirmDialog(this, pnlEdit2,"Edit Appointment", JOptionPane.OK_CANCEL_OPTION);
+                lblDocSelect = new JLabel("Doctor:");
+                lblDocSelect.setBounds(10, 162, 110, 28);
+                cmbDoctor.setBounds(130, 162, 210, 28);
+                pnlEdit2.add(lblDocSelect);
+                pnlEdit2.add(cmbDoctor);
+
+                int option = JOptionPane.showConfirmDialog(this, pnlEdit2, "Edit Appointment", JOptionPane.OK_CANCEL_OPTION);
 
                 if (option == JOptionPane.OK_OPTION) {
                     String selectedTime = (String) cmbTime.getSelectedItem();
                     String selectedType = (String) cmbType.getSelectedItem();
+                    String selectedDoc = (String) cmbDoctor.getSelectedItem();
 
-                    if (selectedTime == null || selectedType == null) {
-                        JOptionPane.showMessageDialog(this, "All fields must be filled.");
-                        return;
-                    }
-
-                    tblApp.setValueAt(selectedTime, row, 0);
-                    tblApp.setValueAt(selectedType, row, 3);
-
-                    if (currentSelectedDate != null) {
-                        java.util.List<Object[]> appts = appointmentsMap.get(currentSelectedDate);
-                        if (appts != null && row < appts.size()) {
-                            appts.get(row)[0] = selectedTime;
-                            appts.get(row)[3] = selectedType;
-                        }
-                    }
-
-                    if (currentSelectedDate != null) {
-                        java.util.List<CalendarEvent> evs = calendarEvents.get(currentSelectedDate);
-                        if (evs != null) {
-                            for (CalendarEvent ev : evs) {
-                                if (ev.patientId.equals(pid) && ev.patientName.equals(pname)) {
-                                    ev.time = selectedTime;
-                                    ev.type = EventType.fromLabel(selectedType);
-                                    break;
-                                }
+                    Appointment targetMatch = null;
+                    if (currentSelectedDate != null && appointmentsMap.containsKey(currentSelectedDate.toString())) {
+                        for (Appointment a : appointmentsMap.get(currentSelectedDate.toString())) {
+                            if (a.getPatientName().equalsIgnoreCase(pname) && appptTimeExtractor(a.getAppointmentDate()).equals(oldTime)) {
+                                targetMatch = a;
+                                break;
                             }
                         }
                     }
 
-                    renderMonthCalendar();
+                    if (targetMatch != null) {
+                        if (selectedDoc != null && !selectedDoc.startsWith("Dr. ")) {
+                            selectedDoc = "Dr. " + selectedDoc;
+                        }
+                        
+                        targetMatch.setDoctorName(selectedDoc);
+                        targetMatch.setTreatment(selectedType);
+                        targetMatch.setAppointmentDate(currentSelectedDate.toString() + " " + selectedTime);
+                        
+                        if (AppointmentSQL.updateAppointment(targetMatch)) {
+                            loadAppointmentsFromDatabase();
+                            renderMonthCalendar();
+                            refreshAppointmentsTable();
+                            JOptionPane.showMessageDialog(this, "Appointment Updated Successfully.");
+                        }
+                    }
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "Select an appointment to edit.");
@@ -706,23 +796,25 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
         } else if (ae.getSource() == btnCancel) {
             int row = tblApp.getSelectedRow();
             if (row != -1) {
-                String pid   = (String) tblApp.getValueAt(row, 1);
+                String timeVal = (String) tblApp.getValueAt(row, 0);
                 String pname = (String) tblApp.getValueAt(row, 2);
 
-                appModel.removeRow(row);
-
-                if (currentSelectedDate != null) {
-                    java.util.List<CalendarEvent> evs = calendarEvents.get(currentSelectedDate);
-                    if (evs != null) {
-                        evs.removeIf(ev -> ev.patientId.equals(pid) && ev.patientName.equals(pname));
-                    }
-                    java.util.List<Object[]> appts = appointmentsMap.get(currentSelectedDate);
-                    if (appts != null) {
-                        appts.removeIf(a -> a[1].equals(pid) && a[2].equals(pname));
+                Appointment targetMatch = null;
+                if (currentSelectedDate != null && appointmentsMap.containsKey(currentSelectedDate.toString())) {
+                    for (Appointment a : appointmentsMap.get(currentSelectedDate.toString())) {
+                        if (a.getPatientName().equalsIgnoreCase(pname) && appptTimeExtractor(a.getAppointmentDate()).equals(timeVal)) {
+                            targetMatch = a;
+                            break;
+                        }
                     }
                 }
-                renderMonthCalendar();
-                JOptionPane.showMessageDialog(this, "Appointment removed.");
+
+                if (targetMatch != null && AppointmentSQL.deleteAppointment(targetMatch.getAppointmentId())) {
+                    loadAppointmentsFromDatabase();
+                    renderMonthCalendar();
+                    refreshAppointmentsTable();
+                    JOptionPane.showMessageDialog(this, "Appointment removed.");
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "Select an appointment to remove.");
             }
@@ -730,7 +822,6 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
     }
 
     class CalendarCellRenderer extends JPanel implements TableCellRenderer {
-
         @Override
         public Component getTableCellRendererComponent(
             JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
@@ -741,8 +832,7 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
             setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, LightGray));
 
             String raw = value == null ? "" : value.toString().trim();
-            if (raw.isEmpty()) return this;
-            if (!raw.matches("\\d+")) return this;
+            if (raw.isEmpty() || !raw.matches("\\d+")) return this;
 
             lblDay = new JLabel(raw);
             lblDay.setFont(new Font("Calibri", Font.PLAIN, 13));
@@ -751,11 +841,11 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
             add(lblDay);
 
             date = CMonth.atDay(Integer.parseInt(raw));
-            java.util.List<CalendarEvent> events = calendarEvents.getOrDefault(date, Collections.emptyList());
+            java.util.List<Appointment> events = appointmentsMap.getOrDefault(date.toString(), Collections.emptyList());
 
             int y = 24;
             int shown = 0;
-            for (CalendarEvent ev : events) {
+            for (Appointment app : events) {
                 if (shown >= 3) {
                     lblMore = new JLabel("  +" + (events.size() - 3) + " more");
                     lblMore.setFont(new Font("Calibri", Font.PLAIN, 11));
@@ -764,10 +854,17 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
                     add(lblMore);
                     break;
                 }
-                lblEv = new JLabel("  " + ev.time + " " + ev.patientName);
+                String displayTime = appptTimeExtractor(app.getAppointmentDate());
+                lblEv = new JLabel("  " + displayTime + " " + app.getPatientName());
                 lblEv.setFont(new Font("Calibri", Font.PLAIN, 11));
                 lblEv.setOpaque(true);
-                lblEv.setBackground(ev.type.color);
+                if ("Urgent".equalsIgnoreCase(app.getStatus())) {
+                    lblEv.setBackground(LightRed);
+                } else if ("Complete".equalsIgnoreCase(app.getStatus())) {
+                    lblEv.setBackground(Green);
+                } else {
+                    lblEv.setBackground(Blue);
+                }
                 lblEv.setForeground(Color.WHITE);
                 lblEv.setBounds(2, y, 142, 14);
                 add(lblEv);
@@ -776,5 +873,12 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener{
             }
             return this;
         }
+    }
+    
+    private void startClockTimer() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mm:ss a");
+        lblDT.setText(LocalDateTime.now().format(formatter));
+        Timer timer = new Timer(1000, e -> lblDT.setText(LocalDateTime.now().format(formatter)));
+        timer.start();
     }
 }

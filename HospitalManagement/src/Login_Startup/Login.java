@@ -24,7 +24,7 @@ public class Login extends JFrame implements ActionListener {
     private JPasswordField txtPassword;
     private JButton btnLogin, btnForgot;
     private JLabel lblbackground, lblLogo, lblTitle, lblUser, lblPass, lblFooter;
-    private ImageIcon imgBg, imgDlogo;
+    private ImageIcon imgBg, imgDlogo, icon;
     private Image BgImage, imgbg;
     
     private static final String URL = "jdbc:mysql://localhost:3306/hospitalmanagement";
@@ -34,18 +34,21 @@ public class Login extends JFrame implements ActionListener {
     public Login() {
         setTitle("Hospital Login");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        
+
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setMinimumSize(new Dimension(1000, 1000));
         setLayout(null);
         setLocationRelativeTo(null);
-        
+
+        icon = new ImageIcon(getClass().getResource("/resources/eTriage.Logo.png"));
+        setIconImage(icon.getImage());
+
         imgBg = new ImageIcon(getClass().getResource("/resources/Login_BG.png"));
-        BgImage = imgBg.getImage().getScaledInstance(1020, 1080 ,Image.SCALE_SMOOTH);
+        BgImage = imgBg.getImage().getScaledInstance(1020, 1080, Image.SCALE_SMOOTH);
         lblbackground = new JLabel(new ImageIcon(BgImage));
         lblbackground.setBounds(900, 0, 1020, 1080);
         add(lblbackground);
-        
+
         pnlLogin = new JPanel();
         pnlLogin.setLayout(null);
         pnlLogin.setBounds(0, 0, 900, 1080);
@@ -53,11 +56,6 @@ public class Login extends JFrame implements ActionListener {
         pnlLogin.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(borderLBLUE, 1, true),
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
-        ));
-
-        pnlLogin.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(borderLBLUE, 1, true),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
 
         add(pnlLogin);
@@ -112,7 +110,7 @@ public class Login extends JFrame implements ActionListener {
         btnForgot = new JButton("Forgot Password?");
         btnForgot.setFont(new Font("Calibri", Font.PLAIN, 16));
         btnForgot.setForeground(Color.BLUE);
-        btnForgot.setBounds(350, 580, 200, 30);
+        btnForgot.setBounds(330, 580, 200, 30);
         btnForgot.setContentAreaFilled(false);
         btnForgot.setBorderPainted(false);
         btnForgot.setFocusPainted(false);

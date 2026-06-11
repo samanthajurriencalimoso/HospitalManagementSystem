@@ -2,7 +2,9 @@ package Left_Sidebar;
 
 import static Color_Palette.ColorPalette.*;
 import Dashboard.Doctor_Dashboard;
+import Database.UserManagementSQL;
 import java.awt.*;
+import java.io.File;
 import javax.swing.*;
 
 public class Doctor_SideBarFrame extends JFrame{
@@ -10,7 +12,8 @@ public class Doctor_SideBarFrame extends JFrame{
     private JPanel window;
     private JPanel header;
     private JLabel lblDoctorName, lblDoctorIcon;
-    private ImageIcon imgDoctor;
+    private ImageIcon imgDoctor, icon;
+    private Image imDoc, imgDoc;
     
     public Doctor_SideBarFrame() {
         setTitle("eTriage | Hospital Management System");
@@ -18,6 +21,9 @@ public class Doctor_SideBarFrame extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLayout(null);
+        
+        icon = new ImageIcon(getClass().getResource("/resources/eTriage.Logo.png"));
+        setIconImage(icon.getImage());
      
         // Sidebar
         Doctor_SideBar sidebar = new Doctor_SideBar(this);
@@ -30,15 +36,30 @@ public class Doctor_SideBarFrame extends JFrame{
         header.setBackground(lightBlue);
         add(header);
         
-        lblDoctorName = new JLabel("Doctor | Isabella Ramos");
-        lblDoctorName.setFont(new Font("Calibri", Font.BOLD, 20));
-        lblDoctorName.setBounds(1320, 20, 300, 35);
+        String doctorName = UserManagementSQL.currentEmployee.getName();
+        String doctorRole = UserManagementSQL.currentEmployee.getRole();
+        lblDoctorName = new JLabel(doctorRole + " | " + doctorName);
+        lblDoctorName.setFont(new Font("Calibri", Font.BOLD, 18));
+        lblDoctorName.setBounds(1300, 20, 350, 35);
         header.add(lblDoctorName);
         
-        imgDoctor = new ImageIcon(getClass().getResource("/resources/DOCTOR.PHOTO.png"));
-        Image imgDoc = imgDoctor.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+        String profileImagePath = UserManagementSQL.currentEmployee.getProfileImage();
+        
+        if (profileImagePath != null && !profileImagePath.isEmpty()) {
+            File imgFile = new File(profileImagePath);
+            if (imgFile.exists()) {
+                imgDoctor = new ImageIcon(profileImagePath);
+            } else {
+                imgDoctor = new ImageIcon(getClass().getResource(profileImagePath));
+            }
+        } else {
+            
+            imgDoctor = new ImageIcon(getClass().getResource("/resources/DOCTOR.PHOTO.png"));
+        }
+        imDoc = imgDoctor.getImage();
+        imgDoc = imDoc.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         lblDoctorIcon = new JLabel(new ImageIcon(imgDoc));
-        lblDoctorIcon.setBounds(1250, 13, 60, 60);
+        lblDoctorIcon.setBounds(1220, 5, 60, 60);
         header.add(lblDoctorIcon);
 
         // Main content area

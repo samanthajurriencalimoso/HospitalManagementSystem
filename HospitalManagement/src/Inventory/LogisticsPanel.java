@@ -2,9 +2,9 @@ package Inventory;
 
 import static Color_Palette.ColorPalette.*;
 import Database.LogisticsSQL;
-import Database.InventorySQL;
+import Database.InventorySQL; 
 import Models.LogisticsOrder;
-import Models.InventoryItem;
+import Models.InventoryItem;   
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
@@ -20,7 +20,7 @@ public class LogisticsPanel extends JPanel {
     private JTextField txtItem, txtAmount;
     private JLabel lbltitle, lblDT, lblItem, lblAmount, lblPending, lblDelivered, lblTValue, lblTitle, lblValue;
     private JTable tblLogis;
-    private JButton btnAdd, btnEdit, btnDeliver, btnRemove, btnAddToInventory;
+    private JButton btnAdd, btnEdit, btnDeliver, btnRemove, btnAddToInventory; 
     private JScrollPane srcLog;
     
     private String selectedOrderId = null;
@@ -44,7 +44,7 @@ public class LogisticsPanel extends JPanel {
         lblDT = new JLabel();
         lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
         lblDT.setForeground(Color.darkGray);
-        lblDT.setBounds(1320, 20, 400, 40);
+        lblDT.setBounds(1390, 20, 400, 40);
         pnlMain.add(lblDT);
         
         startClockTimer();
@@ -163,23 +163,48 @@ public class LogisticsPanel extends JPanel {
     }
     
     private void openAddToInventoryModal() {
-        int row = tblLogis.getSelectedRow();
-        if (row < 0) {
+        int viewRow = tblLogis.getSelectedRow();
+        if (viewRow < 0) {
             JOptionPane.showMessageDialog(this, "Please select an item line from the logistics tracking table first!");
             return;
         }
 
-        int modelRow = tblLogis.convertRowIndexToModel(row);
-        String itemName = tblModel.getValueAt(modelRow, 1).toString();
-        String rawAmount = tblModel.getValueAt(modelRow, 2).toString().replace("₱", "").replace(",", "").trim();
+        int row = tblLogis.convertRowIndexToModel(viewRow);
+        String selectedIdFromTable = tblModel.getValueAt(row, 0).toString();
+        
+        LogisticsOrder targetOrder = null;
+        for (LogisticsOrder o : LogisticsSQL.getAllOrders()) {
+            if (o.getOrderId().equals(selectedIdFromTable)) {
+                targetOrder = o;
+                break;
+            }
+        }
+
+        if (targetOrder == null) {
+            JOptionPane.showMessageDialog(this, "Order record details could not be found.");
+            return;
+        }
+
+        if (!"Delivered".equalsIgnoreCase(targetOrder.getStatus())) {
+            JOptionPane.showMessageDialog(this, "Operational Rule: You cannot register a cargo bundle into physical inventory until its shipment status is 'Delivered'!", "Intake Denied", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (targetOrder.isCheckedIn()) { 
+            JOptionPane.showMessageDialog(this, "This cargo deployment package has already been signed into inventory!", "Duplicate Avoided", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        String itemName = targetOrder.getItem();
+        String rawAmount = String.valueOf(targetOrder.getAmount());
 
         JPanel dialogPanel = new JPanel(new GridLayout(5, 2, 10, 10));
 
         JComboBox<String> cmbCategory = new JComboBox<>(new String[]{"Medicine", "Equipment", "Supplies"});
         JTextField txtItemName = new JTextField(itemName);
-        JTextField txtExpiryDate = new JTextField(LocalDate.now().toString());
-        JTextField txtPrice = new JTextField(rawAmount);
-        JTextField txtQty = new JTextField("1");
+        JTextField txtExpiryDate = new JTextField(LocalDate.now().toString()); 
+        JTextField txtPrice = new JTextField(rawAmount); 
+        JTextField txtQty = new JTextField("1"); 
 
         dialogPanel.add(new JLabel("Category:"));
         dialogPanel.add(cmbCategory);
@@ -223,10 +248,13 @@ public class LogisticsPanel extends JPanel {
                 }
 
                 InventoryItem newItem = new InventoryItem(finalCategory, finalItem, quantity, price, calculatedStatus, finalExpiry);
+                
                 if (InventorySQL.insertItem(newItem)) {
+                    LogisticsSQL.markAsCheckedIn(targetOrder.getOrderId());
                     JOptionPane.showMessageDialog(this, "Logistics asset successfully registered to system inventory assets!");
+                    refreshTableData(); 
                 } else {
-                    JOptionPane.showMessageDialog(this, "The inventory database subsystem rejected the input streaming array pipeline command.");
+                    JOptionPane.showMessageDialog(this, "The inventory database subsystem rejected the execution input command.");
                 }
 
             } catch (NumberFormatException nfe) {
@@ -255,24 +283,29 @@ public class LogisticsPanel extends JPanel {
         return tabUpdate;
     }
     
-    private void refreshTableData() {
+    public void refreshTableData() {
         tblModel.setRowCount(0);
-        List<LogisticsOrder> orders = LogisticsSQL.getAllOrders();
         
+        List<LogisticsOrder> orders = LogisticsSQL.getAllOrders();
         double totalValue = 0.0;
         int pendingCount = 0;
         int deliveredCount = 0;
 
         for (LogisticsOrder order : orders) {
+            String statusDisplay = order.getStatus();
+            if (order.isCheckedIn()) {
+                statusDisplay += " (In Stock)";
+            }
+
             tblModel.addRow(new Object[]{
                 order.getOrderId(),
                 order.getItem(),
                 "₱" + String.format("%,.2f", order.getAmount()),
-                order.getStatus()
+                statusDisplay
             });
             
-            if (order.getStatus().equals("Pending")) pendingCount++;
-            if (order.getStatus().equals("Delivered")) deliveredCount++;
+            if (order.getStatus().equalsIgnoreCase("Pending")) pendingCount++;
+            if (order.getStatus().equalsIgnoreCase("Delivered")) deliveredCount++;
             totalValue += order.getAmount();
         }
         
@@ -299,7 +332,19 @@ public class LogisticsPanel extends JPanel {
         }
 
         if (selectedOrderId != null) {
-            LogisticsOrder updatedOrder = new LogisticsOrder(selectedOrderId, item, amount, "Pending");
+            LogisticsOrder originalOrder = null;
+            for (LogisticsOrder o : LogisticsSQL.getAllOrders()) {
+                if (o.getOrderId().equals(selectedOrderId)) {
+                    originalOrder = o;
+                    break;
+                }
+            }
+
+            String currentStatus = (originalOrder != null) ? originalOrder.getStatus() : "Pending";
+            boolean currentCheckState = (originalOrder != null) && originalOrder.isCheckedIn();
+
+            LogisticsOrder updatedOrder = new LogisticsOrder(selectedOrderId, item, amount, currentStatus, currentCheckState);
+            
             if (LogisticsSQL.updateOrder(updatedOrder)) {
                 JOptionPane.showMessageDialog(this, "Order details successfully modified!");
                 selectedOrderId = null;
@@ -324,27 +369,58 @@ public class LogisticsPanel extends JPanel {
     }
     
     private void editOrder() {
-        int row = tblLogis.getSelectedRow();
-        if (row >= 0) {
-            int modelRow = tblLogis.convertRowIndexToModel(row);
+        int viewRow = tblLogis.getSelectedRow();
+        if (viewRow >= 0) {
+            int row = tblLogis.convertRowIndexToModel(viewRow);
+            String targetId = tblModel.getValueAt(row, 0).toString();
             
-            selectedOrderId = tblModel.getValueAt(modelRow, 0).toString();
-            txtItem.setText(tblModel.getValueAt(modelRow, 1).toString());
-            txtAmount.setText(tblModel.getValueAt(modelRow, 2).toString().replace("₱", "").replace(",", ""));
+            LogisticsOrder order = null;
+            for (LogisticsOrder o : LogisticsSQL.getAllOrders()) {
+                if (o.getOrderId().equals(targetId)) {
+                    order = o;
+                    break;
+                }
+            }
+            
+            if (order == null) return;
+            
+            if (order.isCheckedIn()) {
+                JOptionPane.showMessageDialog(this, "This order is locked and cannot be edited because it has already been processed into inventory.", "Record Locked", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            selectedOrderId = targetId;
+            txtItem.setText(tblModel.getValueAt(row, 1).toString());
+            txtAmount.setText(tblModel.getValueAt(row, 2).toString().replace("₱", "").replace(",", "").trim());
             
             JOptionPane.showMessageDialog(this, "Modify the entries, then click Save Order to execute structural edits.");
         } else {
-            JOptionPane.showMessageDialog(this, "Select an active row matrix element from the grid framework first!");
+            JOptionPane.showMessageDialog(this, "Select an active row element from the grid framework first!");
         }
     }
 
     private void markDelivered() {
-        int row = tblLogis.getSelectedRow();
-        if (row >= 0) {
-            int modelRow = tblLogis.convertRowIndexToModel(row);
-            String orderId = tblModel.getValueAt(modelRow, 0).toString();
+        int viewRow = tblLogis.getSelectedRow();
+        if (viewRow >= 0) {
+            int row = tblLogis.convertRowIndexToModel(viewRow);
+            String orderId = tblModel.getValueAt(row, 0).toString();
             
-            if (LogisticsSQL.updateStatus(orderId, "Delivered")) {
+            LogisticsOrder order = null;
+            for (LogisticsOrder o : LogisticsSQL.getAllOrders()) {
+                if (o.getOrderId().equals(orderId)) {
+                    order = o;
+                    break;
+                }
+            }
+            
+            if (order == null) return;
+            
+            if (order.isCheckedIn()) {
+                JOptionPane.showMessageDialog(this, "This order has already been finalized and processed into inventory storage.", "Action Blocked", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            if (LogisticsSQL.updateStatus(order.getOrderId(), "Delivered")) {
                 JOptionPane.showMessageDialog(this, "Order status shifted to Delivered!");
                 refreshTableData();
             }
@@ -354,17 +430,32 @@ public class LogisticsPanel extends JPanel {
     }
     
     private void removeOrder() {
-        int row = tblLogis.getSelectedRow();
-        if (row >= 0) {
-            int modelRow = tblLogis.convertRowIndexToModel(row);
-            String orderId = tblModel.getValueAt(modelRow, 0).toString();
+        int viewRow = tblLogis.getSelectedRow();
+        if (viewRow >= 0) {
+            int row = tblLogis.convertRowIndexToModel(viewRow);
+            String orderId = tblModel.getValueAt(row, 0).toString();
+            
+            LogisticsOrder order = null;
+            for (LogisticsOrder o : LogisticsSQL.getAllOrders()) {
+                if (o.getOrderId().equals(orderId)) {
+                    order = o;
+                    break;
+                }
+            }
+            
+            if (order == null) return;
+            
+            if (order.isCheckedIn()) {
+                JOptionPane.showMessageDialog(this, "Safety Rule: You cannot delete this record. This supply block is already actively deployed in inventory metrics.", "Purge Denied", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             
             int confirmation = JOptionPane.showConfirmDialog(this, 
-                "Are you sure you want to delete order " + orderId + "?", 
+                "Are you sure you want to delete order " + order.getOrderId() + "?", 
                 "Confirm Order Purge", JOptionPane.YES_NO_OPTION);
                 
             if (confirmation == JOptionPane.YES_OPTION) {
-                if (LogisticsSQL.deleteOrder(orderId)) {
+                if (LogisticsSQL.deleteOrder(order.getOrderId())) {
                     JOptionPane.showMessageDialog(this, "Order safely removed from relational tracking lists.");
                     txtItem.setText("");
                     txtAmount.setText("");

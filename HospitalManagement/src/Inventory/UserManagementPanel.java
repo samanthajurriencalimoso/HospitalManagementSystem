@@ -51,7 +51,7 @@ public class UserManagementPanel extends JPanel {
         lblDT = new JLabel();
         lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
         lblDT.setForeground(Color.darkGray);
-        lblDT.setBounds(1320, 20, 400, 40); 
+        lblDT.setBounds(1390, 20, 400, 40);
         pnlMain.add(lblDT);
 
         startClockTimer();

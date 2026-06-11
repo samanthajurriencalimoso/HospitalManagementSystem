@@ -1,30 +1,36 @@
 package Prescriptions;
 
 import static Color_Palette.ColorPalette.*;
-
+import Database.PrescriptionSQL;
+import Database.PatientManagementSQL;
+import Models.Prescription;
+import Models.Patient;
 import java.awt.*;
 import java.awt.event.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
 
 public class Prescription_Doctor extends JPanel implements ActionListener {
 
-    private JPanel pnlMain, tabPrescription, tabPatients, tabMedicine, tabUpdate, pnlForm, pnlBottom;
-    private JLabel lblTitle, lblDate, lblTPrescription, lblTPatients, lblTMedicine, lblPatient, lblDrug, lblDose, lblFreq, lblDur, lblTitle2, 
-                   lblValue;
-    private JTextField txtPat, txtDrug, txtFreq, txtDur;
-    private JComboBox<String> cbDose;
+    private JPanel pnlMain, tabPrescription, tabPatients, tabUpdate, pnlForm, pnlBottom;
+    private JLabel lblTitle, lblDate, lblDT, lblTPrescription, lblTPatients, lblPatient, lblDrug, lblDose, lblFreq, lblDur, lblTitle2, lblValue;
+    private JTextField txtDrug, txtFreq, txtDur;
+    private JComboBox<String> cbPat, cbDose; 
     private JButton btnAdd, btnDelete, btnUpdate, btnSave;
     private JTable tblPres;
     private JTableHeader hdrtbl;
     private JScrollPane sp;
     private DefaultTableModel tblModel;
-    private ArrayList<String[]> prescriptions = new ArrayList<>();
+    private ArrayList<Integer> dbIds = new ArrayList<>();
+    private ArrayList<String> patientIds = new ArrayList<>(); 
     private boolean isEditing = false;
 
     public Prescription_Doctor() {
-
         setLayout(null);
         setBounds(0, 0, 1620, 930);
 
@@ -39,22 +45,21 @@ public class Prescription_Doctor extends JPanel implements ActionListener {
         lblTitle.setBounds(30, 20, 400, 40);
         pnlMain.add(lblTitle);
 
-        lblDate = new JLabel("May 21, 2026 | 10:00 AM");
-        lblDate.setFont(new Font("Calibri", Font.BOLD, 18));
-        lblDate.setForeground(Color.darkGray);
-        lblDate.setBounds(1390, 20, 400, 40);
-        pnlMain.add(lblDate);
+        lblDT = new JLabel();
+        lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
+        lblDT.setForeground(Color.darkGray);
+        lblDT.setBounds(1390, 20, 400, 40);
+        pnlMain.add(lblDT);
+        startClockTimer();
 
         tabPatients = createTab("Total Patients", "0", mediumBlue);
         tabPatients.setBounds(30, 80, 500, 110);
         pnlMain.add(tabPatients);
-
         lblTPatients = (JLabel) tabPatients.getComponent(1);
         
         tabPrescription = createTab("Total Prescriptions", "0", darkBlue);
         tabPrescription.setBounds(550, 80, 500, 110);
         pnlMain.add(tabPrescription);
-
         lblTPrescription = (JLabel) tabPrescription.getComponent(1);
 
         pnlForm = new JPanel(null);
@@ -67,16 +72,17 @@ public class Prescription_Doctor extends JPanel implements ActionListener {
         lblPatient.setFont(new Font("Calibri", Font.BOLD, 18));
         lblPatient.setBounds(20, 38, 100, 30);
         pnlForm.add(lblPatient);
-        txtPat = new JTextField();
-        txtPat.setBounds(100, 38, 180, 30);
-        pnlForm.add(txtPat);
+        
+        cbPat = new JComboBox<>();
+        cbPat.setBounds(100, 38, 200, 30);
+        pnlForm.add(cbPat);
 
         lblDrug = new JLabel("Drug:");
         lblDrug.setFont(new Font("Calibri", Font.BOLD, 18));
-        lblDrug.setBounds(310, 38, 80, 30);
+        lblDrug.setBounds(320, 38, 80, 30);
         pnlForm.add(lblDrug);
         txtDrug = new JTextField();
-        txtDrug.setBounds(370, 38, 180, 30);
+        txtDrug.setBounds(380, 38, 180, 30);
         pnlForm.add(txtDrug);
 
         lblDose = new JLabel("Dosage:");
@@ -84,25 +90,24 @@ public class Prescription_Doctor extends JPanel implements ActionListener {
         lblDose.setBounds(580, 38, 100, 30);
         pnlForm.add(lblDose);
 
-        cbDose = new JComboBox<>(
-                new String[]{"Select", "5mg", "10mg", "50mg","100mg","400mg","500mg"});
+        cbDose = new JComboBox<>(new String[]{"Select", "5mg", "10mg", "50mg","100mg","400mg","500mg"});
         cbDose.setBounds(660, 38, 140, 30);
         pnlForm.add(cbDose);
         
         lblFreq = new JLabel("Frequency:");
         lblFreq.setFont(new Font("Calibri", Font.BOLD, 18));
-        lblFreq.setBounds(830, 38, 100, 30);
+        lblFreq.setBounds(820, 38, 100, 30);
         pnlForm.add(lblFreq);
         txtFreq = new JTextField();
-        txtFreq.setBounds(930, 38, 150, 30);
+        txtFreq.setBounds(920, 38, 150, 30);
         pnlForm.add(txtFreq);
 
         lblDur = new JLabel("Duration:");
         lblDur.setFont(new Font("Calibri", Font.BOLD, 18));
-        lblDur.setBounds(1110, 38, 100, 30);
+        lblDur.setBounds(1100, 38, 100, 30);
         pnlForm.add(lblDur);
         txtDur = new JTextField();
-        txtDur.setBounds(1200, 38, 120, 30);
+        txtDur.setBounds(1190, 38, 120, 30);
         pnlForm.add(txtDur);
 
         btnAdd = new JButton("Add Prescription");
@@ -114,29 +119,37 @@ public class Prescription_Doctor extends JPanel implements ActionListener {
         btnAdd.addActionListener(this);
         pnlForm.add(btnAdd);
 
-        String[] cols = {"Patient", "Drug", "Dosage", "Frequency", "Duration"};
-
-        tblModel = new DefaultTableModel(cols, 0);
+        String[] cols = {"Patient ID", "Patient Name", "Drug", "Dosage", "Frequency", "Duration"};
+        tblModel = new DefaultTableModel(cols, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+        
         tblPres = new JTable(tblModel);
         tblPres.setRowHeight(35);
-        tblPres.setFont(new Font("Calibri", Font.PLAIN, 16));
+        tblPres.setFont(new Font("Calibri", Font.PLAIN, 16)); 
+        tblPres.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
         hdrtbl = tblPres.getTableHeader();
         hdrtbl.setFont(new Font("Calibri", Font.BOLD, 18));
         hdrtbl.setBackground(lightBlue);
+        
         sp = new JScrollPane(tblPres);
         sp.setBounds(30, 360, 1560, 470);
         sp.setBorder(BorderFactory.createLineBorder(borderLBLUE));
         pnlMain.add(sp);
         
         tblPres.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && isEditing) {
+            if (!e.getValueIsAdjusting()) {
                 int data = tblPres.getSelectedRow();
                 if (data >= 0) {
-                    txtPat.setText(tblModel.getValueAt(data, 0).toString());
-                    txtDrug.setText(tblModel.getValueAt(data, 1).toString());
-                    cbDose.setSelectedItem(tblModel.getValueAt(data, 2).toString());
-                    txtFreq.setText(tblModel.getValueAt(data, 3).toString().replace("x/day", "").trim());
-                    txtDur.setText(tblModel.getValueAt(data, 4).toString().replace("days", "").trim());
+                    String rowPid = patientIds.get(data);
+                    String rowPname = tblModel.getValueAt(data, 1).toString();
+                    setSelectedPatientInComboBox(rowPid, rowPname);
+                    
+                    txtDrug.setText(tblModel.getValueAt(data, 2).toString());
+                    cbDose.setSelectedItem(tblModel.getValueAt(data, 3).toString());
+                    txtFreq.setText(tblModel.getValueAt(data, 4).toString().replace("x/day", "").trim());
+                    txtDur.setText(tblModel.getValueAt(data, 5).toString().replace("days", "").trim());
                 }
             }
         });
@@ -165,34 +178,21 @@ public class Prescription_Doctor extends JPanel implements ActionListener {
         btnUpdate.addActionListener(e -> { 
             int row = tblPres.getSelectedRow();
             if (row < 0) {
-                JOptionPane.showMessageDialog(this, "Select a prescription row first!","No Selection", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Select a prescription row first!", "No Selection", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             isEditing = true;
-            txtPat.setText(tblModel.getValueAt(row, 0).toString());
-            txtDrug.setText(tblModel.getValueAt(row, 1).toString());
-            cbDose.setSelectedItem(tblModel.getValueAt(row, 2).toString());
-            txtFreq.setText(tblModel.getValueAt(row, 3).toString().replace("x/day", "").trim());
-            txtDur.setText(tblModel.getValueAt(row, 4).toString().replace("days", "").trim());
-            JOptionPane.showMessageDialog(this, "Edit the fields then click Save.","Edit Mode", JOptionPane.INFORMATION_MESSAGE);
+            String rowPid = patientIds.get(row);
+            String rowPname = tblModel.getValueAt(row, 1).toString();
+            setSelectedPatientInComboBox(rowPid, rowPname);
+
+            txtDrug.setText(tblModel.getValueAt(row, 2).toString());
+            cbDose.setSelectedItem(tblModel.getValueAt(row, 3).toString());
+            txtFreq.setText(tblModel.getValueAt(row, 4).toString().replace("x/day", "").trim());
+            txtDur.setText(tblModel.getValueAt(row, 5).toString().replace("days", "").trim());
+            JOptionPane.showMessageDialog(this, "Edit the fields then click Save.", "Edit Mode", JOptionPane.INFORMATION_MESSAGE);
         });
         pnlBottom.add(btnUpdate);
-        
-        btnUpdate.addActionListener(e -> {
-            int row = tblPres.getSelectedRow();
-            if (row < 0) {
-                JOptionPane.showMessageDialog(this, "Select a prescription row first!",
-                    "No Selection", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            isEditing = true;
-            txtPat.setText(tblModel.getValueAt(row, 0).toString());
-            txtDrug.setText(tblModel.getValueAt(row, 1).toString());
-            cbDose.setSelectedItem(tblModel.getValueAt(row, 2).toString());
-            txtFreq.setText(tblModel.getValueAt(row, 3).toString().replace("x/day", "").trim());
-            txtDur.setText(tblModel.getValueAt(row, 4).toString().replace("days", "").trim());
-                JOptionPane.showMessageDialog(this, "You can now edit the fields. Click Save to confirm.","Edit Mode", JOptionPane.INFORMATION_MESSAGE);
-        });
 
         btnDelete = new JButton("Delete");
         btnDelete.setBounds(300, 10, 120, 30);
@@ -202,9 +202,43 @@ public class Prescription_Doctor extends JPanel implements ActionListener {
         btnDelete.setFocusPainted(false);
         btnDelete.addActionListener(this);
         pnlBottom.add(btnDelete);
-   
+        
+        populatePatientComboBox();
+        loadDataFromDatabase();
     }
     
+    private void populatePatientComboBox() {
+        cbPat.removeAllItems();
+        cbPat.addItem("Select Patient");
+        List<Patient> list = PatientManagementSQL.getAllPatients();
+        for (Patient p : list) {
+            cbPat.addItem(p.getId() + " - " + p.getName());
+        }
+    }
+    
+    private void setSelectedPatientInComboBox(String id, String name) {
+        String matchTarget = id + " - " + name;
+        for (int i = 0; i < cbPat.getItemCount(); i++) {
+            if (cbPat.getItemAt(i).equalsIgnoreCase(matchTarget)) {
+                cbPat.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
+
+    private void loadDataFromDatabase() {
+        tblModel.setRowCount(0);
+        dbIds.clear();
+        patientIds.clear();
+        List<Prescription> items = PrescriptionSQL.getAllPrescriptions();
+        for (Prescription p : items) {
+            dbIds.add(p.getPrescriptionId());
+            patientIds.add(p.getPatientId());
+            tblModel.addRow(new Object[]{p.getPatientId(), p.getPatientName(), p.getDrugName(), p.getDosage(), p.getFrequency() + "x/day", p.getDuration() + " days"});
+        }
+        updateSummary();
+    }
+
     private JPanel createTab(String title, String value, Color color) {
         tabUpdate = new JPanel(null);
         tabUpdate.setBackground(color);
@@ -234,180 +268,163 @@ public class Prescription_Doctor extends JPanel implements ActionListener {
     }
     
     private void addPrescription() {
-        String patient = txtPat.getText().trim();
         String drug = txtDrug.getText().trim();
         String freq = txtFreq.getText().trim();
         String duration = txtDur.getText().trim();
         
-        if (patient.isEmpty() || drug.isEmpty() || freq.isEmpty() || duration.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "All fields must be filled up!","Incomplete Fields", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        if (!patient.matches("[a-zA-Z ]+")) {
-            JOptionPane.showMessageDialog(this, "Patient name must contain letters only!", "Invalid Name", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        if (!drug.matches("[a-zA-Z\\- ]+")) {
-            JOptionPane.showMessageDialog(this, "Drug name must contain letters only!","Invalid Drug", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        if (cbDose.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(this, "Please select a dosage!","No Dosage Selected", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        int freqVal;
-        try {
-            freqVal = Integer.parseInt(freq);
-            if (freqVal <= 0) {
-                JOptionPane.showMessageDialog(this, "Frequency must be a positive number!", "Invalid Frequency", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-        } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Frequency must be a valid number!", "Invalid Frequency", JOptionPane.WARNING_MESSAGE);
+        if (cbPat.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this, "Please select an applicable patient target profile!", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        int durVal;
-        try {
-            durVal = Integer.parseInt(duration);
-            if (durVal <= 0) {
-                JOptionPane.showMessageDialog(this, "Duration must be a positive number!", "Invalid Duration", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Duration must be a valid number!", "Invalid Duration", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        for (int i = 0; i < tblModel.getRowCount(); i++) {
-            if (tblModel.getValueAt(i, 0).toString().equalsIgnoreCase(patient) &&
-                tblModel.getValueAt(i, 1).toString().equalsIgnoreCase(drug)) {
-                JOptionPane.showMessageDialog(this,
-                    patient + " already has a prescription for " + drug + "!",
-                    "Duplicate Prescription", JOptionPane.WARNING_MESSAGE);
-                return;
+        String selectedItem = cbPat.getSelectedItem().toString();
+        String[] parts = selectedItem.split(" - ", 2);
+        String patientId = parts[0];
+        String patientName = parts[1];
+
+        if (validateInputs(patientId, drug, freq, duration, -1)) {
+            int freqVal = Integer.parseInt(freq);
+            int durVal = Integer.parseInt(duration);
+            String dosage = cbDose.getSelectedItem().toString();
+
+            Prescription target = new Prescription(0, patientId, patientName, drug, dosage, freqVal, durVal, "Pending");
+            if (PrescriptionSQL.addPrescription(target)) {
+                loadDataFromDatabase();
+                clearFields();
+                JOptionPane.showMessageDialog(this, "Prescription added successfully!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Database entry write operation failed.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-
-        String[] row = {patient, drug, cbDose.getSelectedItem().toString(), freqVal + "x/day", durVal + " days"};
-        prescriptions.add(row);
-        tblModel.addRow(row);
-
-
-        updateSummary();
-        clearFields();
-        JOptionPane.showMessageDialog(this, "Prescription added!");
     }
 
     private void deletePrescription() {
         int row = tblPres.getSelectedRow();
-        
         if (row >= 0) {
-            tblModel.removeRow(row);
-            prescriptions.remove(row);
-            updateSummary();
-
-            JOptionPane.showMessageDialog(this, "Prescription deleted!");
+            int confirm = JOptionPane.showConfirmDialog(this, "Completely remove selected prescription entry?", "Confirm Action", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                int dbId = dbIds.get(row);
+                if (PrescriptionSQL.deletePrescription(dbId)) {
+                    loadDataFromDatabase();
+                    clearFields();
+                    isEditing = false;
+                    JOptionPane.showMessageDialog(this, "Prescription dropped from base records system.");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Database rejection encountered on delete query statement execution.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         } else {
-            JOptionPane.showMessageDialog(this,"Select prescription first!");
+            JOptionPane.showMessageDialog(this, "Select target row context from elements map space matrix layout first.", "No Selection", JOptionPane.WARNING_MESSAGE);
         } 
-        
-        clearFields();
     }
     
     private void saveEdit() {
         if (!isEditing) {
-            JOptionPane.showMessageDialog(this, "Click Edit on a row first!","Not in Edit Mode", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Activate layout selection modification by clicking the Edit action button first.", "Not Editing", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         int row = tblPres.getSelectedRow();
         if (row < 0) {
-            JOptionPane.showMessageDialog(this, "No row selected!","No Selection", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Target element structural lookup indexing track broken.", "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        String patient  = txtPat.getText().trim();
+        if (cbPat.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this, "Please select a valid patient context target.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String selectedItem = cbPat.getSelectedItem().toString();
+        String[] parts = selectedItem.split(" - ", 2);
+        String patientId = parts[0];
+        String patientName = parts[1];
+
         String drug     = txtDrug.getText().trim();
         String freq     = txtFreq.getText().trim();
         String duration = txtDur.getText().trim();
 
-        if (patient.isEmpty() || drug.isEmpty() || freq.isEmpty() || duration.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "All fields must be filled up!", "Incomplete Information", JOptionPane.WARNING_MESSAGE);
-            return;
+        if (validateInputs(patientId, drug, freq, duration, row)) {
+            int targetId = dbIds.get(row);
+            int freqVal = Integer.parseInt(freq);
+            int durVal = Integer.parseInt(duration);
+            String dosage = cbDose.getSelectedItem().toString();
+
+            Prescription updatePackage = new Prescription(targetId, patientId, patientName, drug, dosage, freqVal, durVal, "Pending");
+            if (PrescriptionSQL.updatePrescription(updatePackage)) {
+                isEditing = false;
+                loadDataFromDatabase();
+                clearFields();
+                JOptionPane.showMessageDialog(this, "Changes committed successfully!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Database update operation rejected tracking adjustments packages.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
-        if (!patient.matches("[a-zA-Z ]+")) {
-            JOptionPane.showMessageDialog(this, "Patient name must contain letters only!", "Invalid Name", JOptionPane.WARNING_MESSAGE);
-            return;
+    }
+
+    private boolean validateInputs(String patientId, String drug, String freq, String duration, int ignoringRowIndex) {
+        if (drug.isEmpty() || freq.isEmpty() || duration.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "All informational tracking properties require entry values!", "Incomplete Fields", JOptionPane.WARNING_MESSAGE);
+            return false;
         }
         if (!drug.matches("[a-zA-Z\\- ]+")) {
-            JOptionPane.showMessageDialog(this, "Drug name must contain letters only!", "Invalid Drug", JOptionPane.WARNING_MESSAGE);
-            return;
+            JOptionPane.showMessageDialog(this, "Drug target text values should map straight alphabetic strings.", "Invalid Drug", JOptionPane.WARNING_MESSAGE);
+            return false;
         }
         if (cbDose.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(this, "Please select a dosage!", "No Dosage Selected", JOptionPane.WARNING_MESSAGE);
-            return;
+            JOptionPane.showMessageDialog(this, "Assign an active item volume string inside selection choice map options box.", "No Dosage Selected", JOptionPane.WARNING_MESSAGE);
+            return false;
         }
-
-        int freqVal;
         try {
-            freqVal = Integer.parseInt(freq);
-            if (freqVal <= 0) { 
-                JOptionPane.showMessageDialog(this, "Frequency must be a positive number!", "Invalid Frequency", JOptionPane.WARNING_MESSAGE); return; }
+            if (Integer.parseInt(freq) <= 0) {
+                JOptionPane.showMessageDialog(this, "Frequency numbers must represent metrics higher than structural base level zeros.", "Invalid Frequency", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Frequency must be a valid number!", "Invalid Frequency", JOptionPane.WARNING_MESSAGE); return;
+            JOptionPane.showMessageDialog(this, "Frequency tracking requirements must contain simple integer structures.", "Invalid Frequency", JOptionPane.WARNING_MESSAGE);
+            return false;
         }
-
-        int durVal;
         try {
-            durVal = Integer.parseInt(duration);
-            if (durVal <= 0) { 
-                JOptionPane.showMessageDialog(this, "Duration must be a positive number!", "Invalid Duration", JOptionPane.WARNING_MESSAGE); return; }
+            if (Integer.parseInt(duration) <= 0) {
+                JOptionPane.showMessageDialog(this, "Lifecycle durations must encompass active intervals.", "Invalid Duration", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Duration must be a valid number!", "Invalid Duration", JOptionPane.WARNING_MESSAGE); return;
+            JOptionPane.showMessageDialog(this, "Timelines demand plain digital numerical figures for bounds declarations.", "Invalid Duration", JOptionPane.WARNING_MESSAGE);
+            return false;
         }
 
         for (int i = 0; i < tblModel.getRowCount(); i++) {
-            if (i == row) continue;
-            if (tblModel.getValueAt(i, 0).toString().equalsIgnoreCase(patient) &&
-                tblModel.getValueAt(i, 1).toString().equalsIgnoreCase(drug)) {
-                JOptionPane.showMessageDialog(this, patient + " already has a prescription for " + drug + "!","Duplicate Prescription", JOptionPane.WARNING_MESSAGE);
-                return;
+            if (i == ignoringRowIndex) continue;
+            if (patientIds.get(i).equalsIgnoreCase(patientId) &&
+                tblModel.getValueAt(i, 2).toString().equalsIgnoreCase(drug)) {
+                JOptionPane.showMessageDialog(this, "This patient (" + patientId + ") already has an active prescription record for " + drug + "!", "Duplicate Prescription Entry", JOptionPane.WARNING_MESSAGE);
+                return false;
             }
         }
-
-        tblModel.setValueAt(patient, row, 0);
-        tblModel.setValueAt(drug, row, 1);
-        tblModel.setValueAt(cbDose.getSelectedItem(),row, 2);
-        tblModel.setValueAt(freqVal + "x/day", row, 3);
-        tblModel.setValueAt(durVal  + " days", row, 4);
-
-        isEditing = false;
-        updateSummary();
-        clearFields();
-        JOptionPane.showMessageDialog(this, "Prescription updated!");
+        return true;
     }
 
     private void updateSummary() {
         int totalPrescription = tblModel.getRowCount();
-
-        java.util.HashSet<String> uniquePatients = new java.util.HashSet<>();
-        for (int i = 0; i < tblModel.getRowCount(); i++) {
-            uniquePatients.add(tblModel.getValueAt(i, 0).toString());
-        }
-            lblTPrescription.setText(String.valueOf(totalPrescription));
-            lblTPatients.setText(String.valueOf(uniquePatients.size()));
+        HashSet<String> uniquePatients = new HashSet<>(patientIds);
+        
+        lblTPrescription.setText(String.valueOf(totalPrescription));
+        lblTPatients.setText(String.valueOf(uniquePatients.size()));
     }
 
     private void clearFields() {
-        txtPat.setText("");
+        cbPat.setSelectedIndex(0);
         txtDrug.setText("");
         txtFreq.setText("");
         txtDur.setText("");
         cbDose.setSelectedIndex(0);
+    }
+    
+    private void startClockTimer() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mm:ss a");
+        lblDate.setText(LocalDateTime.now().format(formatter));
+        Timer timer = new Timer(1000, e -> lblDate.setText(LocalDateTime.now().format(formatter)));
+        timer.start();
     }
 }
