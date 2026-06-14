@@ -1,6 +1,7 @@
 package Inventory;
 
 import static Color_Palette.ColorPalette.*;
+import Database.LogisticsSQL;
 import Database.MedicalRequestSQL;
 import Database.UserManagementSQL;
 import javax.swing.*;
@@ -200,49 +201,61 @@ public class RequestPanel_Doctor extends JPanel {
     }
 
     private void addItem() {
-        String category = cmbCate.getSelectedItem().toString();
-        String item     = cmbItem.getSelectedItem().toString();
-        String qtyText  = txtQty.getText().trim();
+    String category = cmbCate.getSelectedItem().toString();
+    String item     = cmbItem.getSelectedItem().toString();
+    String qtyText  = txtQty.getText().trim();
 
-        if (qtyText.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a quantity!", "Missing Quantity", JOptionPane.WARNING_MESSAGE);
+    if (qtyText.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter a quantity!", "Missing Quantity", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    int qty;
+    try {
+        qty = Integer.parseInt(qtyText);
+        if (qty <= 0) {
+            JOptionPane.showMessageDialog(this, "Quantity must be greater than zero!", "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
             return;
         }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Quantity must be a valid number!", "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-        int qty;
-        try {
-            qty = Integer.parseInt(qtyText);
-            if (qty <= 0) {
-                JOptionPane.showMessageDialog(this, "Quantity must be greater than zero!", "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Quantity must be a valid number!", "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
+    // Check for duplicate in the current table (optional)
+    for (int i = 0; i < tblModel.getRowCount(); i++) {
+        if (tblModel.getValueAt(i, 1).toString().equals(category) &&
+            tblModel.getValueAt(i, 2).toString().equals(item)) {
+            JOptionPane.showMessageDialog(this,
+                item + " already exists under " + category + ".\nUse 'Add Quantity' to update it instead.",
+                "Duplicate Item", JOptionPane.WARNING_MESSAGE);
             return;
         }
+    }
 
-        for (int i = 0; i < tblModel.getRowCount(); i++) {
-            if (tblModel.getValueAt(i, 1).toString().equals(category) &&
-                tblModel.getValueAt(i, 2).toString().equals(item)) {
-                JOptionPane.showMessageDialog(this,
-                    item + " already exists under " + category + ".\nUse 'Add Quantity' to update it instead.",
-                    "Duplicate Item", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-        }
+    String status = "Pending";
 
-        String status = "Pending";
-
-        if (MedicalRequestSQL.addRequest(category, item, qty, status, currentUserId)) {
-            loadDataFromDatabase();
+    // 1. Insert into medical_requests table (existing)
+    if (MedicalRequestSQL.addRequest(category, item, qty, status, currentUserId)) {
+        
+        // 2. ALSO create a corresponding logistics order
+        boolean logisticsAdded = LogisticsSQL.insertOrderFromDoctorRequest(item, qty);
+        
+        if (logisticsAdded) {
+            loadDataFromDatabase();   // refresh doctor's own table
             txtQty.setText("");
             cmbCate.setSelectedIndex(0);
             refreshItemComboBox();
             JOptionPane.showMessageDialog(this, "Request submitted to Admin and routed to Logistics pipeline!");
         } else {
-            JOptionPane.showMessageDialog(this, "Database entry write transaction failed.", "Error", JOptionPane.ERROR_MESSAGE);
+            // If logistics insert fails, you may want to roll back or notify admin
+            JOptionPane.showMessageDialog(this, "Medical request saved, but logistics entry failed. Please contact IT.", "Partial Error", JOptionPane.WARNING_MESSAGE);
+            loadDataFromDatabase(); // still refresh
         }
+    } else {
+        JOptionPane.showMessageDialog(this, "Database entry write transaction failed.", "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
 
     private void addQuantity() {
         int viewRow = tblInve.getSelectedRow();
