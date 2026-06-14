@@ -236,24 +236,21 @@ public class PatientCentralPanel extends JPanel {
     }
 
     private void loadDataFromDatabase() {
-        tblModel.setRowCount(0);
-        String loggedInDoctor = "Dr. " + UserManagementSQL.currentEmployee.getName();
-        List<Patient> patients = PatientManagementSQL.getAllPatients();
-        for (Patient p : patients) {
-            if (p.getDoctor() != null && p.getDoctor().equalsIgnoreCase(loggedInDoctor)) {
-                tblModel.addRow(new Object[]{
-                    p.getId(),
-                    p.getName(),
-                    p.getRoom(),
-                    p.getDoctor(),
-                    p.getNurse(),
-                    p.getStatus(),
-                    p.getAdmissionDate()
-                });
-            }
-        }
-        updateSummary();
+    tblModel.setRowCount(0);
+    List<Patient> patients = PatientManagementSQL.getAllPatients();
+    for (Patient p : patients) {
+        tblModel.addRow(new Object[]{
+            p.getId(),
+            p.getName(),
+            p.getRoom(),
+            p.getDoctor(),
+            p.getNurse(),
+            p.getStatus(),
+            p.getAdmissionDate()
+        });
     }
+    updateSummary();
+}
     
     private void addPatient() {
         String name = txtName.getText().trim();

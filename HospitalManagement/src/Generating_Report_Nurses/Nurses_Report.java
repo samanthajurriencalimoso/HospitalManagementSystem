@@ -26,53 +26,53 @@ public class Nurses_Report extends JPanel implements ActionListener {
 
     public Nurses_Report() {
         setLayout(null);
-        setBounds(0, 0, 1020, 620);
+        setBounds(0, 0, 1620, 930);
 
         pnlMain = new JPanel();
         pnlMain.setLayout(null);
         pnlMain.setBackground(veryLightBlue);
-        pnlMain.setBounds(0, 0, 1020, 620);
+        pnlMain.setBounds(0, 0, 1620, 930);
         add(pnlMain);
 
-        lblNurse = new JLabel("Appointment History");
-        lblNurse.setBounds(20, 10, 350, 40);
-        lblNurse.setFont(new Font("Calibri", Font.BOLD, 24));
+        lblNurse = new JLabel("Nurse Reports");
+        lblNurse.setBounds(30, 20, 300, 50);
+        lblNurse.setFont(new Font("Calibri", Font.BOLD, 28));
         lblNurse.setForeground(Color.BLACK);
         pnlMain.add(lblNurse);
 
         lblDT = new JLabel();
-        lblDT.setFont(new Font("Calibri", Font.BOLD, 15));
+        lblDT.setFont(new Font("Calibri", Font.BOLD, 18));
         lblDT.setForeground(Color.darkGray);
-        lblDT.setBounds(700, 10, 310, 30);
+        lblDT.setBounds(1390, 20, 400, 40);
         pnlMain.add(lblDT);
         startClockTimer();
 
         lblType = new JLabel();
-        lblType.setBounds(20, 45, 600, 30);
-        lblType.setFont(new Font("Calibri", Font.BOLD, 18));
+        lblType.setBounds(275, 20, 400, 50);
+        lblType.setFont(new Font("Calibri", Font.BOLD, 28));
         lblType.setForeground(Color.BLACK);
         pnlMain.add(lblType);
 
         lbltext = new JLabel("View and manage patient appointment history reports.");
-        lbltext.setBounds(20, 70, 600, 25);
-        lbltext.setFont(new Font("Calibri", Font.PLAIN, 15));
-        lbltext.setForeground(Color.DARK_GRAY);
+        lbltext.setBounds(30, 60, 500, 30);
+        lbltext.setFont(new Font("Calibri", Font.PLAIN, 18));
+        lbltext.setForeground(Color.BLACK);
         pnlMain.add(lbltext);
 
         pnlRType = new JPanel();
         pnlRType.setLayout(null);
-        pnlRType.setBounds(10, 105, 230, 500);
+        pnlRType.setBounds(30, 110, 450, 800);
         pnlRType.setBackground(Color.WHITE);
         pnlMain.add(pnlRType);
 
-        lblRType = new JLabel("Report Type");
-        lblRType.setBounds(15, 15, 200, 25);
-        lblRType.setFont(new Font("Calibri", Font.BOLD, 18));
+        lblRType = new JLabel("Select Report Type");
+        lblRType.setBounds(30, 20, 240, 30);
+        lblRType.setFont(new Font("Calibri", Font.BOLD, 24));
         pnlRType.add(lblRType);
 
-        btnVitals = new JButton("<html><center>Appointment<br>History</center></html>");
-        btnVitals.setBounds(10, 50, 210, 65);
-        btnVitals.setFont(new Font("Calibri", Font.BOLD, 14));
+        btnVitals = new JButton("Appointment History");
+        btnVitals.setBounds(20, 70, 400, 80);
+        btnVitals.setFont(new Font("Calibri", Font.BOLD, 18));
         btnVitals.setBackground(Color.WHITE);
         btnVitals.setBorder(BorderFactory.createLineBorder(borderLBLUE, 2));
         btnVitals.setFocusPainted(false);
@@ -81,17 +81,17 @@ public class Nurses_Report extends JPanel implements ActionListener {
 
         pnlB = new JPanel();
         pnlB.setLayout(null);
-        pnlB.setBounds(250, 105, 760, 500);
+        pnlB.setBounds(500, 110, 1100, 800);
         pnlB.setBackground(Color.WHITE);
         pnlMain.add(pnlB);
 
         lblPrev = new JLabel("Report Preview");
-        lblPrev.setBounds(15, 10, 200, 30);
+        lblPrev.setBounds(30, 20, 200, 40);
         lblPrev.setFont(new Font("Calibri", Font.BOLD, 20));
         pnlB.add(lblPrev);
 
         btnMComplete = new JButton("Complete");
-        btnMComplete.setBounds(220, 12, 100, 26);
+        btnMComplete.setBounds(350, 25, 100, 30);
         btnMComplete.setBackground(Green);
         btnMComplete.setForeground(Color.WHITE);
         btnMComplete.setFont(new Font("Calibri", Font.BOLD, 12));
@@ -100,7 +100,7 @@ public class Nurses_Report extends JPanel implements ActionListener {
         pnlB.add(btnMComplete);
 
         btnMIncomplete = new JButton("Incomplete");
-        btnMIncomplete.setBounds(330, 12, 100, 26);
+        btnMIncomplete.setBounds(470, 25, 100, 30);
         btnMIncomplete.setBackground(Yellow);
         btnMIncomplete.setForeground(Color.BLACK);
         btnMIncomplete.setFont(new Font("Calibri", Font.BOLD, 12));
@@ -109,7 +109,7 @@ public class Nurses_Report extends JPanel implements ActionListener {
         pnlB.add(btnMIncomplete);
 
         btnMMissing = new JButton("Missing");
-        btnMMissing.setBounds(440, 12, 90, 26);
+        btnMMissing.setBounds(590, 25, 100, 30);
         btnMMissing.setBackground(LightRed);
         btnMMissing.setForeground(Color.WHITE);
         btnMMissing.setFont(new Font("Calibri", Font.BOLD, 12));
@@ -118,7 +118,7 @@ public class Nurses_Report extends JPanel implements ActionListener {
         pnlB.add(btnMMissing);
 
         lblStatus = new JLabel("Status: No report selected");
-        lblStatus.setBounds(545, 12, 200, 26);
+        lblStatus.setBounds(850, 25, 250, 28);
         lblStatus.setFont(new Font("Calibri", Font.BOLD, 14));
         lblStatus.setForeground(Color.RED);
         pnlB.add(lblStatus);
@@ -126,17 +126,18 @@ public class Nurses_Report extends JPanel implements ActionListener {
         pnlPrev = new JPanel();
         pnlPrev.setLayout(null);
         pnlPrev.setBackground(Color.WHITE);
-        pnlPrev.setPreferredSize(new Dimension(720, 800));
+        pnlPrev.setPreferredSize(new Dimension(1020, 920));
 
         scroll = new JScrollPane(pnlPrev);
-        scroll.setBounds(15, 48, 730, 380);
-        scroll.setBorder(BorderFactory.createLineBorder(borderLBLUE));
+        scroll.setBounds(30, 70, 1050, 650);
+        scroll.setBorder(null);
+        scroll.setViewportBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         pnlB.add(scroll);
 
         btnEdit = new JButton("Edit Report");
-        btnEdit.setBounds(250, 440, 140, 32);
+        btnEdit.setBounds(500, 730, 150, 35);
         btnEdit.setBackground(darkBlue);
         btnEdit.setForeground(Color.WHITE);
         btnEdit.setFont(new Font("Calibri", Font.BOLD, 13));
@@ -145,7 +146,7 @@ public class Nurses_Report extends JPanel implements ActionListener {
         pnlB.add(btnEdit);
 
         btnSend = new JButton("Send to Doctor");
-        btnSend.setBounds(400, 440, 155, 32);
+        btnSend.setBounds(660, 730, 170, 35);
         btnSend.setBackground(Green);
         btnSend.setForeground(Color.BLACK);
         btnSend.setFont(new Font("Calibri", Font.BOLD, 13));
@@ -154,7 +155,7 @@ public class Nurses_Report extends JPanel implements ActionListener {
         pnlB.add(btnSend);
 
         btnPrint = new JButton("Print Report");
-        btnPrint.setBounds(565, 440, 145, 32);
+        btnPrint.setBounds(840, 730, 180, 35);
         btnPrint.setBackground(LightGray);
         btnPrint.setForeground(Color.BLACK);
         btnPrint.setFont(new Font("Calibri", Font.BOLD, 13));
@@ -168,11 +169,14 @@ public class Nurses_Report extends JPanel implements ActionListener {
         resetTypeButtonStyles();
 
         if (ae.getSource() == btnVitals) {
-            currentReportType = "Appointment History";
-            btnVitals.setBackground(lightBlue);
-            lblType.setText(" > Appointment History");
-            loadOrCreateReport();
 
+            currentReportType = "Appointment History";
+
+            btnVitals.setBackground(lightBlue);
+
+            lblType.setText(" > Appointment History");
+
+            loadOrCreateReport();
         }
     }
     
@@ -194,57 +198,72 @@ public class Nurses_Report extends JPanel implements ActionListener {
     }
 
     private void renderPreview(NurseAppointment report) {
+
         pnlPrev.removeAll();
 
         JLabel lblHeader = new JLabel(currentReportType);
-        lblHeader.setBounds(20, 15, 680, 30);
+        lblHeader.setBounds(20, 15, 1100, 30);
         lblHeader.setFont(new Font("Calibri", Font.BOLD, 20));
         pnlPrev.add(lblHeader);
 
         JSeparator sep = new JSeparator();
-        sep.setBounds(20, 50, 680, 2);
+        sep.setBounds(20, 50, 1180, 2);
         pnlPrev.add(sep);
 
-        addInfoRow(pnlPrev,  70, "Report ID:", String.valueOf(currentReportDbId));
+        addInfoRow(pnlPrev, 70, "Report ID:", String.valueOf(currentReportDbId));
         addInfoRow(pnlPrev, 105, "Report Type:", currentReportType);
-        addInfoRow(pnlPrev, 140, "Patient Name:",report.getPatientName());
+        addInfoRow(pnlPrev, 140, "Patient Name:", report.getPatientName());
         addInfoRow(pnlPrev, 175, "Patient ID:", report.getPatientId());
-        addInfoRow(pnlPrev, 210, "Prepared By:",report.getSentBy());
-        addInfoRow(pnlPrev, 245, "Sent To:",report.getSentTo());
-        addInfoRow(pnlPrev, 280, "Status:",report.getStatus());
-        addInfoRow(pnlPrev, 315, "Date:",
-            LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy hh:mm a")));
+        addInfoRow(pnlPrev, 210, "Prepared By:", report.getSentBy());
+        addInfoRow(pnlPrev, 245, "Sent To:", report.getSentTo());
+        addInfoRow(pnlPrev, 280, "Status:", report.getStatus());
+
+        addInfoRow(
+                pnlPrev,
+                315,
+                "Date:",
+                LocalDateTime.now().format(
+                        DateTimeFormatter.ofPattern("MMMM dd, yyyy hh:mm a")
+                )
+        );
 
         JLabel lblNotes = new JLabel("Notes / Report Data:");
-        lblNotes.setBounds(20, 360, 200, 25);
+        lblNotes.setBounds(20, 370, 250, 25);
         lblNotes.setFont(new Font("Calibri", Font.BOLD, 14));
         pnlPrev.add(lblNotes);
 
         JTextArea txtNotes = new JTextArea(
-            report.getReportData() != null ? report.getReportData() : "");
-        txtNotes.setFont(new Font("Calibri", Font.PLAIN, 13));
+                report.getReportData() == null
+                        ? ""
+                        : report.getReportData()
+        );
+
         txtNotes.setLineWrap(true);
         txtNotes.setWrapStyleWord(true);
         txtNotes.setEditable(false);
-        txtNotes.setBackground(new Color(245, 245, 245));
+        txtNotes.setFont(new Font("Calibri", Font.PLAIN, 14));
+
         JScrollPane noteScroll = new JScrollPane(txtNotes);
-        noteScroll.setBounds(20, 388, 680, 120);
+        noteScroll.setBounds(20, 400, 1180, 250);
         pnlPrev.add(noteScroll);
 
-        pnlPrev.setPreferredSize(new Dimension(720, 540));
+        pnlPrev.setPreferredSize(new Dimension(1020, 920));
+
         pnlPrev.revalidate();
         pnlPrev.repaint();
+
         scroll.getVerticalScrollBar().setValue(0);
     }
 
     private void addInfoRow(JPanel panel, int y, String labelText, String valueText) {
+
         JLabel lbl = new JLabel(labelText);
         lbl.setBounds(20, y, 180, 25);
         lbl.setFont(new Font("Calibri", Font.BOLD, 14));
         panel.add(lbl);
 
         JLabel val = new JLabel(valueText != null ? valueText : "—");
-        val.setBounds(210, y, 490, 25);
+        val.setBounds(220, y, 950, 25);
         val.setFont(new Font("Calibri", Font.PLAIN, 14));
         panel.add(val);
     }

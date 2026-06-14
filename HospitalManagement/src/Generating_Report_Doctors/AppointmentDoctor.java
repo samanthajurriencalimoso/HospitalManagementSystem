@@ -509,46 +509,46 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         }
     }
 
-private void editPatient() {
-    JTextField txtPatientName = new JTextField(patientName, 20);
-    JTextField txtPatientID   = new JTextField(patientID,   20);
+    private void editPatient() {
+        JTextField txtPatientName = new JTextField(patientName, 20);
+        JTextField txtPatientID   = new JTextField(patientID,   20);
 
-    JPanel panel = new JPanel(null);
-    panel.setPreferredSize(new Dimension(370, 80));
+        JPanel panel = new JPanel(null);
+        panel.setPreferredSize(new Dimension(370, 80));
 
-    JLabel lblPN = new JLabel("Patient Name:*");
-    lblPN.setBounds(10, 10, 110, 25);
-    panel.add(lblPN);
-    txtPatientName.setBounds(130, 10, 220, 25);
-    panel.add(txtPatientName);
+        JLabel lblPN = new JLabel("Patient Name:*");
+        lblPN.setBounds(10, 10, 110, 25);
+        panel.add(lblPN);
+        txtPatientName.setBounds(130, 10, 220, 25);
+        panel.add(txtPatientName);
 
-    JLabel lblPID = new JLabel("Patient ID:*");
-    lblPID.setBounds(10, 45, 110, 25);
-    panel.add(lblPID);
-    txtPatientID.setBounds(130, 45, 220, 25);
-    panel.add(txtPatientID);
+        JLabel lblPID = new JLabel("Patient ID:*");
+        lblPID.setBounds(10, 45, 110, 25);
+        panel.add(lblPID);
+        txtPatientID.setBounds(130, 45, 220, 25);
+        panel.add(txtPatientID);
 
-    int result = JOptionPane.showConfirmDialog(this, panel, 
-        "Edit Patient Information", JOptionPane.OK_CANCEL_OPTION);
-    if (result == JOptionPane.OK_OPTION) {
-        String newName = txtPatientName.getText().trim();
-        String newID   = txtPatientID.getText().trim();
-        if (newName.isEmpty() || newID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Patient Name and ID are required!");
-            return;
+        int result = JOptionPane.showConfirmDialog(this, panel, 
+            "Edit Patient Information", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            String newName = txtPatientName.getText().trim();
+            String newID   = txtPatientID.getText().trim();
+            if (newName.isEmpty() || newID.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Patient Name and ID are required!");
+                return;
+            }
+            patientName = newName;
+            patientID   = newID;
+            lblPName.setText("Patient Name: " + patientName);
+            lblPID.setText("Patient ID: "     + patientID);
+            isApproved = false;
+            status = "Pending";
+            lblStatus.setText("Status: Pending");
+            lblStatus.setForeground(orange);
+            updateApproveButtonState();
+            JOptionPane.showMessageDialog(this, "Patient information updated!");
         }
-        patientName = newName;
-        patientID   = newID;
-        lblPName.setText("Patient Name: " + patientName);
-        lblPID.setText("Patient ID: "     + patientID);
-        isApproved = false;
-        status = "Pending";
-        lblStatus.setText("Status: Pending");
-        lblStatus.setForeground(orange);
-        updateApproveButtonState();
-        JOptionPane.showMessageDialog(this, "Patient information updated!");
     }
-}
     
     private void newReport() {
         int confirm = JOptionPane.showConfirmDialog(this, "Create new blank report? Unsaved data will be lost.");

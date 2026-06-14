@@ -9,7 +9,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableModel; 
 
 public class AppointmentAdmin extends JPanel implements ActionListener {
 

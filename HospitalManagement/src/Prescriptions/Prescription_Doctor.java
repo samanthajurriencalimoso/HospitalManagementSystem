@@ -18,7 +18,7 @@ import javax.swing.table.*;
 public class Prescription_Doctor extends JPanel implements ActionListener {
 
     private JPanel pnlMain, tabPrescription, tabPatients, tabUpdate, pnlForm, pnlBottom;
-    private JLabel lblTitle, lblDate, lblDT, lblTPrescription, lblTPatients, lblPatient, lblDrug, lblDose, lblFreq, lblDur, lblTitle2, lblValue;
+    private JLabel lblTitle, lblDT, lblTPrescription, lblTPatients, lblPatient, lblDrug, lblDose, lblFreq, lblDur, lblTitle2, lblValue;
     private JTextField txtDrug, txtFreq, txtDur;
     private JComboBox<String> cbPat, cbDose; 
     private JButton btnAdd, btnDelete, btnUpdate, btnSave;
@@ -240,22 +240,22 @@ public class Prescription_Doctor extends JPanel implements ActionListener {
     }
 
     private JPanel createTab(String title, String value, Color color) {
-        tabUpdate = new JPanel(null);
-        tabUpdate.setBackground(color);
+        JPanel tab = new JPanel(null);
+        tab.setBackground(color);
         
-        lblTitle2 = new JLabel(title);
+        JLabel lblTitle2 = new JLabel(title);
         lblTitle2.setFont(new Font("Calibri", Font.BOLD, 20));
         lblTitle2.setForeground(Color.WHITE);
         lblTitle2.setBounds(20, 20, 300, 30);
-        tabUpdate.add(lblTitle2);
+        tab.add(lblTitle2);
         
-        lblValue = new JLabel(value);
+        JLabel lblValue = new JLabel(value);
         lblValue.setFont(new Font("Calibri", Font.BOLD, 32));
         lblValue.setForeground(Color.WHITE);
         lblValue.setBounds(20, 55, 200, 40);
-        tabUpdate.add(lblValue);
+        tab.add(lblValue);
         
-        return tabUpdate;
+        return tab;
     }
 
     @Override
@@ -423,8 +423,8 @@ public class Prescription_Doctor extends JPanel implements ActionListener {
     
     private void startClockTimer() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mm:ss a");
-        lblDate.setText(LocalDateTime.now().format(formatter));
-        Timer timer = new Timer(1000, e -> lblDate.setText(LocalDateTime.now().format(formatter)));
+        lblDT.setText(LocalDateTime.now().format(formatter));
+        Timer timer = new Timer(1000, e -> lblDT.setText(LocalDateTime.now().format(formatter)));
         timer.start();
     }
 }
