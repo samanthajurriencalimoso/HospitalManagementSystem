@@ -23,9 +23,9 @@ public class NurseAppointmentSQL {
     }
 
     public static int saveReport(NurseAppointment report) {
-          String sql = "INSERT INTO nurse_appointment_history (patient_name, patient_id, report_data, status, sent_by, sent_to, sent_date) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO nurse_appointment_history (patient_name, patient_id, report_data, status, sent_by, sent_to, sent_date) VALUES (?, ?, ?, ?, ?, ?, NOW())";
         try (Connection conn = getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, report.getPatientName());
             pstmt.setString(2, report.getPatientId());
             pstmt.setString(3, report.getReportData());
@@ -60,7 +60,7 @@ public class NurseAppointmentSQL {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
-        public static List<NurseAppointment> getReportsForDoctor() {
+    public static List<NurseAppointment> getReportsForDoctor() {
         List<NurseAppointment> reports = new ArrayList<>();
         String sql = "SELECT * FROM nurse_appointment_history WHERE status='Sent to Doctor' ORDER BY sent_date DESC";
         try (Connection conn = getConnection();
@@ -109,5 +109,34 @@ public class NurseAppointmentSQL {
         } catch (SQLException e) { e.printStackTrace(); }
         return null;
     }
+    
+    public static List<NurseAppointment> getReportsByPatient(String patientName) {
+        List<NurseAppointment> reports = new ArrayList<>();
+        String sql = "SELECT * FROM nurse_appointment_history WHERE patient_name = ? ORDER BY sent_date DESC";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, patientName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Timestamp timestamp = rs.getTimestamp("sent_date");
+                    LocalDateTime sentDate = timestamp != null ? timestamp.toLocalDateTime() : null;
+
+                    reports.add(new NurseAppointment(
+                        rs.getInt("id"),
+                        rs.getString("patient_name"),
+                        rs.getString("patient_id"),
+                        rs.getString("report_data"),
+                        rs.getString("status"),
+                        rs.getString("sent_by"),
+                        rs.getString("sent_to"),
+                        sentDate
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return reports;
     }
 
+}

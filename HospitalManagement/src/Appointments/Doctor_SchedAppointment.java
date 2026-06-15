@@ -5,9 +5,11 @@ import Database.AppointmentSQL;
 import Database.PatientManagementSQL;
 import Database.PrescriptionSQL;
 import Database.UserManagementSQL;
+import Database.DoctorAppointmentSQL;
 import Models.Appointment;
 import Models.Patient;
 import Models.Prescription;
+import Models.DoctorAppointment;
 import Patient_Information.PatientInfo_Doctor;
 import MedicalHistory.MedicalHistory_Doctor;
 import java.awt.*;
@@ -451,24 +453,54 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
         }
 
         filtered.sort((a, b) -> {
-            String timeA = a.getAppointmentDate().contains(" ") ? a.getAppointmentDate().substring(a.getAppointmentDate().indexOf(" ") + 1) : "12:00 AM";
-            String timeB = b.getAppointmentDate().contains(" ") ? b.getAppointmentDate().substring(b.getAppointmentDate().indexOf(" ") + 1) : "12:00 AM";
+            String timeA = a.getAppointmentDate().contains(" ")
+                ? a.getAppointmentDate().substring(a.getAppointmentDate().indexOf(" ") + 1) : "12:00 AM";
+            String timeB = b.getAppointmentDate().contains(" ")
+                ? b.getAppointmentDate().substring(b.getAppointmentDate().indexOf(" ") + 1) : "12:00 AM";
             return parseTimeTo24hr(timeA).compareTo(parseTimeTo24hr(timeB));
         });
 
         for (Appointment app : filtered) {
             String extractedTime = "09:00 AM";
             if (app.getAppointmentDate().contains(" ")) {
-                extractedTime = app.getAppointmentDate().substring(app.getAppointmentDate().indexOf(" ") + 1);
+                extractedTime = app.getAppointmentDate()
+                    .substring(app.getAppointmentDate().indexOf(" ") + 1);
             }
+
+            String displayStatus = app.getStatus();
+            String nurseStatus = getStatusFromNurseReport(app.getPatientName());
+            if (nurseStatus != null && nurseStatus.equalsIgnoreCase("Completed")) {
+                displayStatus = "Completed";
+                if (!app.getStatus().equalsIgnoreCase("Completed")) {
+                    Appointment synced = new Appointment(
+                        app.getAppointmentId(),
+                        app.getPatientName(),
+                        app.getDoctorName(),
+                        app.getTreatment(),
+                        "Completed",
+                        app.getAppointmentDate()
+                    );
+                    AppointmentSQL.updateAppointment(synced);
+                }
+            }
+
             appModel.addRow(new Object[]{
                 extractedTime,
                 app.getAppointmentId(),
                 app.getPatientName(),
                 app.getTreatment(),
-                app.getStatus()
+                displayStatus
             });
         }
+    }
+    
+    private String getStatusFromNurseReport(String patientName) {
+        List<Models.NurseAppointment> reports = Database.NurseAppointmentSQL.getReportsByPatient(patientName);
+        if (reports != null && !reports.isEmpty()) {
+            Models.NurseAppointment latest = reports.get(reports.size() - 1);
+            return latest.getStatus();
+        }
+        return null;
     }
 
     private String parseTimeTo24hr(String time) {
@@ -804,84 +836,84 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
 
         } else if (ae.getSource() == btnEdit2) {
             int row = tblApp.getSelectedRow();
-            if (row != -1) {
-                String id = (String) tblApp.getValueAt(row, 1);
-                String pname = (String) tblApp.getValueAt(row, 2);
-                String currentTreatment = (String) tblApp.getValueAt(row, 3);
-                String currentStatus = (String) tblApp.getValueAt(row, 4);
-
-                String[] workingHours = {"08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM",
-                                         "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"};
-                cmbTime = new JComboBox<>(workingHours);
-                cmbTime.setSelectedItem(tblApp.getValueAt(row, 0));
-
-                PID = new JTextField(id);
-                PID.setEditable(false);
-                PID.setBackground(Color.LIGHT_GRAY);
-
-                JTextField PNameDisplay = new JTextField(pname);
-                PNameDisplay.setEditable(false);
-                PNameDisplay.setBackground(Color.LIGHT_GRAY);
-
-                cmbType = new JComboBox<>(new String[]{"Appointment", "Follow-up", "Surgery", "Emergency"});
-                cmbType.setSelectedItem(currentTreatment);
-
-                txtStatus = new JTextField(currentStatus);
-                txtStatus.setEditable(false);
-                txtStatus.setBackground(LightGray);
-
-                pnlEdit2 = new JPanel();
-                pnlEdit2.setLayout(null);
-                pnlEdit2.setPreferredSize(new Dimension(360, 220));
-
-                lblTime2 = new JLabel("Time:");
-                lblTime2.setBounds(10, 10, 110, 28);
-                cmbTime.setBounds(130, 10, 210, 28);
-                pnlEdit2.add(lblTime2); pnlEdit2.add(cmbTime);
-
-                lblPID = new JLabel("Appointment ID:");
-                lblPID.setBounds(10, 48, 110, 28);
-                PID.setBounds(130, 48, 210, 28);
-                pnlEdit2.add(lblPID); pnlEdit2.add(PID);
-
-                lblPName = new JLabel("Patient Name:");
-                lblPName.setBounds(10, 86, 110, 28);
-                PNameDisplay.setBounds(130, 86, 210, 28);
-                pnlEdit2.add(lblPName); pnlEdit2.add(PNameDisplay);
-
-                lblType = new JLabel("Type:");
-                lblType.setBounds(10, 124, 110, 28);
-                cmbType.setBounds(130, 124, 210, 28);
-                pnlEdit2.add(lblType); pnlEdit2.add(cmbType);
-
-                lblStatus = new JLabel("Status:");
-                lblStatus.setBounds(10, 162, 110, 28);
-                txtStatus.setBounds(130, 162, 210, 28);
-                pnlEdit2.add(lblStatus); pnlEdit2.add(txtStatus);
-
-                int option = JOptionPane.showConfirmDialog(this, pnlEdit2, "Edit Appointment Details", JOptionPane.OK_CANCEL_OPTION);
-
-                if (option == JOptionPane.OK_OPTION) {
-                    String updatedTime = (String) cmbTime.getSelectedItem();
-                    String updatedType = (String) cmbType.getSelectedItem();
-                    String updatedFullCombinedDate = currentSelectedDate.toString() + " " + updatedTime;
-                    String loggedInDoctor = "Dr. " + UserManagementSQL.currentEmployee.getName();
-
-                    Appointment updatePayload = new Appointment(id, pname, loggedInDoctor, updatedType, currentStatus, updatedFullCombinedDate);
-
-                    if (AppointmentSQL.updateAppointment(updatePayload)) {
-                        JOptionPane.showMessageDialog(this, "Appointment updated successfully!");
-                        loadAppointmentsFromDatabase(currentSelectedDate);
-                        renderMonthCalendar();
-                        updateCardMetrics();
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Failed to update appointment.");
-                    }
-                }
-            } else {
+            if (row == -1) {
                 JOptionPane.showMessageDialog(this, "Select an appointment row to edit.");
+                return;
+            }
+            if (currentSelectedDate == null) {
+                JOptionPane.showMessageDialog(this, "Please click the calendar date first.");
+                return;
             }
 
+            String id             = (String) tblApp.getValueAt(row, 1);
+            String pname          = (String) tblApp.getValueAt(row, 2);
+            String currentTreatment = (String) tblApp.getValueAt(row, 3);
+            String currentStatus  = (String) tblApp.getValueAt(row, 4);
+
+            String[] workingHours = {"08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM",
+                                     "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"};
+            cmbTime = new JComboBox<>(workingHours);
+            cmbTime.setSelectedItem(tblApp.getValueAt(row, 0));
+
+            PID = new JTextField(id);
+            PID.setEditable(false);
+            PID.setBackground(Color.LIGHT_GRAY);
+
+            JTextField PNameDisplay = new JTextField(pname);
+            PNameDisplay.setEditable(false);
+            PNameDisplay.setBackground(Color.LIGHT_GRAY);
+
+            cmbType = new JComboBox<>(new String[]{"Appointment", "Follow-up", "Surgery", "Emergency"});
+            cmbType.setSelectedItem(currentTreatment);
+
+            JComboBox<String> cmbStatus = new JComboBox<>(
+                new String[]{"Pending", "Confirmed", "Urgent", "Completed", "Cancelled"});
+            cmbStatus.setSelectedItem(currentStatus);
+
+            JPanel pnlEdit2 = new JPanel();
+            pnlEdit2.setLayout(null);
+            pnlEdit2.setPreferredSize(new Dimension(360, 220));
+
+            JLabel lTime   = new JLabel("Time:");          lTime.setBounds(10, 10, 110, 28);
+            JLabel lID     = new JLabel("Appointment ID:"); lID.setBounds(10, 48, 110, 28);
+            JLabel lName   = new JLabel("Patient Name:");   lName.setBounds(10, 86, 110, 28);
+            JLabel lType   = new JLabel("Type:");           lType.setBounds(10, 124, 110, 28);
+            JLabel lStatus = new JLabel("Status:");         lStatus.setBounds(10, 162, 110, 28);
+
+            cmbTime.setBounds(130, 10, 210, 28);
+            PID.setBounds(130, 48, 210, 28);
+            PNameDisplay.setBounds(130, 86, 210, 28);
+            cmbType.setBounds(130, 124, 210, 28);
+            cmbStatus.setBounds(130, 162, 210, 28);
+
+            pnlEdit2.add(lTime);   pnlEdit2.add(cmbTime);
+            pnlEdit2.add(lID);     pnlEdit2.add(PID);
+            pnlEdit2.add(lName);   pnlEdit2.add(PNameDisplay);
+            pnlEdit2.add(lType);   pnlEdit2.add(cmbType);
+            pnlEdit2.add(lStatus); pnlEdit2.add(cmbStatus);
+
+            int option = JOptionPane.showConfirmDialog(
+                this, pnlEdit2, "Edit Appointment Details", JOptionPane.OK_CANCEL_OPTION);
+
+            if (option == JOptionPane.OK_OPTION) {
+                String updatedTime   = (String) cmbTime.getSelectedItem();
+                String updatedType   = (String) cmbType.getSelectedItem();
+                String updatedStatus = (String) cmbStatus.getSelectedItem();
+                String updatedFullDate = currentSelectedDate.toString() + " " + updatedTime;
+                String loggedInDoctor  = "Dr. " + UserManagementSQL.currentEmployee.getName();
+
+                Appointment updatePayload = new Appointment(
+                    id, pname, loggedInDoctor, updatedType, updatedStatus, updatedFullDate);
+
+                if (AppointmentSQL.updateAppointment(updatePayload)) {
+                    JOptionPane.showMessageDialog(this, "Appointment updated successfully!");
+                    loadAppointmentsFromDatabase(currentSelectedDate);
+                    renderMonthCalendar();
+                    updateCardMetrics();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to update appointment.");
+                }
+    }
         } else if (ae.getSource() == btnCancel) {
             int row = tblApp.getSelectedRow();
             if (row != -1) {
@@ -964,16 +996,14 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
                 lblEv.setOpaque(true);
                 if ("Urgent".equalsIgnoreCase(app.getStatus())) {
                     lblEv.setBackground(LightRed);
-                } else if ("Complete".equalsIgnoreCase(app.getStatus())) {
-                    lblEv.setBackground(Green);
+                } else if ("Completed".equalsIgnoreCase(app.getStatus())
+                        || "Complete".equalsIgnoreCase(app.getStatus())) {
+                    lblEv.setBackground(Green);   // already green — now "Completed" also matches
+                } else if ("Cancelled".equalsIgnoreCase(app.getStatus())) {
+                    lblEv.setBackground(Color.GRAY);
                 } else {
                     lblEv.setBackground(Blue);
                 }
-                lblEv.setForeground(Color.WHITE);
-                lblEv.setBounds(2, y, 142, 14);
-                add(lblEv);
-                y += 18;
-                shown++;
             }
             return this;
         }

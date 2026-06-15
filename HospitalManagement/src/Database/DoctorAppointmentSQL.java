@@ -35,6 +35,19 @@ public class DoctorAppointmentSQL {
         } catch (SQLException e) { e.printStackTrace(); }
         return -1;
     }
+    
+    // ✅ Doctor can check latest nurse report status for a patient
+    public static String getStatusFromNurseReport(String patientName) {
+        String sql = "SELECT status FROM nurse_appointment_history " +
+                     "WHERE patient_name = ? ORDER BY sent_date DESC LIMIT 1";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, patientName);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getString("status");
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
+    }
 
     public static boolean sendToAdmin(int id) {
         String sql = "UPDATE doctor_appointment_history SET status='Sent to Admin', sent_date=NOW() WHERE id=?";
