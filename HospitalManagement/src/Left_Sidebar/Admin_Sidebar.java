@@ -8,6 +8,7 @@ import Inventory.InventoryPanel;
 import Inventory.LogisticsPanel;
 import Inventory.PatientCentralPanel;
 import Inventory.UserManagementPanel;
+import Inventory.RequestPanel_Admin;
 import Login_Startup.Login;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,7 +19,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
 
     private JPanel leftSidebar, pnlInventory;
     private JLabel lblLogo, lblLogoTitle;
-    private JButton btnDashboard, btnUManagement, btnPInfo, btnAppointment, btnInventory, btnPOptions, btnIManagement, btnLogistics, btnReport, btnLogout, btnDesign, btnLout;
+    private JButton btnDashboard, btnUManagement, btnPInfo, btnAppointment, btnInventory, btnPOptions, btnIManagement, btnLogistics, btnReport, btnLogout, btnDesign, btnLout, btnRequestManagement;
     private ImageIcon imgDlogo;
     private Image imgbg;
     private Admin_SideBarFrame navPage;
@@ -49,7 +50,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnDashboard = btnSideBar("Dashboard", 20, 260, 260, 45, darkBlue);
         leftSidebar.add(btnDashboard);
         
-        btnUManagement = btnSideBar("User Management", 20, 320, 260,45, darkBlue);
+        btnUManagement = btnSideBar("User Management", 20, 320, 260, 45, darkBlue);
         leftSidebar.add(btnUManagement);
         
         btnPInfo = btnSideBar("Patient Central", 20, 380, 260, 45, darkBlue);
@@ -58,7 +59,7 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnAppointment = btnSideBar("Appointment", 20, 440, 260, 45, darkBlue);
         leftSidebar.add(btnAppointment);
         
-        btnInventory = btnSideBar("Inventory  +", 20, 500, 260, 45, darkBlue);
+        btnInventory = btnSideBar("Inventory", 20, 500, 260, 45, darkBlue);
         leftSidebar.add(btnInventory);
         
         pnlInventory = new JPanel();
@@ -83,22 +84,27 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
             InveOption += 40;
         }
         
-        btnReport = btnSideBar("Report & Documents", 20, 560, 260, 45, darkBlue);
+        btnReport = btnSideBar("Report & Documents", 20, 650, 260, 45, darkBlue);
         leftSidebar.add(btnReport);
+        
+        btnRequestManagement = btnSideBar("Request Management", 20, 710, 260, 45, darkBlue);
+        leftSidebar.add(btnRequestManagement);
         
         btnInventory.addActionListener(e -> {
             boolean expandIOptions = !pnlInventory.isVisible();
             pnlInventory.setVisible(expandIOptions);
             
-                if (expandIOptions) {
-                    btnInventory.setText("Inventory  -");
-                    pnlInventory.setBounds(40, 545, 240, 90);
-                    btnReport.setBounds(20, 650, 260, 45);
-                } else {
-                    btnInventory.setText("Inventory  +");
-                    pnlInventory.setVisible(false);
-                    btnReport.setBounds(20, 560, 260, 45);
-                }
+            if (expandIOptions) {
+                btnInventory.setText("Inventory -");
+                pnlInventory.setBounds(40, 545, 240, 90);
+                btnReport.setBounds(20, 650, 260, 45);
+                btnRequestManagement.setBounds(20, 710, 260, 45);
+            } else {
+                btnInventory.setText("Inventory +");
+                pnlInventory.setVisible(false);
+                btnReport.setBounds(20, 560, 260, 45);
+                btnRequestManagement.setBounds(20, 620, 260, 45);
+            }
             leftSidebar.repaint();
             leftSidebar.revalidate();
         });
@@ -113,19 +119,19 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnLogistics.addActionListener(this);
         btnAppointment.addActionListener(this);
         btnReport.addActionListener(this);
+        btnRequestManagement.addActionListener(this);
         btnLogout.addActionListener(this);   
     }
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-    if (ae.getSource() == btnLogout) {
-
-        int confirm = JOptionPane.showConfirmDialog(
-                navPage,
-                "Are you sure you want to logout?",
-                "Logout Confirmation",
-                JOptionPane.YES_NO_OPTION
-        );
+        if (ae.getSource() == btnLogout) {
+            int confirm = JOptionPane.showConfirmDialog(
+                    navPage,
+                    "Are you sure you want to logout?",
+                    "Logout Confirmation",
+                    JOptionPane.YES_NO_OPTION
+            );
             if (confirm == JOptionPane.YES_OPTION) {
                 Login lg = new Login();
                 lg.setVisible(true);
@@ -138,13 +144,15 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         } else if (ae.getSource() == btnPInfo) {
             navPage.turnPage(new PatientCentralPanel());
         } else if (ae.getSource() == btnAppointment) {
-           navPage.turnPage(new Admin_SchedAppointment());
+            navPage.turnPage(new Admin_SchedAppointment());
         } else if (ae.getSource() == btnIManagement) {
             navPage.turnPage(new InventoryPanel());
         } else if (ae.getSource() == btnLogistics) {
             navPage.turnPage(new LogisticsPanel());
         } else if (ae.getSource() == btnReport) {
             navPage.turnPage(new Admin_Reports());
+        } else if (ae.getSource() == btnRequestManagement) {
+            navPage.turnPage(new RequestPanel_Admin());
         }
     } 
 
@@ -164,18 +172,18 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
     }
     
     private JButton btnInve(String text, int x, int y, int wid, int hei) {
-            btnPOptions = new JButton(text);
-            btnPOptions.setBounds(x, y, wid, hei);
-            btnPOptions.setForeground(Color.WHITE);
-            btnPOptions.setBackground(darkBlue);
-            btnPOptions.setFont(new Font("Calibri", Font.BOLD, 18));
-            btnPOptions.setBorderPainted(false);
-            btnPOptions.setFocusPainted(false);
-            btnPOptions.setContentAreaFilled(false);
-            btnPOptions.setOpaque(true);
-            btnPOptions.setHorizontalAlignment(SwingConstants.LEFT);
-            btnPOptions.setMargin(new Insets(0, 10, 0, 0));
-            return btnPOptions;
+        btnPOptions = new JButton(text);
+        btnPOptions.setBounds(x, y, wid, hei);
+        btnPOptions.setForeground(Color.WHITE);
+        btnPOptions.setBackground(darkBlue);
+        btnPOptions.setFont(new Font("Calibri", Font.BOLD, 18));
+        btnPOptions.setBorderPainted(false);
+        btnPOptions.setFocusPainted(false);
+        btnPOptions.setContentAreaFilled(false);
+        btnPOptions.setOpaque(true);
+        btnPOptions.setHorizontalAlignment(SwingConstants.LEFT);
+        btnPOptions.setMargin(new Insets(0, 10, 0, 0));
+        return btnPOptions;
     }
     
     private JButton btnLog(String text, int x, int y, int wid, int hei, Color veryLightBlue) {
@@ -192,5 +200,4 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         btnLout.setMargin(new Insets(0, 10, 0, 0));
         return btnLout;
     }
-    
 }

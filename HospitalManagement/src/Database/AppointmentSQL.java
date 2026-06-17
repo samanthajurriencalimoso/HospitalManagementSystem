@@ -66,14 +66,15 @@ public class AppointmentSQL {
     }
 
     public static boolean updateAppointment(Appointment app) {
-        String sql = "UPDATE appointments SET patient_name = ?, doctor_name = ?, treatment = ?, appointment_date = ? WHERE appointment_id = ?";
+        String sql = "UPDATE appointments SET patient_name = ?, doctor_name = ?, treatment = ?, status = ?, appointment_date = ? WHERE appointment_id = ?";
         try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, app.getPatientName());
             stmt.setString(2, app.getDoctorName());
             stmt.setString(3, app.getTreatment());
-            stmt.setString(4, app.getAppointmentDate());
-            stmt.setString(5, app.getAppointmentId());
+            stmt.setString(4, app.getStatus());
+            stmt.setString(5, app.getAppointmentDate());
+            stmt.setString(6, app.getAppointmentId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

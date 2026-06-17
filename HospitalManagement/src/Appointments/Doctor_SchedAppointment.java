@@ -43,8 +43,7 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
     private JTableHeader tblCHdr;
     private javax.swing.table.DefaultTableModel CModel;
     private YearMonth CMonth = YearMonth.now();
-
-    private JComboBox<String> cmbTime, cmbType;
+    private JComboBox<String> cmbTime, cmbType, cmbStatus;
     private DefaultTableModel appModel;
     private LocalDate currentSelectedDate = null;
     private DateTimeFormatter formatter;
@@ -822,6 +821,18 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
                 }
 
                 String fullCombinedDate = SDate.toString() + " " + timeSelected;
+                List<Appointment> existingAppts = AppointmentSQL.getAllAppointments();
+                for (Appointment existing : existingAppts) {
+                    if (existing.getAppointmentDate() != null
+                            && existing.getAppointmentDate().equalsIgnoreCase(fullCombinedDate)
+                            && existing.getDoctorName().equalsIgnoreCase(loggedInDoctor)) {
+                        JOptionPane.showMessageDialog(this,
+                            "Time slot " + timeSelected + " on " + SDate + " is already booked.\nPlease select a different time.",
+                            "Time Conflict", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                }
+
                 Appointment newApptObj = new Appointment(generatedID, patientNameStr, loggedInDoctor, typeTreatment, "Pending", fullCombinedDate);
 
                 if (AppointmentSQL.insertAppointment(newApptObj)) {
@@ -833,7 +844,6 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
                     JOptionPane.showMessageDialog(this, "Failed to save appointment to database.");
                 }
             }
-
         } else if (ae.getSource() == btnEdit2) {
             int row = tblApp.getSelectedRow();
             if (row == -1) {
@@ -866,9 +876,13 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
             cmbType = new JComboBox<>(new String[]{"Appointment", "Follow-up", "Surgery", "Emergency"});
             cmbType.setSelectedItem(currentTreatment);
 
-            JComboBox<String> cmbStatus = new JComboBox<>(
-                new String[]{"Pending", "Confirmed", "Urgent", "Completed", "Cancelled"});
+            cmbStatus = new JComboBox<>(
+            new String[]{"Pending", "Confirmed", "Urgent", "Completed", "Cancelled"});
             cmbStatus.setSelectedItem(currentStatus);
+
+            if (currentStatus.equalsIgnoreCase("Completed")) {
+                cmbStatus.setEnabled(false);
+            }
 
             JPanel pnlEdit2 = new JPanel();
             pnlEdit2.setLayout(null);
@@ -895,25 +909,43 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
             int option = JOptionPane.showConfirmDialog(
                 this, pnlEdit2, "Edit Appointment Details", JOptionPane.OK_CANCEL_OPTION);
 
-            if (option == JOptionPane.OK_OPTION) {
+                if (option == JOptionPane.OK_OPTION) {
                 String updatedTime   = (String) cmbTime.getSelectedItem();
                 String updatedType   = (String) cmbType.getSelectedItem();
-                String updatedStatus = (String) cmbStatus.getSelectedItem();
+                String updatedStatus = currentStatus.equalsIgnoreCase("Completed") 
+                                       ? "Completed" 
+                                       : (String) cmbStatus.getSelectedItem();
                 String updatedFullDate = currentSelectedDate.toString() + " " + updatedTime;
                 String loggedInDoctor  = "Dr. " + UserManagementSQL.currentEmployee.getName();
 
-                Appointment updatePayload = new Appointment(
-                    id, pname, loggedInDoctor, updatedType, updatedStatus, updatedFullDate);
-
-                if (AppointmentSQL.updateAppointment(updatePayload)) {
-                    JOptionPane.showMessageDialog(this, "Appointment updated successfully!");
-                    loadAppointmentsFromDatabase(currentSelectedDate);
-                    renderMonthCalendar();
-                    updateCardMetrics();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Failed to update appointment.");
+                List<Appointment> existingAppts = AppointmentSQL.getAllAppointments();
+                for (Appointment existing : existingAppts) {
+                    if (existing.getAppointmentDate() != null
+                            && existing.getAppointmentDate().equalsIgnoreCase(updatedFullDate)
+                            && existing.getDoctorName().equalsIgnoreCase(loggedInDoctor)
+                            && !existing.getAppointmentId().equalsIgnoreCase(id)) {
+                        JOptionPane.showMessageDialog(this,
+                            "Time slot " + updatedTime + " on " + currentSelectedDate + " is already booked.\nPlease select a different time.",
+                            "Time Conflict", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
                 }
+
+    Appointment updatePayload = new Appointment(
+        id, pname, loggedInDoctor, updatedType, updatedStatus, updatedFullDate);
+
+    if (AppointmentSQL.updateAppointment(updatePayload)) {
+        JOptionPane.showMessageDialog(this, "Appointment updated successfully!");
+        loadAppointmentsFromDatabase(currentSelectedDate);
+        renderMonthCalendar();
+        updateCardMetrics();
+        if (row < tblApp.getRowCount()) {
+            tblApp.setRowSelectionInterval(row, row);
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Failed to update appointment.");
     }
+}
         } else if (ae.getSource() == btnCancel) {
             int row = tblApp.getSelectedRow();
             if (row != -1) {
@@ -998,13 +1030,17 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
                     lblEv.setBackground(LightRed);
                 } else if ("Completed".equalsIgnoreCase(app.getStatus())
                         || "Complete".equalsIgnoreCase(app.getStatus())) {
-                    lblEv.setBackground(Green);   // already green — now "Completed" also matches
+                    lblEv.setBackground(Green);  
                 } else if ("Cancelled".equalsIgnoreCase(app.getStatus())) {
                     lblEv.setBackground(Color.GRAY);
                 } else {
                     lblEv.setBackground(Blue);
                 }
-            }
+                lblEv.setBounds(2, y, 142, 14);
+                add(lblEv);
+                y += 16;
+                shown++;
+    }
             return this;
         }
     }

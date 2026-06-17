@@ -1,12 +1,13 @@
 package Inventory;
 
 import static Color_Palette.ColorPalette.*;
-import Database.LogisticsSQL;
+import Database.InventorySQL;
 import Database.MedicalRequestSQL;
 import Database.UserManagementSQL;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -18,24 +19,37 @@ public class RequestPanel_Doctor extends JPanel {
     private JTextField txtQty;
     private JLabel lblTItem, lblLStock, lblTValue, lbltitle, lblDT, lblCate, lblItem, lblQty, lblTitle, lblValue;
     private JTable tblInve;
-    private JButton btnAdd, btnQty, btnRemove;
-    private JComboBox<String> cmbCate, cmbItem;
+    private JButton btnAdd, btnRefresh;
+    private JComboBox<String> cmbCate;
+    private JComboBox<InventoryItemOption> cmbItem;
     private JScrollPane srcInve;
+    private String currentUserId;
 
-    private final String currentUserId;
-
-    private static final String[][] CATEGORY_ITEMS = {
-        {"Paracetamol", "Ibuprofen", "Amoxicillin", "Metformin", "Amlodipine",
-         "Omeprazole", "Cetirizine", "Azithromycin", "Losartan", "Aspirin"},
-        {"Stethoscope", "Blood Pressure Monitor", "Thermometer", "Pulse Oximeter",
-         "Otoscope", "Syringe", "IV Drip Stand", "Defibrillator", "Glucometer", "Nebulizer"},
-        {"Surgical Gloves", "Face Mask", "Gauze Pad", "Bandage Roll", "Alcohol Wipes",
-         "Cotton Balls", "Adhesive Plaster", "Tongue Depressor", "Specimen Cup", "Sterile Drape"}
-    };
+    private class InventoryItemOption {
+        int id;
+        String name;
+        int stock;
+        String expiry;
+        
+        InventoryItemOption(int id, String name, int stock, String expiry) {
+            this.id = id;
+            this.name = name;
+            this.stock = stock;
+            this.expiry = expiry;
+        }
+        
+        @Override
+        public String toString() {
+            return name + " (Exp: " + expiry + ", Stock: " + stock + ")";
+        }
+    }
 
     public RequestPanel_Doctor() {
-        this.currentUserId = UserManagementSQL.currentEmployee.getId();
-        MedicalRequestSQL.ensureRequestedByColumn();
+        if (UserManagementSQL.currentEmployee != null) {
+            currentUserId = UserManagementSQL.currentEmployee.getId();
+        } else {
+            currentUserId = "DCT001";
+        }
 
         setLayout(null);
         setBounds(0, 0, 1620, 930);
@@ -46,7 +60,7 @@ public class RequestPanel_Doctor extends JPanel {
         pnlMain.setBounds(0, 0, 1620, 930);
         add(pnlMain);
 
-        lbltitle = new JLabel("Medical Supply Request");
+        lbltitle = new JLabel("Medical Supply Request - Doctor");
         lbltitle.setFont(new Font("Calibri", Font.BOLD, 24));
         lbltitle.setForeground(Color.BLACK);
         lbltitle.setBounds(30, 20, 400, 40);
@@ -59,17 +73,17 @@ public class RequestPanel_Doctor extends JPanel {
         pnlMain.add(lblDT);
         startClockTimer();
 
-        tabItem = createTab("Total Requested Items", "0", darkBlue);
+        tabItem = createTab("Total Requests", "0", darkBlue);
         tabItem.setBounds(30, 80, 500, 100);
         pnlMain.add(tabItem);
         lblTItem = (JLabel) tabItem.getComponent(1);
 
-        tabLows = createTab("Total Received Items", "0", Yellow);
+        tabLows = createTab("Received", "0", Yellow);
         tabLows.setBounds(550, 80, 500, 100);
         pnlMain.add(tabLows);
         lblLStock = (JLabel) tabLows.getComponent(1);
 
-        tabValue = createTab("Total Pending Items", "0", mediumBlue);
+        tabValue = createTab("Pending", "0", mediumBlue);
         tabValue.setBounds(1070, 80, 500, 100);
         pnlMain.add(tabValue);
         lblTValue = (JLabel) tabValue.getComponent(1);
@@ -86,7 +100,7 @@ public class RequestPanel_Doctor extends JPanel {
         lblCate.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblCate);
 
-        cmbCate = new JComboBox<>(new String[]{"Medication", "Equipment", "Supplies"});
+        cmbCate = new JComboBox<>(new String[]{"Medicine", "Equipment", "Supplies"});
         cmbCate.setBounds(100, 26, 180, 28);
         cmbCate.addActionListener(ae -> refreshItemComboBox());
         pnlSelection.add(cmbCate);
@@ -96,7 +110,7 @@ public class RequestPanel_Doctor extends JPanel {
         lblItem.setFont(new Font("Calibri", Font.BOLD, 16));
         pnlSelection.add(lblItem);
 
-        cmbItem = new JComboBox<>(CATEGORY_ITEMS[0]);
+        cmbItem = new JComboBox<>();
         cmbItem.setBounds(355, 26, 220, 28);
         pnlSelection.add(cmbItem);
 
@@ -109,7 +123,7 @@ public class RequestPanel_Doctor extends JPanel {
         txtQty.setBounds(645, 26, 120, 28);
         pnlSelection.add(txtQty);
 
-        btnAdd = new JButton("Add Item");
+        btnAdd = new JButton("Request Item");
         btnAdd.setBackground(Green);
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFont(new Font("Calibri", Font.BOLD, 16));
@@ -118,7 +132,7 @@ public class RequestPanel_Doctor extends JPanel {
         btnAdd.addActionListener(e -> addItem());
         pnlSelection.add(btnAdd);
 
-        String[] clm = {"#", "Category", "Item", "Quantity", "Billing Amount", "Status"};
+        String[] clm = {"#", "Category", "Item", "Quantity", "Amount", "Status"};
         tblModel = new DefaultTableModel(clm, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -141,208 +155,202 @@ public class RequestPanel_Doctor extends JPanel {
         pnlBot.setBounds(30, 860, 1560, 50);
         pnlMain.add(pnlBot);
 
-        btnQty = new JButton("Add Quantity");
-        btnQty.setBackground(mediumBlue);
-        btnQty.setForeground(Color.WHITE);
-        btnQty.setFont(new Font("Calibri", Font.BOLD, 14));
-        btnQty.setFocusPainted(false);
-        btnQty.setBounds(20, 10, 130, 30);
-        btnQty.addActionListener(e -> addQuantity());
-        pnlBot.add(btnQty);
+        btnRefresh = new JButton("Refresh");
+        btnRefresh.setBounds(20, 10, 120, 30);
+        btnRefresh.setBackground(mediumBlue);
+        btnRefresh.setForeground(Color.WHITE);
+        btnRefresh.setFocusPainted(false);
+        btnRefresh.addActionListener(e -> loadRequests());
+        pnlBot.add(btnRefresh);
 
-        btnRemove = new JButton("Remove");
-        btnRemove.setBackground(LightRed);
-        btnRemove.setForeground(Color.WHITE);
-        btnRemove.setFont(new Font("Calibri", Font.BOLD, 14));
-        btnRemove.setFocusPainted(false);
-        btnRemove.setBounds(170, 10, 120, 30);
-        btnRemove.addActionListener(e -> removeItem());
-        pnlBot.add(btnRemove);
-
-        loadDataFromDatabase();
+        refreshItemComboBox();
+        loadRequests();
     }
 
     private void refreshItemComboBox() {
-        int index = cmbCate.getSelectedIndex();
-        if (index < 0) return;
         cmbItem.removeAllItems();
-        for (String item : CATEGORY_ITEMS[index]) {
-            cmbItem.addItem(item);
+        String category = cmbCate.getSelectedItem().toString();
+        
+        String sql = "SELECT id, item, quantity, expiry FROM inventory WHERE category = ? AND quantity > 0 ORDER BY expiry ASC";
+        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospitalmanagement", "root", "");
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, category);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("item");
+                int stock = rs.getInt("quantity");
+                String expiry = rs.getString("expiry");
+                cmbItem.addItem(new InventoryItemOption(id, name, stock, expiry));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        if (cmbItem.getItemCount() == 0) {
+            cmbItem.addItem(new InventoryItemOption(-1, "No items available", 0, ""));
         }
     }
 
-    private void loadDataFromDatabase() {
+    private void loadRequests() {
         tblModel.setRowCount(0);
-        List<Object[]> data = MedicalRequestSQL.getRequestsByUser(currentUserId);
-        for (Object[] row : data) {
-            tblModel.addRow(row);
+        
+        if (currentUserId == null) {
+            lblTItem.setText("0");
+            lblLStock.setText("0");
+            lblTValue.setText("0");
+            return;
         }
-        updateSummary();
+        
+        List<Object[]> requests = MedicalRequestSQL.getUserRequests(currentUserId);
+        int total = 0, received = 0, pending = 0;
+        for (Object[] req : requests) {
+            tblModel.addRow(req);
+            total++;
+            String status = (String) req[6];
+            if (status.equalsIgnoreCase("Received")) received++;
+            if (status.equalsIgnoreCase("Pending")) pending++;
+        }
+        lblTItem.setText(String.valueOf(total));
+        lblLStock.setText(String.valueOf(received));
+        lblTValue.setText(String.valueOf(pending));
     }
 
     private JPanel createTab(String title, String value, Color color) {
         tabUpdate = new JPanel();
         tabUpdate.setLayout(null);
         tabUpdate.setBackground(color);
-
         lblTitle = new JLabel(title);
         lblTitle.setFont(new Font("Calibri", Font.BOLD, 20));
         lblTitle.setForeground(Color.WHITE);
         lblTitle.setBounds(20, 20, 250, 25);
         tabUpdate.add(lblTitle);
-
         lblValue = new JLabel(value);
         lblValue.setFont(new Font("Calibri", Font.BOLD, 28));
         lblValue.setForeground(Color.WHITE);
         lblValue.setBounds(20, 50, 150, 40);
         tabUpdate.add(lblValue);
-
         return tabUpdate;
     }
 
+    private double getPriceFromInventory(int itemId) {
+        String sql = "SELECT price FROM inventory WHERE id = ?";
+        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospitalmanagement", "root", "");
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, itemId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("price");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
+    private boolean decreaseStockById(int itemId, int requestedQty) {
+        String selectSql = "SELECT quantity FROM inventory WHERE id = ?";
+        String updateSql = "UPDATE inventory SET quantity = ? WHERE id = ?";
+        
+        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospitalmanagement", "root", "")) {
+            con.setAutoCommit(false);
+            
+            int currentQty = 0;
+            try (PreparedStatement stmt = con.prepareStatement(selectSql)) {
+                stmt.setInt(1, itemId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    currentQty = rs.getInt("quantity");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Item not found in inventory!");
+                    return false;
+                }
+            }
+            
+            if (currentQty < requestedQty) {
+                JOptionPane.showMessageDialog(null, "Insufficient stock! Available: " + currentQty + ", Requested: " + requestedQty);
+                return false;
+            }
+            
+            int newQty = currentQty - requestedQty;
+            String newStatus = newQty == 0 ? "Out of Stock" : (newQty < 50 ? "Low Stock" : "Good");
+            
+            try (PreparedStatement stmt = con.prepareStatement(updateSql)) {
+                stmt.setInt(1, newQty);
+                stmt.setInt(2, itemId);
+                stmt.executeUpdate();
+            }
+            
+            con.commit();
+            return true;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private void addItem() {
-    String category = cmbCate.getSelectedItem().toString();
-    String item     = cmbItem.getSelectedItem().toString();
-    String qtyText  = txtQty.getText().trim();
-
-    if (qtyText.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please enter a quantity!", "Missing Quantity", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-
-    int qty;
-    try {
-        qty = Integer.parseInt(qtyText);
-        if (qty <= 0) {
-            JOptionPane.showMessageDialog(this, "Quantity must be greater than zero!", "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
+        InventoryItemOption selectedItem = (InventoryItemOption) cmbItem.getSelectedItem();
+        if (selectedItem == null || selectedItem.id == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a valid item!", "Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Quantity must be a valid number!", "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-
-    // Check for duplicate in the current table (optional)
-    for (int i = 0; i < tblModel.getRowCount(); i++) {
-        if (tblModel.getValueAt(i, 1).toString().equals(category) &&
-            tblModel.getValueAt(i, 2).toString().equals(item)) {
-            JOptionPane.showMessageDialog(this,
-                item + " already exists under " + category + ".\nUse 'Add Quantity' to update it instead.",
-                "Duplicate Item", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-    }
-
-    String status = "Pending";
-
-    // 1. Insert into medical_requests table (existing)
-    if (MedicalRequestSQL.addRequest(category, item, qty, status, currentUserId)) {
         
-        // 2. ALSO create a corresponding logistics order
-        boolean logisticsAdded = LogisticsSQL.insertOrderFromDoctorRequest(item, qty);
-        
-        if (logisticsAdded) {
-            loadDataFromDatabase();   // refresh doctor's own table
-            txtQty.setText("");
-            cmbCate.setSelectedIndex(0);
-            refreshItemComboBox();
-            JOptionPane.showMessageDialog(this, "Request submitted to Admin and routed to Logistics pipeline!");
-        } else {
-            // If logistics insert fails, you may want to roll back or notify admin
-            JOptionPane.showMessageDialog(this, "Medical request saved, but logistics entry failed. Please contact IT.", "Partial Error", JOptionPane.WARNING_MESSAGE);
-            loadDataFromDatabase(); // still refresh
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Database entry write transaction failed.", "Error", JOptionPane.ERROR_MESSAGE);
-    }
-}
+        String category = cmbCate.getSelectedItem().toString();
+        String itemName = selectedItem.name;
+        int itemId = selectedItem.id;
+        int currentStock = selectedItem.stock;
+        String qtyText = txtQty.getText().trim();
 
-    private void addQuantity() {
-        int viewRow = tblInve.getSelectedRow();
-        if (viewRow < 0) {
-            JOptionPane.showMessageDialog(this, "Select an item first!", "No Selection", JOptionPane.WARNING_MESSAGE);
+        if (qtyText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a quantity!", "Missing Quantity", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        int row = tblInve.convertRowIndexToModel(viewRow);
-        int targetDbId      = Integer.parseInt(tblModel.getValueAt(row, 6).toString());
-        int current         = Integer.parseInt(tblModel.getValueAt(row, 3).toString());
-        String currentStatus = tblModel.getValueAt(row, 5).toString();
-        String itemName     = tblModel.getValueAt(row, 2).toString();
-
-        String addStr = JOptionPane.showInputDialog(this,
-            "Item: " + itemName + "\nCurrent Qty: " + current + "\nAdd Qty:");
-        if (addStr == null) return;
-
-        addStr = addStr.trim();
-        if (addStr.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a quantity to add!", "Missing Quantity", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        int add;
+        int qty;
         try {
-            add = Integer.parseInt(addStr);
-            if (add <= 0) {
-                JOptionPane.showMessageDialog(this, "Quantity to add must be greater than zero!", "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
+            qty = Integer.parseInt(qtyText);
+            if (qty <= 0) {
+                JOptionPane.showMessageDialog(this, "Quantity must be greater than zero!", "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
                 return;
             }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid number!", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Quantity must be a valid number!", "Invalid Quantity", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        int newQty = current + add;
-        if (currentStatus.equals("Received")) currentStatus = "Pending";
-
-        if (MedicalRequestSQL.updateQuantity(targetDbId, newQty, currentStatus)) {
-            loadDataFromDatabase();
-            JOptionPane.showMessageDialog(this, "Quantity addition synchronized successfully.");
-        } else {
-            JOptionPane.showMessageDialog(this, "Database modification error tracking update requests.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void removeItem() {
-        int viewRow = tblInve.getSelectedRow();
-        if (viewRow < 0) {
-            JOptionPane.showMessageDialog(this, "Select an item first!", "No Selection", JOptionPane.WARNING_MESSAGE);
+        if (currentStock < qty) {
+            JOptionPane.showMessageDialog(this, "Insufficient stock!\nAvailable: " + currentStock + "\nRequested: " + qty, "Stock Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int row = tblInve.convertRowIndexToModel(viewRow);
+        double pricePerUnit = getPriceFromInventory(itemId);
+        double billingAmount = pricePerUnit * qty;
 
-        int targetDbId  = Integer.parseInt(tblModel.getValueAt(row, 6).toString());
-        String itemName = tblModel.getValueAt(row, 2).toString();
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Request Details:\nItem: " + itemName + "\nExpiry: " + selectedItem.expiry + "\nQuantity: " + qty + 
+            "\nUnit Price: ₱" + pricePerUnit + "\nTotal: ₱" + billingAmount + 
+            "\n\nConfirm request?", "Confirm Request", JOptionPane.YES_NO_OPTION);
+        
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
 
-        int confirm = JOptionPane.showConfirmDialog(this,
-            "Remove \"" + itemName + "\" from the request list?",
-            "Confirm Removal", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            if (MedicalRequestSQL.deleteRequest(targetDbId)) {
-                loadDataFromDatabase();
-                JOptionPane.showMessageDialog(this, itemName + " deleted from active records tracking system.");
+        if (decreaseStockById(itemId, qty)) {
+            String status = "Pending";
+            
+            if (MedicalRequestSQL.addRequestWithBilling(category, itemName, qty, status, currentUserId, billingAmount)) {
+                loadRequests();
+                txtQty.setText("");
+                refreshItemComboBox();
+                JOptionPane.showMessageDialog(this, "Request submitted! Stock updated. Remaining: " + (currentStock - qty));
             } else {
-                JOptionPane.showMessageDialog(this, "Database delete query execution failed.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Failed to record request in database!", "Error", JOptionPane.ERROR_MESSAGE);
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to update inventory stock!", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private void updateSummary() {
-        int total    = tblModel.getRowCount();
-        int received = 0;
-        int pending  = 0;
-
-        for (int i = 0; i < total; i++) {
-            String status = tblModel.getValueAt(i, 5).toString();
-            if (status.equalsIgnoreCase("Received")) received++;
-            if (status.equalsIgnoreCase("Pending"))  pending++;
-        }
-
-        lblTItem.setText(String.valueOf(total));
-        lblLStock.setText(String.valueOf(received));
-        lblTValue.setText(String.valueOf(pending));
     }
     
     private void startClockTimer() {

@@ -4,7 +4,7 @@ import static Color_Palette.ColorPalette.*;
 import Database.LogisticsSQL;
 import Database.InventorySQL; 
 import Models.LogisticsOrder;
-import Models.InventoryItem;   
+import Models.Item;   
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
@@ -247,7 +247,7 @@ public class LogisticsPanel extends JPanel {
                     return;
                 }
 
-                InventoryItem newItem = new InventoryItem(finalCategory, finalItem, quantity, price, calculatedStatus, finalExpiry);
+                Item newItem = new Item(finalCategory, finalItem, quantity, price, calculatedStatus, finalExpiry);
                 
                 if (InventorySQL.insertItem(newItem)) {
                     LogisticsSQL.markAsCheckedIn(targetOrder.getOrderId());

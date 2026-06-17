@@ -201,4 +201,11 @@ public class UserManagementSQL {
         }
         return doctors;
     }
+    
+    public static String getCurrentUserId() {
+        if (currentEmployee != null) {
+            return currentEmployee.getId();
+        }
+        return null;
+    }
 }
