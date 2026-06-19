@@ -41,32 +41,38 @@ public class AdminAppointmentSQL {
         return -1;
     }
 
-        public static List<DoctorAppointment> getReportsForAdmin() {
-            List<DoctorAppointment> reports = new ArrayList<>();
-            String sql = "SELECT * FROM doctor_appointment_history WHERE status='Sent to Admin' ORDER BY sent_date DESC";
-            try (Connection conn = getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(sql);
-                 ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Timestamp timestamp = rs.getTimestamp("sent_date");
-                    LocalDateTime sentDate = timestamp != null ? timestamp.toLocalDateTime() : null;
+    public static List<DoctorAppointment> getReportsForAdmin() {
+        List<DoctorAppointment> reports = new ArrayList<>();
+        String sql = "SELECT * FROM doctor_appointment_history WHERE status='Sent to Admin' ORDER BY sent_date DESC";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                Timestamp timestamp = rs.getTimestamp("sent_date");
+                LocalDateTime sentDate = timestamp != null ? timestamp.toLocalDateTime() : null;
+                Timestamp approvedTimestamp = rs.getTimestamp("approved_date");
+                LocalDateTime approvedDate = approvedTimestamp != null ? approvedTimestamp.toLocalDateTime() : null;
 
-                    DoctorAppointment report = new DoctorAppointment(
-                        rs.getInt("id"),
-                        rs.getInt("nurse_report_id"),
-                        rs.getString("patient_name"),
-                        rs.getString("patient_id"),
-                        rs.getString("report_data"),
-                        rs.getString("status"),
-                        rs.getString("sent_by"),
-                        rs.getString("sent_to"),
-                        sentDate
-                    );
-                    reports.add(report);
-                }
-            } catch (SQLException e) { e.printStackTrace(); }
-            return reports;
-        }
+                DoctorAppointment report = new DoctorAppointment(
+                    rs.getInt("id"),
+                    rs.getInt("nurse_report_id"),
+                    rs.getString("patient_name"),
+                    rs.getString("patient_id"),
+                    rs.getString("report_data"),
+                    rs.getString("doctor_notes"),
+                    rs.getString("status"),
+                    rs.getString("sent_by"),
+                    rs.getString("sent_to"),
+                    sentDate,
+                    rs.getString("approved_by"),
+                    rs.getString("approved_role"),
+                    approvedDate
+                );
+                reports.add(report);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return reports;
+    }
 
     public static DoctorAppointment getDoctorReportById(int id) {
         String sql = "SELECT * FROM doctor_appointment_history WHERE id=?";
@@ -77,18 +83,24 @@ public class AdminAppointmentSQL {
             if (rs.next()) {
                 Timestamp timestamp = rs.getTimestamp("sent_date");
                 LocalDateTime sentDate = timestamp != null ? timestamp.toLocalDateTime() : null;
-                
+                Timestamp approvedTimestamp = rs.getTimestamp("approved_date");
+                LocalDateTime approvedDate = approvedTimestamp != null ? approvedTimestamp.toLocalDateTime() : null;
+
                 DoctorAppointment report = new DoctorAppointment(
                     rs.getInt("id"),
                     rs.getInt("nurse_report_id"),
                     rs.getString("patient_name"),
                     rs.getString("patient_id"),
                     rs.getString("report_data"),
+                    rs.getString("doctor_notes"),
                     rs.getString("status"),
                     rs.getString("sent_by"),
-                    rs.getString("sent_to")
+                    rs.getString("sent_to"),
+                    sentDate,
+                    rs.getString("approved_by"),
+                    rs.getString("approved_role"),
+                    approvedDate
                 );
-                report.setSentDate(sentDate);
                 return report;
             }
         } catch (SQLException e) { e.printStackTrace(); }
@@ -117,4 +129,3 @@ public class AdminAppointmentSQL {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 }
-

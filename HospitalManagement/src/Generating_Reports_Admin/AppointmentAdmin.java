@@ -2,6 +2,7 @@ package Generating_Reports_Admin;
 
 import static Color_Palette.ColorPalette.*;
 import Database.AdminReportSQL;
+import Database.DoctorAppointmentSQL;
 import Models.DoctorAppointment;
 import java.awt.*;
 import java.awt.Toolkit;
@@ -30,7 +31,7 @@ public class AppointmentAdmin extends JPanel implements ActionListener {
 
     public AppointmentAdmin () {
         setLayout(null);
-        setBounds(0, 0, 1060, 750);
+        setBounds(0, 0, 1620, 930);
         setBackground(Color.WHITE);
 
         pnlMain = new JPanel();
@@ -40,7 +41,7 @@ public class AppointmentAdmin extends JPanel implements ActionListener {
         pnlMain.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
         scrMain = new JScrollPane(pnlMain);
-        scrMain.setBounds(0, 0, 1060, 700);
+        scrMain.setBounds(0, 0, 1060, 750);
         scrMain.setBorder(BorderFactory.createEmptyBorder());
         add(scrMain);
 
@@ -263,35 +264,37 @@ public class AppointmentAdmin extends JPanel implements ActionListener {
         lblPID.setText("Patient ID: " + patientID);
 
         recordsModel.setRowCount(0);
-        for (String line : report.getReportData().split("\n")) {
-            String[] parts = line.split(" \\| ");
-            if (parts.length >= 5) recordsModel.addRow(parts);
+        String reportData = report.getReportData();
+        if (reportData != null && !reportData.isEmpty()) {
+            for (String line : reportData.split("\n")) {
+                String[] parts = line.split(" \\| ");
+                if (parts.length >= 5) recordsModel.addRow(parts);
+            }
         }
 
         String currentStatus = report.getStatus();
         lblStatus.setText("Status: " + currentStatus);
-        lblStatus.setForeground(
-            currentStatus.equals("Sent to Admin") ? orange
-            : currentStatus.equals("Approved by Admin") ? Green
-            : LightRed
-        );
 
-        boolean pending = currentStatus.equals("Sent to Admin");
-        isApproved = currentStatus.equals("Approved by Admin");
-        btnApprove.setEnabled(pending);
-        btnReject.setEnabled(pending);
-
-        if (isApproved) {
-            lblApprovedBy.setText("✓ Already APPROVED by Admin on record.");
-            btnApprove.setText("✓ APPROVED");
-            btnApprove.setBackground(new Color(0, 150, 0));
-        } else {
+        if (currentStatus.equals("Sent to Admin")) {
+            lblStatus.setForeground(orange);
+            btnApprove.setEnabled(true);
+            btnReject.setEnabled(true);
             lblApprovedBy.setText("");
-            btnApprove.setText("✔ APPROVE REPORT");
-            btnApprove.setBackground(Green);
+        } else if (currentStatus.equals("Approved by Admin")) {
+            lblStatus.setForeground(Green);
+            btnApprove.setEnabled(false);
+            btnReject.setEnabled(false);
+            lblApprovedBy.setText("✓ FINAL APPROVED on record.");
+        } else if (currentStatus.equals("Returned by Admin")) {
+            lblStatus.setForeground(LightRed);
+            btnApprove.setEnabled(false);
+            btnReject.setEnabled(false);
+            String returnReason = DoctorAppointmentSQL.getReturnReason(selectedReportId);
+            lblApprovedBy.setText("✘ RETURNED to Doctor. Reason: " + (returnReason != null ? returnReason : "N/A"));
         }
 
-        JOptionPane.showMessageDialog(this, "Report loaded from Doctor. You can review and then Approve or Return.");
+        isApproved = currentStatus.equals("Approved by Admin");
+        updateApproveButtonState();
     }
 
     private void updateApproveButtonState() {

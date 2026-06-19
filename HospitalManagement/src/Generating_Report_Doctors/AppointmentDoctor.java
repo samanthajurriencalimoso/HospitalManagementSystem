@@ -18,35 +18,36 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
 
     private JPanel pnlMain, pnlTable;
     private JLabel lblLogo, lblHospital, lblAddress, lblContact, lblRefNo, lblDate,
-            lblPName, lblPID, lblFooter, lblStatus, lblApprovedBy;
-    private JTable tblApp, tblReceived;
-    private JScrollPane scrTable, scrReceived;
+            lblPName, lblPID, lblFooter, lblStatus, lblApprovedBy, lblNotesDisplay;
+    private JTable tblApp, tblReceived, tblReturned;
+    private JScrollPane scrTable, scrReceived, scrReturned;
     private ImageIcon imgLogo;
     private Image imgLG;
-    private JButton btnSave, btnCopy, btnEdit, btnAddRow, btnDeleteRow, btnApprove, btnNewReport, btnEditPatient, btnEditRow, btnLoadFromNurse;
-    private DefaultTableModel tableModel, receivedModel;
-    private JPanel pnlApprove, pnlReceived;
+    private JButton btnSave, btnCopy, btnEdit, btnAddRow, btnDeleteRow, btnApprove, btnNewReport, btnEditPatient, btnEditRow, btnLoadFromNurse, btnLoadReturned, btnNotes;
+    private DefaultTableModel tableModel, receivedModel, returnedModel;
+    private JPanel pnlApprove, pnlReceived, pnlReturned;
     private boolean isApproved = false;
     private String approvedByName, approvedByRole;
     private String status = "Pending";
     private String patientName = "";
     private String patientID = "";
+    private String doctorNotes = "";
     private int currentDoctorReportId = -1;
     private int selectedNurseReportId = -1;
 
     public AppointmentDoctor() {
         setLayout(null);
-        setBounds(0, 0, 160, 550);
+        setBounds(0, 0, 1060, 900);
         setBackground(Color.WHITE);
 
         pnlMain = new JPanel();
         pnlMain.setLayout(null);
-        pnlMain.setPreferredSize(new Dimension(1020, 900));
+        pnlMain.setPreferredSize(new Dimension(1020, 1000));
         pnlMain.setBackground(Color.WHITE);
         pnlMain.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
         JScrollPane scrMain = new JScrollPane(pnlMain);
-        scrMain.setBounds(0, 0, 1060, 700);
+        scrMain.setBounds(0, 0, 1060, 750);
         scrMain.setBorder(BorderFactory.createEmptyBorder());
         add(scrMain);
 
@@ -121,7 +122,6 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         lineTop.setBackground(neutralGray);
         pnlMain.add(lineTop);
 
-        
         JPanel pnlPatient = new JPanel();
         pnlPatient.setLayout(null);
         pnlPatient.setBounds(30, 145, 940, 80);
@@ -137,10 +137,10 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         lblPID.setFont(new Font("Calibri", Font.PLAIN, 14));
         lblPID.setBounds(400, 30, 200, 20);
         pnlPatient.add(lblPID);
-      
+
         pnlReceived = new JPanel();
         pnlReceived.setLayout(null);
-        pnlReceived.setBounds(30, 235, 940, 200);
+        pnlReceived.setBounds(30, 235, 940, 150);
         pnlReceived.setBorder(BorderFactory.createTitledBorder("Received from Nurse"));
         pnlMain.add(pnlReceived);
 
@@ -150,19 +150,42 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         tblReceived.setRowHeight(30);
         tblReceived.setFont(new Font("Calibri", Font.PLAIN, 12));
         scrReceived = new JScrollPane(tblReceived);
-        scrReceived.setBounds(20, 25, 900, 140);
+        scrReceived.setBounds(20, 25, 900, 90);
         pnlReceived.add(scrReceived);
 
         btnLoadFromNurse = new JButton("Load Selected Report");
-        btnLoadFromNurse.setBounds(760, 170, 160, 25);
+        btnLoadFromNurse.setBounds(760, 120, 160, 25);
         btnLoadFromNurse.setBackground(darkBlue);
         btnLoadFromNurse.setForeground(Color.WHITE);
         btnLoadFromNurse.addActionListener(this);
         pnlReceived.add(btnLoadFromNurse);
+
+        // Returned by Admin Panel
+        pnlReturned = new JPanel();
+        pnlReturned.setLayout(null);
+        pnlReturned.setBounds(30, 400, 940, 150);
+        pnlReturned.setBorder(BorderFactory.createTitledBorder("Returned by Admin"));
+        pnlMain.add(pnlReturned);
+
+        String[] clmReturned = {"ID", "Patient Name", "Patient ID", "Status", "Return Date"};
+        returnedModel = new DefaultTableModel(clmReturned, 0);
+        tblReturned = new JTable(returnedModel);
+        tblReturned.setRowHeight(30);
+        tblReturned.setFont(new Font("Calibri", Font.PLAIN, 12));
+        scrReturned = new JScrollPane(tblReturned);
+        scrReturned.setBounds(20, 25, 900, 90);
+        pnlReturned.add(scrReturned);
+
+        btnLoadReturned = new JButton("Load Returned Report");
+        btnLoadReturned.setBounds(760, 120, 160, 25);
+        btnLoadReturned.setBackground(orange);
+        btnLoadReturned.setForeground(Color.WHITE);
+        btnLoadReturned.addActionListener(this);
+        pnlReturned.add(btnLoadReturned);
         
         pnlTable = new JPanel();
         pnlTable.setLayout(null);
-        pnlTable.setBounds(30, 450, 940, 250);
+        pnlTable.setBounds(30, 565, 940, 220);
         pnlTable.setBorder(BorderFactory.createTitledBorder("Appointment Records"));
         pnlMain.add(pnlTable);
 
@@ -172,34 +195,52 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         tblApp.setRowHeight(35);
         tblApp.setFont(new Font("Calibri", Font.PLAIN, 13));
         scrTable = new JScrollPane(tblApp);
-        scrTable.setBounds(20, 30, 900, 160);
+        scrTable.setBounds(20, 30, 900, 140);
         pnlTable.add(scrTable);
         
         btnEditRow = new JButton("Edit Selected");
-        btnEditRow.setBounds(20, 200, 120, 30);
+        btnEditRow.setBounds(20, 180, 120, 30);
         btnEditRow.setBackground(darkBlue);
         btnEditRow.setForeground(Color.WHITE);
         btnEditRow.addActionListener(this);
         pnlTable.add(btnEditRow);
         
         btnAddRow = new JButton("Add Row");
-        btnAddRow.setBounds(150, 200, 100, 30);
+        btnAddRow.setBounds(150, 180, 100, 30);
         btnAddRow.setBackground(TealGreen);
         btnAddRow.setForeground(Color.WHITE);
         btnAddRow.addActionListener(this);
         pnlTable.add(btnAddRow);
         
         btnDeleteRow = new JButton("Delete Row");
-        btnDeleteRow.setBounds(260, 200, 100, 30);
+        btnDeleteRow.setBounds(260, 180, 100, 30);
         btnDeleteRow.setBackground(LightRed);
         btnDeleteRow.setForeground(Color.WHITE);
         btnDeleteRow.addActionListener(this);
         pnlTable.add(btnDeleteRow);
 
+        JLabel lblNotesTitle = new JLabel("Doctor's Notes:");
+        lblNotesTitle.setBounds(30, 800, 100, 25);
+        lblNotesTitle.setFont(new Font("Calibri", Font.BOLD, 14));
+        pnlMain.add(lblNotesTitle);
+
+        lblNotesDisplay = new JLabel(doctorNotes.isEmpty() ? "No notes added" : doctorNotes);
+        lblNotesDisplay.setBounds(140, 800, 500, 25);
+        lblNotesDisplay.setFont(new Font("Calibri", Font.PLAIN, 13));
+        lblNotesDisplay.setForeground(Color.DARK_GRAY);
+        pnlMain.add(lblNotesDisplay);
+
+        btnNotes = new JButton("Add/Edit Notes");
+        btnNotes.setBounds(660, 798, 130, 30);
+        btnNotes.setBackground(darkBlue);
+        btnNotes.setForeground(Color.WHITE);
+        btnNotes.addActionListener(this);
+        pnlMain.add(btnNotes);
        
+        // Approve Section
         pnlApprove = new JPanel();
         pnlApprove.setLayout(null);
-        pnlApprove.setBounds(30, 720, 940, 80);
+        pnlApprove.setBounds(30, 840, 940, 80);
         pnlApprove.setBackground(Color.WHITE);
         pnlMain.add(pnlApprove);
         
@@ -211,26 +252,27 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         pnlApprove.add(btnApprove);
 
         JPanel lineFooter = new JPanel();
-        lineFooter.setBounds(30, 820, 940, 2);
+        lineFooter.setBounds(30, 940, 940, 2);
         lineFooter.setBackground(neutralGray);
         pnlMain.add(lineFooter);
 
         lblApprovedBy = new JLabel("");
         lblApprovedBy.setFont(new Font("Calibri", Font.BOLD, 14));
         lblApprovedBy.setForeground(Green);
-        lblApprovedBy.setBounds(60, 840, 500, 25);
+        lblApprovedBy.setBounds(60, 960, 500, 25);
         pnlMain.add(lblApprovedBy);
 
         lblFooter = new JLabel("Total Appointments: 0 | Completed: 0 | Cancelled: 0");
         lblFooter.setFont(new Font("Calibri", Font.ITALIC, 12));
-        lblFooter.setBounds(300, 870, 400, 20);
+        lblFooter.setBounds(300, 990, 400, 20);
         pnlMain.add(lblFooter);
         
         JLabel spacer = new JLabel();
-        spacer.setBounds(0, 920, 10, 50);
+        spacer.setBounds(0, 1030, 10, 50);
         pnlMain.add(spacer);
         
         loadReceivedReports();
+        loadReturnedReports();
         updateApproveButtonState();
     }
     
@@ -239,6 +281,20 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         List<NurseAppointment> reports = NurseAppointmentSQL.getReportsForDoctor();
         for (NurseAppointment report : reports) {
             receivedModel.addRow(new Object[]{
+                report.getId(),
+                report.getPatientName(),
+                report.getPatientId(),
+                report.getStatus(),
+                report.getSentDate() != null ? report.getSentDate().toString().substring(0, 10) : "N/A"
+            });
+        }
+    }
+    
+    private void loadReturnedReports() {
+        returnedModel.setRowCount(0);
+        List<DoctorAppointment> reports = DoctorAppointmentSQL.getReturnedReportsForDoctor();
+        for (DoctorAppointment report : reports) {
+            returnedModel.addRow(new Object[]{
                 report.getId(),
                 report.getPatientName(),
                 report.getPatientId(),
@@ -261,25 +317,101 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         if (nurseReport != null) {
             patientName = nurseReport.getPatientName();
             patientID = nurseReport.getPatientId();
+            doctorNotes = "";
             lblPName.setText("Patient Name: " + patientName);
             lblPID.setText("Patient ID: " + patientID);
+            lblNotesDisplay.setText("No notes added");
+            lblNotesDisplay.setForeground(Color.DARK_GRAY);
 
-            
             String reportData = nurseReport.getReportData();
             tableModel.setRowCount(0);
-            String[] lines = reportData.split("\n");
-            for (String line : lines) {
-                String[] parts = line.split(" \\| ");
-                if (parts.length >= 5) {
-                    tableModel.addRow(parts);
+            if (reportData != null && !reportData.isEmpty()) {
+                for (String line : reportData.split("\n")) {
+                    String[] parts = line.split(" \\| ");
+                    if (parts.length >= 5) {
+                        tableModel.addRow(parts);
+                    }
                 }
             }
             
+            currentDoctorReportId = -1;
             status = "Loaded from Nurse";
             lblStatus.setText("Status: Loaded from Nurse");
             lblStatus.setForeground(orange);
             
             JOptionPane.showMessageDialog(this, "Report loaded from Nurse. You can edit and then Approve & Send to Admin.");
+        }
+    }
+    
+    private void loadReturnedReport() {
+        int row = tblReturned.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a returned report!");
+            return;
+        }
+        
+        int returnedId = (int) returnedModel.getValueAt(row, 0);
+        DoctorAppointment returnedReport = DoctorAppointmentSQL.getReportById(returnedId);
+        
+        if (returnedReport != null) {
+            patientName = returnedReport.getPatientName();
+            patientID = returnedReport.getPatientId();
+            doctorNotes = returnedReport.getDoctorNotes() != null ? returnedReport.getDoctorNotes() : "";
+            lblPName.setText("Patient Name: " + patientName);
+            lblPID.setText("Patient ID: " + patientID);
+            
+            if (!doctorNotes.isEmpty()) {
+                lblNotesDisplay.setText(doctorNotes);
+                lblNotesDisplay.setForeground(Color.BLACK);
+            } else {
+                lblNotesDisplay.setText("No notes added");
+                lblNotesDisplay.setForeground(Color.DARK_GRAY);
+            }
+
+            String returnReason = DoctorAppointmentSQL.getReturnReason(returnedId);
+            if (returnReason != null && !returnReason.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Report was returned by Admin.\nReason: " + returnReason, "Returned Report", JOptionPane.WARNING_MESSAGE);
+            }
+            
+            String reportData = returnedReport.getReportData();
+            tableModel.setRowCount(0);
+            if (reportData != null && !reportData.isEmpty()) {
+                for (String line : reportData.split("\n")) {
+                    String[] parts = line.split(" \\| ");
+                    if (parts.length >= 5) {
+                        tableModel.addRow(parts);
+                    }
+                }
+            }
+            
+            currentDoctorReportId = returnedId;
+            selectedNurseReportId = returnedReport.getNurseReportId();
+            status = "Returned - Needs Revision";
+            lblStatus.setText("Status: Returned by Admin - Needs Revision");
+            lblStatus.setForeground(LightRed);
+            
+            JOptionPane.showMessageDialog(this, "Report loaded. Please revise based on Admin feedback, then Save and Send to Admin again.");
+        }
+    }
+    
+    private void editNotes() {
+        JTextArea txtNotes = new JTextArea(doctorNotes, 10, 40);
+        txtNotes.setLineWrap(true);
+        txtNotes.setWrapStyleWord(true);
+        JScrollPane scrollPane = new JScrollPane(txtNotes);
+        scrollPane.setPreferredSize(new Dimension(500, 200));
+        
+        int result = JOptionPane.showConfirmDialog(this, scrollPane, "Doctor's Notes", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            doctorNotes = txtNotes.getText();
+            if (doctorNotes.isEmpty()) {
+                lblNotesDisplay.setText("No notes added");
+                lblNotesDisplay.setForeground(Color.DARK_GRAY);
+            } else {
+                lblNotesDisplay.setText(doctorNotes);
+                lblNotesDisplay.setForeground(Color.BLACK);
+            }
+            JOptionPane.showMessageDialog(this, "Notes saved! Remember to click Save to store in database.");
         }
     }
     
@@ -338,7 +470,7 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         }
     }
     
-    private void saveReport() {
+    public void saveReport() {
         if (!isReportComplete()) {
             JOptionPane.showMessageDialog(this, "❌ Cannot save report! Please fill all required fields first.", "Incomplete Report", JOptionPane.ERROR_MESSAGE);
             return;
@@ -348,19 +480,26 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         
         if (currentDoctorReportId == -1) {
             DoctorAppointment report = new DoctorAppointment(selectedNurseReportId, patientName, patientID, reportData, "Doctor", "Admin");
+            report.setDoctorNotes(doctorNotes);
             currentDoctorReportId = DoctorAppointmentSQL.saveReport(report);
             if (currentDoctorReportId > 0) {
                 status = "Saved";
                 lblStatus.setText("Status: Saved");
                 lblStatus.setForeground(Green);
-                JOptionPane.showMessageDialog(this, "✓ Report saved to database!");
+                JOptionPane.showMessageDialog(this, "✓ Report saved to database! ID: " + currentDoctorReportId);
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to save report!");
             }
         } else {
-            DoctorAppointmentSQL.updateReportData(currentDoctorReportId, reportData, "");
-            status = "Saved";
-            lblStatus.setText("Status: Saved");
-            lblStatus.setForeground(Green);
-            JOptionPane.showMessageDialog(this, "✓ Report updated!");
+            boolean success = DoctorAppointmentSQL.updateReportData(currentDoctorReportId, reportData, doctorNotes);
+            if (success) {
+                status = "Saved";
+                lblStatus.setText("Status: Saved");
+                lblStatus.setForeground(Green);
+                JOptionPane.showMessageDialog(this, "✓ Report and notes updated in database!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to update report!");
+            }
         }
         updateApproveButtonState();
     }
@@ -369,6 +508,7 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         StringBuilder data = new StringBuilder("=== ETRIAGE HOSPITAL APPOINTMENT HISTORY (DOCTOR) ===\n\n");
         data.append("Patient Name: " + (patientName.isEmpty() ? "[EMPTY]" : patientName) + "\n");
         data.append("Patient ID: " + (patientID.isEmpty() ? "[EMPTY]" : patientID) + "\n\n");
+        data.append("Doctor's Notes: " + (doctorNotes.isEmpty() ? "None" : doctorNotes) + "\n\n");
         data.append("Date\t\tDoctor\t\tDepartment\t\tStatus\t\tRemarks\n");
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             for (int j = 0; j < tableModel.getColumnCount(); j++) {
@@ -424,6 +564,18 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
                 lblApprovedBy.setText("✓ APPROVED by: " + name + " (Doctor) on " + java.time.LocalDate.now());
                 updateApproveButtonState();
                 JOptionPane.showMessageDialog(this, "Report Approved and Sent to Admin!");
+
+                currentDoctorReportId = -1;
+                patientName = "";
+                patientID = "";
+                doctorNotes = "";
+                tableModel.setRowCount(0);
+                lblPName.setText("Patient Name: ________");
+                lblPID.setText("Patient ID: ________");
+                lblNotesDisplay.setText("No notes added");
+                
+                loadReceivedReports();
+                loadReturnedReports();
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to send report to Admin!");
             }
@@ -551,11 +703,13 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
     }
     
     private void newReport() {
-        int confirm = JOptionPane.showConfirmDialog(this, "Create new blank report? Unsaved data will be lost.");
+        int confirm = JOptionPane.showConfirmDialog(this, "Create new blank report? Unsaved data will be lost.", "New Report", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             tableModel.setRowCount(0);
             patientName = "";
             patientID = "";
+            doctorNotes = "";
+            lblNotesDisplay.setText("No notes added");
             currentDoctorReportId = -1;
             selectedNurseReportId = -1;
             isApproved = false;
@@ -582,5 +736,7 @@ public class AppointmentDoctor extends JPanel implements ActionListener {
         else if (e.getSource() == btnAddRow) addRow();
         else if (e.getSource() == btnDeleteRow) deleteRow();
         else if (e.getSource() == btnLoadFromNurse) loadReportFromNurse();
+        else if (e.getSource() == btnLoadReturned) loadReturnedReport();
+        else if (e.getSource() == btnNotes) editNotes();
     }
 }

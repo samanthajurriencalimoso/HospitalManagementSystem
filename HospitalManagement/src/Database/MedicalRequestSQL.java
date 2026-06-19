@@ -16,7 +16,7 @@ public class MedicalRequestSQL {
     }
 
     public static boolean addRequestWithBilling(String category, String item, int qty, String status, String requestedBy, double billingAmount) {
-        String query = "INSERT INTO medical_requests (category, item_name, quantity, status, requested_by, billing_amount, request_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO medical_requests (category, item_name, quantity, status, requested_by, billing_amount, requested_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, category);
@@ -35,7 +35,8 @@ public class MedicalRequestSQL {
 
     public static List<Object[]> getAllPendingRequests() {
         List<Object[]> list = new ArrayList<>();
-        String query = "SELECT request_id, category, item_name, quantity, requested_by, billing_amount, status, request_date FROM medical_requests WHERE status = 'Pending' ORDER BY request_date ASC";
+        String query = "SELECT request_id, category, item_name, quantity, requested_by, billing_amount, status, requested_at " +
+                       "FROM medical_requests WHERE status = 'Pending' ORDER BY requested_at ASC";
         try (Connection conn = getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(query)) {
@@ -50,7 +51,7 @@ public class MedicalRequestSQL {
                     rs.getString("requested_by"),
                     String.format("₱%.2f", rs.getDouble("billing_amount")),
                     rs.getString("status"),
-                    rs.getTimestamp("request_date")
+                    rs.getTimestamp("requested_at")
                 });
             }
         } catch (SQLException e) {
@@ -59,9 +60,10 @@ public class MedicalRequestSQL {
         return list;
     }
 
+
     public static List<Object[]> getUserRequests(String userId) {
         List<Object[]> list = new ArrayList<>();
-        String query = "SELECT request_id, category, item_name, quantity, billing_amount, status, request_date FROM medical_requests WHERE requested_by = ? ORDER BY request_date DESC";
+        String query = "SELECT request_id, category, item_name, quantity, billing_amount, status, requested_at FROM medical_requests WHERE requested_by = ? ORDER BY requested_at DESC";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, userId);
@@ -76,7 +78,7 @@ public class MedicalRequestSQL {
                     rs.getInt("quantity"),
                     String.format("₱%.2f", rs.getDouble("billing_amount")),
                     rs.getString("status"),
-                    rs.getTimestamp("request_date")
+                    rs.getTimestamp("requested_at")
                 });
             }
         } catch (SQLException e) {

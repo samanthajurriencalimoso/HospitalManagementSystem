@@ -28,10 +28,10 @@ public class RequestPanel_Admin extends JPanel {
         pnlMain.setBounds(0, 0, 1620, 930);
         add(pnlMain);
 
-        lbltitle = new JLabel("Admin - Request Management");
+        lbltitle = new JLabel("Request Management");
         lbltitle.setFont(new Font("Calibri", Font.BOLD, 28));
         lbltitle.setForeground(Color.BLACK);
-        lbltitle.setBounds(30, 20, 400, 40);
+        lbltitle.setBounds(30, 20, 300, 50);
         pnlMain.add(lbltitle);
 
         lblDT = new JLabel();

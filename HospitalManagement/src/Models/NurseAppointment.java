@@ -11,9 +11,13 @@ public class NurseAppointment {
     private String sentBy;
     private String sentTo;
     private LocalDateTime sentDate;
+    private String approvedBy;
+    private String approvedRole;
+    private LocalDateTime approvedDate;
 
     public NurseAppointment(int id, String patientName, String patientId, String reportData, 
-                            String status, String sentBy, String sentTo, LocalDateTime sentDate) {
+                            String status, String sentBy, String sentTo, LocalDateTime sentDate,
+                            String approvedBy, String approvedRole, LocalDateTime approvedDate) {
         this.id = id;
         this.patientName = patientName;
         this.patientId = patientId;
@@ -22,11 +26,14 @@ public class NurseAppointment {
         this.sentBy = sentBy;
         this.sentTo = sentTo;
         this.sentDate = sentDate;
+        this.approvedBy = approvedBy;
+        this.approvedRole = approvedRole;
+        this.approvedDate = approvedDate;
     }
 
     public NurseAppointment(String patientName, String patientId, String reportData, 
                             String sentBy, String sentTo) {
-        this(0, patientName, patientId, reportData, "Draft", sentBy, sentTo, null);
+        this(0, patientName, patientId, reportData, "Draft", sentBy, sentTo, null, null, null, null);
     }
 
     public int getId() { return id; }
@@ -45,5 +52,10 @@ public class NurseAppointment {
     public void setSentTo(String sentTo) { this.sentTo = sentTo; }
     public LocalDateTime getSentDate() { return sentDate; }
     public void setSentDate(LocalDateTime sentDate) { this.sentDate = sentDate; }
-
+    public String getApprovedBy() { return approvedBy; }
+    public void setApprovedBy(String approvedBy) { this.approvedBy = approvedBy; }
+    public String getApprovedRole() { return approvedRole; }
+    public void setApprovedRole(String approvedRole) { this.approvedRole = approvedRole; }
+    public LocalDateTime getApprovedDate() { return approvedDate; }
+    public void setApprovedDate(LocalDateTime approvedDate) { this.approvedDate = approvedDate; }
 }

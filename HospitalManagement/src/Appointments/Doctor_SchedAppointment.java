@@ -34,7 +34,7 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
                    lblMonth, lblTDAp, lblValue, lblDay, lblMore, lblEv, lblTime2, lblPID, lblPName;
     private ImageIcon imgPatient;
     private Image imgPat;
-    private JButton btnRecord, btnNote, btnEdit, btnPrev, btnNext, btnNew, btnEdit2, btnCancel, btnMedHistory;
+    private JButton btnRecord, btnNote, btnEdit, btnPrev, btnNext, btnNew, btnEdit2, btnCancel, btnMedHistory, btnCompleteReport;
     private JTextArea txtNote;
     private JTextField PID, txtStatus;
     private JComboBox<String> PName;
@@ -401,6 +401,15 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
         btnCancel.setFocusPainted(false);
         pnlSched.add(btnCancel);
 
+        btnCompleteReport = new JButton("Complete & Send to Report");
+        btnCompleteReport.setBounds(360, 745, 200, 35);
+        btnCompleteReport.setFont(new Font("Calibri", Font.BOLD, 13));
+        btnCompleteReport.setBackground(Green);
+        btnCompleteReport.setForeground(Color.WHITE);
+        btnCompleteReport.setFocusPainted(false);
+        btnCompleteReport.addActionListener(this);
+        pnlSched.add(btnCompleteReport);
+
         btnRecord.addActionListener(this);
         btnNote.addActionListener(this);
         btnEdit.addActionListener(this);
@@ -410,6 +419,7 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
         btnEdit2.addActionListener(this);
         btnCancel.addActionListener(this);
         btnMedHistory.addActionListener(this);
+        btnCompleteReport.addActionListener(this);
 
         updateCardMetrics();
     }
@@ -446,7 +456,8 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
         for (Appointment app : allAppts) {
             if (app.getAppointmentDate() != null
                     && app.getAppointmentDate().startsWith(dateTargetStr)
-                    && app.getDoctorName().equalsIgnoreCase(loggedInDoctor)) {
+                    && app.getDoctorName().equalsIgnoreCase(loggedInDoctor)
+                    && !"Complete".equalsIgnoreCase(app.getStatus())) {
                 filtered.add(app);
             }
         }
@@ -466,40 +477,14 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
                     .substring(app.getAppointmentDate().indexOf(" ") + 1);
             }
 
-            String displayStatus = app.getStatus();
-            String nurseStatus = getStatusFromNurseReport(app.getPatientName());
-            if (nurseStatus != null && nurseStatus.equalsIgnoreCase("Completed")) {
-                displayStatus = "Completed";
-                if (!app.getStatus().equalsIgnoreCase("Completed")) {
-                    Appointment synced = new Appointment(
-                        app.getAppointmentId(),
-                        app.getPatientName(),
-                        app.getDoctorName(),
-                        app.getTreatment(),
-                        "Completed",
-                        app.getAppointmentDate()
-                    );
-                    AppointmentSQL.updateAppointment(synced);
-                }
-            }
-
             appModel.addRow(new Object[]{
                 extractedTime,
                 app.getAppointmentId(),
                 app.getPatientName(),
                 app.getTreatment(),
-                displayStatus
+                app.getStatus()
             });
         }
-    }
-    
-    private String getStatusFromNurseReport(String patientName) {
-        List<Models.NurseAppointment> reports = Database.NurseAppointmentSQL.getReportsByPatient(patientName);
-        if (reports != null && !reports.isEmpty()) {
-            Models.NurseAppointment latest = reports.get(reports.size() - 1);
-            return latest.getStatus();
-        }
-        return null;
     }
 
     private String parseTimeTo24hr(String time) {
@@ -527,6 +512,99 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
         lblTItem.setText(String.valueOf(totalToday));
         lblSup.setText(String.valueOf(pending));
         lblMed.setText(String.valueOf(urgent));
+    }
+
+    private void completeAppointmentAndCreateReport() {
+        int row = tblApp.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an appointment first.");
+            return;
+        }
+
+        String selectedAppId = (String) appModel.getValueAt(row, 1);
+        String selectedPName = (String) appModel.getValueAt(row, 2);
+        String selectedTime = (String) appModel.getValueAt(row, 0);
+        String selectedType = (String) appModel.getValueAt(row, 3);
+
+        String currentStatus = (String) appModel.getValueAt(row, 4);
+        if ("Complete".equalsIgnoreCase(currentStatus)) {
+            JOptionPane.showMessageDialog(this, "This appointment is already completed.");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+            this, 
+            "Mark appointment for " + selectedPName + " as COMPLETE and create a report?\nThis will send it to the Doctor's Generating Reports section.", 
+            "Complete Appointment", 
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        Appointment targetApp = null;
+        List<Appointment> allAppts = AppointmentSQL.getAllAppointments();
+        for (Appointment a : allAppts) {
+            if (a.getAppointmentId().equals(selectedAppId)) {
+                targetApp = a;
+                break;
+            }
+        }
+
+        if (targetApp == null) {
+            JOptionPane.showMessageDialog(this, "Could not find the appointment in the database.");
+            return;
+        }
+
+        boolean statusUpdated = AppointmentSQL.updateStatus(targetApp.getAppointmentId(), "Complete");
+        
+        if (statusUpdated) {
+            String patientId = "N/A";
+            List<Patient> patients = PatientManagementSQL.getAllPatients();
+            for (Patient p : patients) {
+                if (p.getName().equalsIgnoreCase(selectedPName)) {
+                    patientId = p.getId();
+                    break;
+                }
+            }
+
+            String loggedInDoctor = "Dr. " + UserManagementSQL.currentEmployee.getName();
+            
+            String reportData = targetApp.getAppointmentDate() + " | " + 
+                               targetApp.getDoctorName() + " | " + 
+                               targetApp.getTreatment() + " | " + 
+                               "Complete | " + 
+                               "Completed by Doctor on " + LocalDate.now();
+
+            DoctorAppointment doctorReport = new DoctorAppointment(
+                0, 
+                selectedPName,
+                patientId,
+                reportData,
+                loggedInDoctor,
+                "Admin"
+            );
+            
+            int savedId = DoctorAppointmentSQL.saveReport(doctorReport);
+            
+            if (savedId > 0) {
+                loadAppointmentsFromDatabase(currentSelectedDate);
+                renderMonthCalendar();
+                updateCardMetrics();
+                
+                JOptionPane.showMessageDialog(
+                    this, 
+                    "Appointment marked as COMPLETE!\nReport created in Doctor Reports (ID: " + savedId + ")\nGo to Doctor Reports → Appointment History to review and send to Admin.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+            } else {
+                JOptionPane.showMessageDialog(this, "Report created but failed to save to database. Appointment status was updated.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to update appointment status.");
+        }
     }
 
     public enum EventType {
@@ -586,7 +664,9 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if (ae.getSource() == btnRecord) {
+        if (ae.getSource() == btnCompleteReport) {
+            completeAppointmentAndCreateReport();
+        } else if (ae.getSource() == btnRecord) {
             int row = tblApp.getSelectedRow();
             if (row == -1) {
                 JOptionPane.showMessageDialog(this, "Please select an appointment first.");
@@ -617,7 +697,6 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
                 JOptionPane.showMessageDialog(this, "Selected appointment has incomplete data.");
                 return;
             }
-            // Set current patient before navigating
             PatientManagementSQL.setCurrentPatient(pname, "");
             par = this.getParent();
             par.removeAll();
@@ -969,81 +1048,98 @@ public class Doctor_SchedAppointment extends JPanel implements ActionListener {
 
     class CalendarCellRenderer extends JPanel implements TableCellRenderer {
 
-        @Override
-        public Component getTableCellRendererComponent(
-            JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+    @Override
+    public Component getTableCellRendererComponent(
+        JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
 
-            removeAll();
-            setLayout(null);
-            setBackground(isSelected ? lightBlue : Color.WHITE);
-            setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, LightGray));
+        removeAll();
+        setLayout(null);
+        setBackground(isSelected ? lightBlue : Color.WHITE);
+        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, LightGray));
 
-            String raw = value == null ? "" : value.toString().trim();
-            if (raw.isEmpty() || !raw.matches("\\d+")) return this;
+        String raw = value == null ? "" : value.toString().trim();
+        if (raw.isEmpty() || !raw.matches("\\d+")) return this;
 
-            lblDay = new JLabel(raw);
-            lblDay.setFont(new Font("Calibri", Font.PLAIN, 13));
-            lblDay.setForeground(Color.DARK_GRAY);
-            lblDay.setBounds(115, 4, 30, 16);
-            add(lblDay);
+        lblDay = new JLabel(raw);
+        lblDay.setFont(new Font("Calibri", Font.PLAIN, 13));
+        lblDay.setForeground(Color.DARK_GRAY);
+        lblDay.setBounds(115, 4, 30, 16);
+        add(lblDay);
 
-            date = CMonth.atDay(Integer.parseInt(raw));
-            String cellDateString = date.toString();
+        date = CMonth.atDay(Integer.parseInt(raw));
+        String cellDateString = date.toString();
 
-            List<Appointment> dbAppointments = AppointmentSQL.getAllAppointments();
-            List<Appointment> filteredMatches = new ArrayList<>();
+        List<Appointment> dbAppointments = AppointmentSQL.getAllAppointments();
+        List<Appointment> filteredMatches = new ArrayList<>();
 
-            String loggedInDoctor = "Dr. " + UserManagementSQL.currentEmployee.getName();
-            for (Appointment a : dbAppointments) {
-                if (a.getAppointmentDate() != null
-                        && a.getAppointmentDate().startsWith(cellDateString)
-                        && a.getDoctorName().equalsIgnoreCase(loggedInDoctor)) {
-                    filteredMatches.add(a);
-                }
+        String loggedInDoctor = "Dr. " + UserManagementSQL.currentEmployee.getName();
+        for (Appointment a : dbAppointments) {
+            if (a.getAppointmentDate() != null
+                    && a.getAppointmentDate().startsWith(cellDateString)
+                    && a.getDoctorName().equalsIgnoreCase(loggedInDoctor)
+                    && !"Complete".equalsIgnoreCase(a.getStatus())) {
+                filteredMatches.add(a);
             }
-
-            filteredMatches.sort((a, b) -> {
-                String timeA = a.getAppointmentDate().contains(" ") ? a.getAppointmentDate().substring(a.getAppointmentDate().indexOf(" ") + 1) : "12:00 AM";
-                String timeB = b.getAppointmentDate().contains(" ") ? b.getAppointmentDate().substring(b.getAppointmentDate().indexOf(" ") + 1) : "12:00 AM";
-                return parseTimeTo24hr(timeA).compareTo(parseTimeTo24hr(timeB));
-            });
-
-            int y = 24;
-            int shown = 0;
-            for (Appointment app : filteredMatches) {
-                if (shown >= 3) {
-                    lblMore = new JLabel("  +" + (filteredMatches.size() - 3) + " more");
-                    lblMore.setFont(new Font("Calibri", Font.PLAIN, 11));
-                    lblMore.setForeground(Color.DARK_GRAY);
-                    lblMore.setBounds(2, y, 142, 14);
-                    add(lblMore);
-                    break;
-                }
-                String displayTime = "09:00 AM";
-                if (app.getAppointmentDate().contains(" ")) {
-                    displayTime = app.getAppointmentDate().substring(app.getAppointmentDate().indexOf(" ") + 1);
-                }
-                lblEv = new JLabel("  " + displayTime + " " + app.getPatientName());
-                lblEv.setFont(new Font("Calibri", Font.PLAIN, 11));
-                lblEv.setOpaque(true);
-                if ("Urgent".equalsIgnoreCase(app.getStatus())) {
-                    lblEv.setBackground(LightRed);
-                } else if ("Completed".equalsIgnoreCase(app.getStatus())
-                        || "Complete".equalsIgnoreCase(app.getStatus())) {
-                    lblEv.setBackground(Green);  
-                } else if ("Cancelled".equalsIgnoreCase(app.getStatus())) {
-                    lblEv.setBackground(Color.GRAY);
-                } else {
-                    lblEv.setBackground(Blue);
-                }
-                lblEv.setBounds(2, y, 142, 14);
-                add(lblEv);
-                y += 16;
-                shown++;
-    }
-            return this;
         }
+
+        filteredMatches.sort((a, b) -> {
+            String timeA = a.getAppointmentDate().contains(" ") ? a.getAppointmentDate().substring(a.getAppointmentDate().indexOf(" ") + 1) : "12:00 AM";
+            String timeB = b.getAppointmentDate().contains(" ") ? b.getAppointmentDate().substring(b.getAppointmentDate().indexOf(" ") + 1) : "12:00 AM";
+            return parseTimeTo24hr(timeA).compareTo(parseTimeTo24hr(timeB));
+        });
+
+        int y = 24;
+        int shown = 0;
+        for (Appointment app : filteredMatches) {
+            if (shown >= 3) {
+                lblMore = new JLabel("  +" + (filteredMatches.size() - 3) + " more");
+                lblMore.setFont(new Font("Calibri", Font.PLAIN, 11));
+                lblMore.setForeground(Color.DARK_GRAY);
+                lblMore.setBounds(2, y, 142, 14);
+                add(lblMore);
+                break;
+            }
+            String displayTime = "09:00 AM";
+            if (app.getAppointmentDate().contains(" ")) {
+                displayTime = app.getAppointmentDate().substring(app.getAppointmentDate().indexOf(" ") + 1);
+            }
+            
+            lblEv = new JLabel("  " + displayTime + " " + app.getPatientName());
+            lblEv.setFont(new Font("Calibri", Font.PLAIN, 11));
+            lblEv.setOpaque(true);
+            lblEv.setForeground(Color.WHITE);
+            
+            if ("Urgent".equalsIgnoreCase(app.getStatus())) {
+                lblEv.setBackground(LightRed);
+            } else if ("Confirmed".equalsIgnoreCase(app.getStatus())) {
+                lblEv.setBackground(darkBlue);
+            } else if ("Pending".equalsIgnoreCase(app.getStatus())) {
+                lblEv.setBackground(Yellow);
+                lblEv.setForeground(Color.BLACK);
+            } else if ("Completed".equalsIgnoreCase(app.getStatus())) {
+                lblEv.setBackground(Green);
+            } else if ("Cancelled".equalsIgnoreCase(app.getStatus())) {
+                lblEv.setBackground(Color.GRAY);
+            } else {
+                lblEv.setBackground(Blue);
+            }
+            lblEv.setBounds(2, y, 142, 14);
+            add(lblEv);
+            y += 16;
+            shown++;
+        }
+        
+        if (!filteredMatches.isEmpty()) {
+            JPanel dotIndicator = new JPanel();
+            dotIndicator.setBackground(Blue);
+            dotIndicator.setBounds(150, 90, 10, 10);
+            dotIndicator.setOpaque(true);
+            add(dotIndicator);
+        }
+        
+        return this;
     }
+}
     
     private void startClockTimer() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy | hh:mm:ss a");

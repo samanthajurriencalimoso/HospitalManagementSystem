@@ -83,33 +83,6 @@ public class Admin_Reports extends JPanel implements ActionListener{
         lblPrev.setForeground(Color.BLACK);
         pnlB.add(lblPrev);
         
-        btnMComplete = new JButton("Complete");
-        btnMComplete.setBounds(350, 25, 100, 30);
-        btnMComplete.setBackground(Green);
-        btnMComplete.setForeground(Color.WHITE);
-        btnMComplete.addActionListener(e -> setStatus("Complete"));
-        pnlB.add(btnMComplete);
-        
-        btnMIncomplete = new JButton("Incomplete");
-        btnMIncomplete.setBounds(470, 25, 100, 30);
-        btnMIncomplete.setBackground(Yellow);
-        btnMIncomplete.setForeground(Color.BLACK);
-        btnMIncomplete.addActionListener(e -> setStatus("Incomplete"));
-        pnlB.add(btnMIncomplete);
-        
-        btnMMissing = new JButton("Missing");
-        btnMMissing.setBounds(590, 25, 100, 30);
-        btnMMissing.setBackground(LightRed);
-        btnMMissing.setForeground(Color.WHITE);
-        btnMMissing.addActionListener(e -> setStatus("Missing"));
-        pnlB.add(btnMMissing);
-        
-        lblStatus = new JLabel("Status: No report selected");
-        lblStatus.setBounds(850, 25, 250, 28);
-        lblStatus.setFont(new Font("Calibri", Font.BOLD, 20));
-        lblStatus.setForeground(Color.RED);
-        pnlB.add(lblStatus);
-        
         pnlPrev = new JPanel();
         pnlPrev.setLayout(null);
         pnlPrev.setBackground(Color.WHITE);
@@ -122,73 +95,6 @@ public class Admin_Reports extends JPanel implements ActionListener{
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         pnlB.add(scroll);
-        
-        btnEdit = new JButton("Edit Report");
-        btnEdit.setBounds(500, 730, 150, 35);
-        btnEdit.setFont(new Font("Calibri", Font.BOLD, 16));
-        btnEdit.setBackground(darkBlue);
-        btnEdit.setForeground(Color.WHITE);
-        btnEdit.addActionListener(e -> editReport());
-        pnlB.add(btnEdit);
-        
-        btnSend = new JButton("Send to Patient");
-        btnSend.setBounds(660, 730, 170, 35);
-        btnSend.setFont(new Font("Calibri", Font.BOLD, 16));
-        btnSend.setBackground(Green);
-        btnSend.setForeground(Color.BLACK);
-        btnSend.addActionListener(e -> sendReport());
-        pnlB.add(btnSend);
-        
-        btnEx = new JButton("Export (CSV)");
-        btnEx.setBounds(840, 730, 180, 35);
-        btnEx.setFont(new Font("Calibri", Font.BOLD, 16));
-        btnEx.setBackground(LightGray);
-        btnEx.setForeground(Color.BLACK);
-        btnEx.addActionListener(e -> exportReport());
-        pnlB.add(btnEx);
-    }
-
-    private void setStatus(String status) {
-        if (currentReportType.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please select a report first!");
-            return;
-        }
-        lblStatus.setText("Status: " + status);
-        
-        switch (status) {
-            case "Complete": lblStatus.setForeground(Green); break;
-            case "Incomplete": lblStatus.setForeground(new Color(255, 140, 0)); break;
-            case "Missing": lblStatus.setForeground(Color.RED); break;
-            default: lblStatus.setForeground(Color.BLACK);
-        }
-    }
-    
-    private void editReport() {
-        if (currentReportType.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please select a report first!");
-            return;
-        }
-        JOptionPane.showMessageDialog(this, "Edit Report: " + currentReportType);
-    }
-    
-    private void sendReport() {
-        if (currentReportType.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please select a report first!");
-            return;
-        } else if (currentReportType.equals("Staff Attendance")) {
-            JOptionPane.showMessageDialog(this, "Staff Attendance Report cannot be sent to patients.");
-            return;
-        }
-        setStatus("Sent to Patient");
-        JOptionPane.showMessageDialog(this, "Sending " + currentReportType + " to Patient for approval...");
-    }
-    
-    private void exportReport() {
-        if (currentReportType.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please select a report first!");
-            return;
-        }
-        JOptionPane.showMessageDialog(this, "Exporting " + currentReportType + "...");
     }
     
     @Override
@@ -196,15 +102,12 @@ public class Admin_Reports extends JPanel implements ActionListener{
         if (ae.getSource() == btnPrescriptionReport) {
             pnlPrev.removeAll();
             AppointmentAdmin pr = new AppointmentAdmin();
-            pr.setBounds(0, 0, 1020, 820);
-            pnlPrev.setPreferredSize(new Dimension(1020, 820));
+            pr.setBounds(0, 0, 1060, 800);
+            pnlPrev.setPreferredSize(new Dimension(1060, 850));
             pnlPrev.add(pr);
             pnlPrev.revalidate();
             pnlPrev.repaint();
             scroll.getVerticalScrollBar().setValue(0);
-            currentReportType = "Appointment History";
-            lblStatus.setText("Status: Incomplete");
-            lblStatus.setForeground(new Color(255, 140, 0));
             lblType.setText(" > Appointment History");
             btnSend.setVisible(true);
         }

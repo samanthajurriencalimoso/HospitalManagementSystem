@@ -4,9 +4,12 @@ import static Color_Palette.ColorPalette.*;
 import Database.AppointmentSQL;
 import Database.PatientManagementSQL;
 import Database.UserManagementSQL;
+import Database.NurseAppointmentSQL;
 import MedicalHistory.MedicalHistory_Nurse;
 import Models.Appointment;
 import Models.Patient;
+import Models.NurseAppointment;
+import Models.Employee;
 import Patient_Information.PatientInfo_Nurse;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.*;
@@ -31,7 +35,7 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
                    lblMonth, lblTDAp, lblValue, lblDay, lblMore, lblEv, lblTime2, lblPID, lblPName, lblDocSelect;
     private ImageIcon imgPatient;
     private Image imgPat;
-    private JButton btnRecord, btnNote, btnMedHistory, btnEdit, btnPrev, btnNext, btnNew, btnEdit2, btnCancel;
+    private JButton btnRecord, btnNote, btnMedHistory, btnEdit, btnPrev, btnNext, btnNew, btnEdit2, btnCancel, btnCompleteReport;
     private JTextArea txtNote;
     private JTextField PID, txtStatus;
     private JComboBox PName;
@@ -50,6 +54,7 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
     private LocalDate FMonth, date, SDate, today, selectedDate;
     private Container par;
     private EventType et;
+    private Map<String, String> doctorDepartmentCache = new HashMap<>();
     
     public Nurse_SchedAppointment() {
         setLayout(null);
@@ -294,8 +299,10 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
                                 if (appt.getAppointmentDate().contains(" ")) {
                                     displayTime = appptTimeExtractor(appt.getAppointmentDate());
                                 }
+                                String dept = getDoctorDepartment(appt.getDoctorName());
+                                
                                 appModel.addRow(new Object[]{
-                                    displayTime, appt.getDoctorName(), appt.getPatientName(), appt.getTreatment(), appt.getStatus()
+                                    displayTime, appt.getDoctorName(), appt.getPatientName(), dept, appt.getStatus()
                                 });
                             }
                         }
@@ -319,7 +326,7 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
         lblTDAp.setForeground(Color.BLACK);
         pnlSched.add(lblTDAp);
         
-        String[] clmAppointments = {"Time","Doctor","Patient Name","Type","Status"};
+        String[] clmAppointments = {"Time","Doctor","Patient Name","Department","Status"};
 
         appModel = new DefaultTableModel(clmAppointments, 0) {
             @Override
@@ -346,7 +353,7 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
                     String selectedTime   = (String) appModel.getValueAt(row, 0);
                     String selectedDoctor = (String) appModel.getValueAt(row, 1);
                     String selectedPName  = (String) appModel.getValueAt(row, 2);
-                    String selectedType   = (String) appModel.getValueAt(row, 3);
+                    String selectedDept   = (String) appModel.getValueAt(row, 3);
                     String selectedStatus = (String) appModel.getValueAt(row, 4);
 
                     String patientId = "N/A";
@@ -390,7 +397,7 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
                     lblPatient.setText("Patient Name: " + selectedPName);
                     lblPatID.setText("Patient ID: " + patientId);
                     lblComp.setText("Care Need: " + condition);
-                    lblType.setText("Task: " + selectedType);
+                    lblType.setText("Department: " + selectedDept);
 
                     lblTime.setText("Time: " + selectedTime);
                     lblRoom.setText("Room: " + room);
@@ -430,6 +437,15 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
         btnCancel.setForeground(Color.WHITE);
         btnCancel.setFocusPainted(false);
         pnlSched.add(btnCancel);
+
+        btnCompleteReport = new JButton("Complete & Send to Report");
+        btnCompleteReport.setBounds(360, 745, 200, 35);
+        btnCompleteReport.setFont(new Font("Calibri", Font.BOLD, 13));
+        btnCompleteReport.setBackground(Green);
+        btnCompleteReport.setForeground(Color.WHITE);
+        btnCompleteReport.setFocusPainted(false);
+        btnCompleteReport.addActionListener(this);
+        pnlSched.add(btnCompleteReport);
         
         btnRecord.addActionListener(this);
         btnNote.addActionListener(this);
@@ -440,45 +456,131 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
         btnNew.addActionListener(this);
         btnEdit2.addActionListener(this);
         btnCancel.addActionListener(this);
+        btnCompleteReport.addActionListener(this);
+    }
+    
+    private String getDoctorDepartment(String doctorName) {
+        if (doctorDepartmentCache.containsKey(doctorName)) {
+            return doctorDepartmentCache.get(doctorName);
+        }
+
+        try {
+            List<Employee> employees = UserManagementSQL.getAllEmployees();
+            for (Employee emp : employees) {
+                String fullName = emp.getName();
+                if (doctorName.contains(emp.getName()) || emp.getName().contains(doctorName.replace("Dr. ", ""))) {
+                    String dept = emp.getDepartment();
+                    if (dept != null && !dept.isEmpty()) {
+                        doctorDepartmentCache.put(doctorName, dept);
+                        return dept;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        doctorDepartmentCache.put(doctorName, "General Medicine");
+        return "General Medicine";
     }
     
     private void loadAppointmentsFromDatabase() {
         appointmentsMap.clear();
         java.util.List<Appointment> list = AppointmentSQL.getAllAppointments();
         for (Appointment app : list) {
+            if ("Complete".equalsIgnoreCase(app.getStatus())) {
+                continue;
+            }
             String fullDate = app.getAppointmentDate();
             String datePart = fullDate.split(" ")[0]; 
             appointmentsMap.computeIfAbsent(datePart, k -> new ArrayList<>()).add(app);
         }
     }
     
-    private void saveNurseCompletionReport(String patientName, String doctorName) {
-        String patientId = "N/A";
-        java.util.List<Patient> patients = PatientManagementSQL.getAllPatients();
-        for (Patient p : patients) {
-            if (p.getName().equalsIgnoreCase(patientName)) {
-                patientId = p.getId();
-                break;
+    private void completeAppointmentAndCreateReport() {
+        int row = tblApp.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an appointment first.");
+            return;
+        }
+
+        String selectedPName = (String) appModel.getValueAt(row, 2);
+        String selectedDoctor = (String) appModel.getValueAt(row, 1);
+        String selectedTime = (String) appModel.getValueAt(row, 0);
+        String selectedDept = (String) appModel.getValueAt(row, 3);
+
+        int confirm = JOptionPane.showConfirmDialog(
+            this, 
+            "Mark appointment for " + selectedPName + " as COMPLETE and create a report?\nThis will send it to the Generating Reports section.", 
+            "Complete Appointment", 
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+        
+        Appointment targetApp = null;
+        if (currentSelectedDate != null && appointmentsMap.containsKey(currentSelectedDate.toString())) {
+            for (Appointment a : appointmentsMap.get(currentSelectedDate.toString())) {
+                if (a.getPatientName().equalsIgnoreCase(selectedPName) && 
+                    appptTimeExtractor(a.getAppointmentDate()).equals(selectedTime)) {
+                    targetApp = a;
+                    break;
+                }
             }
         }
 
-        String loggedInNurse = UserManagementSQL.currentEmployee.getName() + " (Nurse)";
-        String reportData = "Vitals completed by nurse on " + LocalDate.now().toString();
+        if (targetApp == null) {
+            JOptionPane.showMessageDialog(this, "Could not find the appointment in the database.");
+            return;
+        }
 
-        Models.NurseAppointment nurseReport = new Models.NurseAppointment(
-            0,             
-            patientName,
-            patientId,
-            reportData,
-            "Completed",
-            loggedInNurse,
-            doctorName,
-            null
-        );
+        if (AppointmentSQL.updateStatus(targetApp.getAppointmentId(), "Complete")) {
+            
+            String patientId = "N/A";
+            String reportData = targetApp.getAppointmentDate() + " | " + 
+                               targetApp.getDoctorName() + " | " + 
+                               selectedDept + " | " + 
+                               "Complete | " + 
+                               "Completed by Nurse on " + LocalDate.now();
 
-        int savedId = Database.NurseAppointmentSQL.saveReport(nurseReport);
-        if (savedId > 0) {
-            Database.NurseAppointmentSQL.sendToDoctor(savedId);
+            List<Patient> patients = PatientManagementSQL.getAllPatients();
+            for (Patient p : patients) {
+                if (p.getName().equalsIgnoreCase(selectedPName)) {
+                    patientId = p.getId();
+                    break;
+                }
+            }
+
+            String loggedInNurse = "Nurse " + UserManagementSQL.currentEmployee.getName();
+
+            NurseAppointment nurseReport = new NurseAppointment(
+                selectedPName,
+                patientId,
+                reportData,
+                loggedInNurse,
+                selectedDoctor
+            );
+            
+            int savedId = NurseAppointmentSQL.saveReport(nurseReport);
+            
+            if (savedId > 0) {
+                loadAppointmentsFromDatabase();
+                renderMonthCalendar();
+                refreshAppointmentsTable();
+                
+                JOptionPane.showMessageDialog(
+                    this, 
+                    "Appointment marked as COMPLETE!\nReport created in Nurse Reports (ID: " + savedId + ")\nGo to Nurse Reports → Appointment History to review and send to Doctor.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to create report, but appointment status was updated.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to update appointment status.");
         }
     }
 
@@ -564,7 +666,9 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if (ae.getSource() == btnRecord) {
+        if (ae.getSource() == btnCompleteReport) {
+            completeAppointmentAndCreateReport();
+        } else if (ae.getSource() == btnRecord) {
             int row = tblApp.getSelectedRow();
             if (row == -1) {
                 JOptionPane.showMessageDialog(this, "Please select an appointment first.");
@@ -621,23 +725,6 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
                 java.util.List<Patient> allPatients = PatientManagementSQL.getAllPatients();
                 for (Patient p : allPatients) {
                     if (p.getName().equalsIgnoreCase(selectedPName)) {
-                        Patient updated = new Patient(
-                            p.getId(), p.getName(), p.getRoom(), p.getDoctor(), p.getNurse(),
-                            p.getStatus(), p.getAdmissionDate(), p.getAddress(), p.getContactNumber(),
-                            p.getAllergies(), p.getConditions(), p.getMedications(), p.getSurgicalHistory(),
-                            p.getFamilyHistory(), p.getLifestyleDiet(), p.getMedicalManagement(),
-                            p.getDietBreakfast(), p.getDietLunch(), p.getDietDinner(),
-                            p.getEmergencyName(), p.getEmergencyRel(), p.getEmergencyNum(),
-                            p.getBloodType(), p.getAge(), newNotes, p.getBp(), p.getHr(),
-                            p.getTemp(), p.getSpo2(), p.getGeneralAppearance(), p.getCardiovascular(),
-                            p.getRespiratory(), p.getNeurological()
-                        );
-                        if (PatientManagementSQL.updatePatientProfile(updated)) {
-                            JOptionPane.showMessageDialog(this, "Notes saved for " + selectedPName + ".");
-                            txtNote.setEditable(false);
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Failed to save notes.", "Error", JOptionPane.ERROR_MESSAGE);
-                        }
                         break;
                     }
                 }
@@ -706,19 +793,19 @@ public class Nurse_SchedAppointment extends JPanel implements ActionListener {
                     break;
                 }
                 String displayTime = appptTimeExtractor(app.getAppointmentDate());
-                lblEv = new JLabel("  " + displayTime + " " + app.getPatientName());
+                String dept = getDoctorDepartment(app.getDoctorName());
+                lblEv = new JLabel("  " + displayTime + " " + app.getPatientName() + " (" + dept + ")");
                 lblEv.setFont(new Font("Calibri", Font.PLAIN, 11));
                 lblEv.setOpaque(true);
-                    if ("Urgent".equalsIgnoreCase(app.getStatus())) {
-                        lblEv.setBackground(LightRed);
-                    } else if ("Completed".equalsIgnoreCase(app.getStatus())
-                            || "Complete".equalsIgnoreCase(app.getStatus())) {
-                        lblEv.setBackground(Green);
-                    } else if ("Cancelled".equalsIgnoreCase(app.getStatus())) {
-                        lblEv.setBackground(Color.GRAY);
-                    } else {
-                        lblEv.setBackground(Blue);
-                    }
+                if ("Urgent".equalsIgnoreCase(app.getStatus())) {
+                    lblEv.setBackground(LightRed);
+                } else if ("Complete".equalsIgnoreCase(app.getStatus())) {
+                    lblEv.setBackground(Green);
+                } else if ("Cancelled".equalsIgnoreCase(app.getStatus())) {
+                    lblEv.setBackground(Color.GRAY);
+                } else {
+                    lblEv.setBackground(Blue);
+                }
                 lblEv.setForeground(Color.WHITE);
                 lblEv.setBounds(2, y, 142, 14);
                 add(lblEv);

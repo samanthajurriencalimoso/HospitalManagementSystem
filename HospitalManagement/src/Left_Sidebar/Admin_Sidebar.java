@@ -64,12 +64,12 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
         
         pnlInventory = new JPanel();
         pnlInventory.setLayout(null);
-        pnlInventory.setBounds(40, 545, 240, 90);
+        pnlInventory.setBounds(40, 545, 240, 130);
         pnlInventory.setBackground(darkBlue);
         pnlInventory.setVisible(false);
         leftSidebar.add(pnlInventory);
         
-        String[] InventoryOptions = {"Inventory Management", "Logistics"};
+        String[] InventoryOptions = {"Inventory Management", "Logistics", "Request Management"};
         int InveOption = 0;
         for (String InventoryOp : InventoryOptions) {
             btnPOptions = btnInve(InventoryOp, 0, InveOption, 240, 35);
@@ -79,16 +79,15 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
                 btnIManagement = btnPOptions;
             } else if (InventoryOp.equals("Logistics")) {
                 btnLogistics = btnPOptions;
+            } else if (InventoryOp.equals("Request Management")) {
+                btnRequestManagement = btnPOptions;
             }
             
             InveOption += 40;
         }
         
-        btnReport = btnSideBar("Report & Documents", 20, 650, 260, 45, darkBlue);
+        btnReport = btnSideBar("Report & Documents", 20, 560, 260, 45, darkBlue);
         leftSidebar.add(btnReport);
-        
-        btnRequestManagement = btnSideBar("Request Management", 20, 710, 260, 45, darkBlue);
-        leftSidebar.add(btnRequestManagement);
         
         btnInventory.addActionListener(e -> {
             boolean expandIOptions = !pnlInventory.isVisible();
@@ -96,14 +95,12 @@ public class Admin_Sidebar extends JPanel implements ActionListener{
             
             if (expandIOptions) {
                 btnInventory.setText("Inventory -");
-                pnlInventory.setBounds(40, 545, 240, 90);
-                btnReport.setBounds(20, 650, 260, 45);
-                btnRequestManagement.setBounds(20, 710, 260, 45);
+                pnlInventory.setBounds(40, 545, 240, 130);
+                btnReport.setBounds(20, 690, 260, 45);
             } else {
                 btnInventory.setText("Inventory +");
                 pnlInventory.setVisible(false);
                 btnReport.setBounds(20, 560, 260, 45);
-                btnRequestManagement.setBounds(20, 620, 260, 45);
             }
             leftSidebar.repaint();
             leftSidebar.revalidate();
